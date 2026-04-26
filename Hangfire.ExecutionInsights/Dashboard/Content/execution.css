@@ -1,0 +1,27 @@
+#grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 15px;
+}
+
+.row-line {
+    display: flex;
+    align-items: center;
+}
+
+.label {
+    width: 120px;
+    font-weight: bold;
+}
+
+.cell {
+    width: 10px;
+    height: 10px;
+    margin-right: 2px;
+}
+
+.success { background: #28a745; }
+.fail { background: #dc3545; }
+.processing { background: #007bff; }
+.idle { background: #e9ecef; }
