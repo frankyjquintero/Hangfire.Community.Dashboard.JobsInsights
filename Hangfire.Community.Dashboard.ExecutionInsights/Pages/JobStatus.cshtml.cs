@@ -107,61 +107,63 @@ WriteLiteral("\r\n                <small class=\"text-muted\">");
             
             #line default
             #line hidden
-WriteLiteral("</small>\r\n                <button class=\"btn btn-default btn-sm pull-right\" id=\"r" +
-"efresh-btn\">\r\n                    <span class=\"glyphicon glyphicon-refresh\"></sp" +
-"an> Refresh\r\n                </button>\r\n            </h3>\r\n            <hr />\r\n " +
-"       </div>\r\n    </div>\r\n\r\n    <!-- VISTA RESUMEN -->\r\n    <div id=\"summary-vi" +
-"ew\">\r\n        <div class=\"row\">\r\n            <div class=\"col-md-3\">\r\n           " +
-"     <select class=\"form-control input-sm\" id=\"summary-state-filter\">\r\n         " +
-"           <option value=\"\">All States</option>\r\n                    <option val" +
-"ue=\"Succeeded\">Success</option>\r\n                    <option value=\"Failed\">Fail" +
-"ed</option>\r\n                </select>\r\n            </div>\r\n            <div cla" +
-"ss=\"col-md-2\">\r\n                <button class=\"btn btn-primary btn-sm\" id=\"summa" +
-"ry-apply\">Apply</button>\r\n            </div>\r\n        </div>\r\n        <div class" +
-"=\"row\" style=\"margin-top:15px;\">\r\n            <div class=\"col-md-12\">\r\n         " +
-"       <div class=\"table-responsive\">\r\n                    <table class=\"table t" +
-"able-striped table-hover\" id=\"summary-table\">\r\n                        <thead>\r\n" +
-"                            <tr>\r\n                                <th>Job Type</" +
-"th>\r\n                                <th>Last 15 Executions</th>\r\n              " +
-"                  <th>Success</th>\r\n                                <th>Failed</" +
-"th>\r\n                                <th>Last Execution</th>\r\n                  " +
-"              <th>Actions</th>\r\n                            </tr>\r\n             " +
-"           </thead>\r\n                        <tbody id=\"summary-body\">\r\n        " +
-"                    <tr>\r\n                                <td colspan=\"6\" class=" +
-"\"text-center text-muted\">Loading...</td>\r\n                            </tr>\r\n   " +
-"                     </tbody>\r\n                    </table>\r\n                </d" +
-"iv>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <!-- VISTA DETALLE (F" +
-"ull History) -->\r\n    <div id=\"detail-view\" style=\"display:none;\">\r\n        <div" +
-" class=\"row\">\r\n            <div class=\"col-md-12\">\r\n                <button clas" +
-"s=\"btn btn-link btn-sm\" id=\"back-to-summary\">\r\n                    <span class=\"" +
-"glyphicon glyphicon-chevron-left\"></span> Back to Summary\r\n                </but" +
-"ton>\r\n                <h4>Full History: <span id=\"detail-jobtype-label\"></span><" +
-"/h4>\r\n            </div>\r\n        </div>\r\n        <div class=\"row\">\r\n           " +
-" <div class=\"col-md-3\">\r\n                <select class=\"form-control input-sm\" i" +
-"d=\"detail-state-filter\">\r\n                    <option value=\"\">All States</optio" +
-"n>\r\n                    <option value=\"Succeeded\">Success</option>\r\n            " +
-"        <option value=\"Failed\">Failed</option>\r\n                </select>\r\n     " +
-"       </div>\r\n            <div class=\"col-md-2\">\r\n                <button class" +
-"=\"btn btn-primary btn-sm\" id=\"detail-apply\">Apply</button>\r\n            </div>\r\n" +
-"        </div>\r\n        <div class=\"row\" style=\"margin-top:15px;\">\r\n            " +
-"<div class=\"col-md-12\">\r\n                <div class=\"table-responsive\">\r\n       " +
-"             <table class=\"table table-striped table-hover\" id=\"detail-table\">\r\n" +
-"                        <thead>\r\n                            <tr>\r\n             " +
-"                   <th>Job ID</th>\r\n                                <th>Queue</t" +
-"h>\r\n                                <th>Last State</th>\r\n                       " +
-"         <th>Last Execution</th>\r\n                                <th>Error</th>" +
-"\r\n                                <th>Actions</th>\r\n                            " +
-"</tr>\r\n                        </thead>\r\n                        <tbody id=\"deta" +
-"il-body\">\r\n                            <tr>\r\n                                <td" +
-" colspan=\"6\" class=\"text-center text-muted\">Loading...</td>\r\n                   " +
-"         </tr>\r\n                        </tbody>\r\n                    </table>\r\n" +
-"                </div>\r\n                <div id=\"detail-pagination\" class=\"text-" +
-"right\"></div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n<script" +
-">\r\n    (function() {\r\n        var summaryApiUrl = \'");
+WriteLiteral("</small>\r\n                <button class=\"btn btn-default btn-sm\" id=\"refresh-btn\"" +
+">\r\n                    <span class=\"glyphicon glyphicon-refresh\"></span> Refresh" +
+"\r\n                </button>\r\n                <button class=\"btn btn-default btn-" +
+"sm\" id=\"toggle-auto-refresh\">\r\n                    <span class=\"glyphicon glyphi" +
+"con-pause\"></span> Pause\r\n                </button>\r\n            </h3>\r\n        " +
+"    <hr />\r\n        </div>\r\n    </div>\r\n\r\n    <!-- VISTA RESUMEN -->\r\n    <div i" +
+"d=\"summary-view\">\r\n        <div class=\"row\">\r\n            <div class=\"col-md-3\">" +
+"\r\n                <select class=\"form-control input-sm\" id=\"summary-state-filter" +
+"\">\r\n                    <option value=\"\">All States</option>\r\n                  " +
+"  <option value=\"Succeeded\">Success</option>\r\n                    <option value=" +
+"\"Failed\">Failed</option>\r\n                </select>\r\n            </div>\r\n       " +
+"     <div class=\"col-md-2\">\r\n                <button class=\"btn btn-primary btn-" +
+"sm\" id=\"summary-apply\">Apply</button>\r\n            </div>\r\n        </div>\r\n     " +
+"   <div class=\"row\" style=\"margin-top:15px;\">\r\n            <div class=\"col-md-12" +
+"\">\r\n                <div class=\"table-responsive\">\r\n                    <table c" +
+"lass=\"table table-striped table-hover\" id=\"summary-table\">\r\n                    " +
+"    <thead>\r\n                            <tr>\r\n                                <" +
+"th>Job Type</th>\r\n                                <th>Last 15 Executions</th>\r\n " +
+"                               <th>Success</th>\r\n                               " +
+" <th>Failed</th>\r\n                                <th>Last Execution</th>\r\n     " +
+"                           <th>Actions</th>\r\n                            </tr>\r\n" +
+"                        </thead>\r\n                        <tbody id=\"summary-bod" +
+"y\">\r\n                            <tr>\r\n                                <td colsp" +
+"an=\"6\" class=\"text-center text-muted\">Loading...</td>\r\n                         " +
+"   </tr>\r\n                        </tbody>\r\n                    </table>\r\n      " +
+"          </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <!-- VIS" +
+"TA DETALLE (Full History) -->\r\n    <div id=\"detail-view\" style=\"display:none;\">\r" +
+"\n        <div class=\"row\">\r\n            <div class=\"col-md-12\">\r\n               " +
+" <button class=\"btn btn-link btn-sm\" id=\"back-to-summary\">\r\n                    " +
+"<span class=\"glyphicon glyphicon-chevron-left\"></span> Back to Summary\r\n        " +
+"        </button>\r\n                <h4>Full History: <span id=\"detail-jobtype-la" +
+"bel\"></span></h4>\r\n            </div>\r\n        </div>\r\n        <div class=\"row\">" +
+"\r\n            <div class=\"col-md-3\">\r\n                <select class=\"form-contro" +
+"l input-sm\" id=\"detail-state-filter\">\r\n                    <option value=\"\">All " +
+"States</option>\r\n                    <option value=\"Succeeded\">Success</option>\r" +
+"\n                    <option value=\"Failed\">Failed</option>\r\n                </s" +
+"elect>\r\n            </div>\r\n            <div class=\"col-md-2\">\r\n                " +
+"<button class=\"btn btn-primary btn-sm\" id=\"detail-apply\">Apply</button>\r\n       " +
+"     </div>\r\n        </div>\r\n        <div class=\"row\" style=\"margin-top:15px;\">\r" +
+"\n            <div class=\"col-md-12\">\r\n                <div class=\"table-responsi" +
+"ve\">\r\n                    <table class=\"table table-striped table-hover\" id=\"det" +
+"ail-table\">\r\n                        <thead>\r\n                            <tr>\r\n" +
+"                                <th>Job ID</th>\r\n                               " +
+" <th>Queue</th>\r\n                                <th>Last State</th>\r\n          " +
+"                      <th>Last Execution</th>\r\n                                <" +
+"th>Error</th>\r\n                                <th>Actions</th>\r\n               " +
+"             </tr>\r\n                        </thead>\r\n                        <t" +
+"body id=\"detail-body\">\r\n                            <tr>\r\n                      " +
+"          <td colspan=\"6\" class=\"text-center text-muted\">Loading...</td>\r\n      " +
+"                      </tr>\r\n                        </tbody>\r\n                 " +
+"   </table>\r\n                </div>\r\n                <div id=\"detail-pagination\"" +
+" class=\"text-right\"></div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</di" +
+"v>\r\n\r\n<script>\r\n    (function() {\r\n        var summaryApiUrl = \'");
 
 
             
-            #line 131 "..\..\Pages\JobStatus.cshtml"
+            #line 134 "..\..\Pages\JobStatus.cshtml"
                         Write(summaryApiUrl);
 
             
@@ -171,127 +173,141 @@ WriteLiteral("\';\r\n        var detailApiUrl = \'");
 
 
             
-            #line 132 "..\..\Pages\JobStatus.cshtml"
+            #line 135 "..\..\Pages\JobStatus.cshtml"
                        Write(detailApiUrl);
 
             
             #line default
             #line hidden
 WriteLiteral("\';\r\n        var allDetailJobs = [];\r\n        var currentJobType = null;\r\n        " +
-"var currentPage = 1;\r\n        var pageSize = 20;\r\n\r\n        // Acceso a elemento" +
-"s del DOM con métodos nativos\r\n        function $(id) { return document.getEleme" +
-"ntById(id); }\r\n        function on(selector, event, handler) {\r\n            var " +
-"els = document.querySelectorAll(selector);\r\n            for (var i = 0; i < els." +
-"length; i++) {\r\n                els[i].addEventListener(event, handler);\r\n      " +
-"      }\r\n        }\r\n\r\n        function init() {\r\n            loadSummary();\r\n\r\n " +
-"           $(\'refresh-btn\').addEventListener(\'click\', function() {\r\n            " +
-"    if ($(\'summary-view\').style.display !== \'none\') loadSummary();\r\n            " +
-"    else if (currentJobType) loadDetail(currentJobType);\r\n            });\r\n     " +
-"       $(\'summary-apply\').addEventListener(\'click\', loadSummary);\r\n            $" +
-"(\'detail-apply\').addEventListener(\'click\', function() {\r\n                if (cur" +
-"rentJobType) loadDetail(currentJobType);\r\n            });\r\n            $(\'back-t" +
-"o-summary\').addEventListener(\'click\', showSummary);\r\n        }\r\n\r\n        functi" +
-"on showSummary() {\r\n            $(\'summary-view\').style.display = \'block\';\r\n    " +
-"        $(\'detail-view\').style.display = \'none\';\r\n        }\r\n\r\n        function " +
-"loadSummary() {\r\n            var state = $(\'summary-state-filter\').value;\r\n     " +
-"       var url = summaryApiUrl + (state ? \'?state=\' + encodeURIComponent(state) " +
-": \'\');\r\n\r\n            $(\'summary-body\').innerHTML = \'<tr><td colspan=\"6\" class=\"" +
-"text-center text-muted\">Loading...</td></tr>\';\r\n            fetch(url)\r\n        " +
-"        .then(function(r) { return r.json(); })\r\n                .then(function(" +
-"data) {\r\n                    renderSummary(data.summaries || []);\r\n             " +
-"   })\r\n                .catch(function(err) {\r\n                    $(\'summary-bo" +
-"dy\').innerHTML = \'<tr><td colspan=\"6\" class=\"text-center text-danger\">Error load" +
-"ing summary: \' + err.message + \'</td></tr>\';\r\n                });\r\n        }\r\n\r\n" +
-"        function renderSummary(summaries) {\r\n            var tbody = $(\'summary-" +
-"body\');\r\n            if (!summaries.length) {\r\n                tbody.innerHTML =" +
-" \'<tr><td colspan=\"6\" class=\"text-center text-muted\">No job types found.</td></t" +
-"r>\';\r\n                return;\r\n            }\r\n\r\n            var html = \'\';\r\n    " +
-"        summaries.forEach(function(s) {\r\n                var dots = \'\';\r\n       " +
-"         if (s.recentExecutions) {\r\n                    s.recentExecutions.forEa" +
-"ch(function(exec) {\r\n                        var cls = exec.state ? exec.state.t" +
-"oLowerCase() : \'\';\r\n                        var title = exec.state + \' at \' + ne" +
-"w Date(exec.timestamp).toLocaleTimeString();\r\n                        dots += \'<" +
-"span class=\"state-dot \' + cls + \'\" title=\"\' + title + \'\"></span>\';\r\n            " +
-"        });\r\n                }\r\n\r\n                var lastExec = s.lastExecution" +
-" ? new Date(s.lastExecution).toLocaleString() : \'N/A\';\r\n\r\n                html +" +
-"= \'<tr>\';\r\n                html += \'<td>\' + escapeHtml(s.jobType) + \'</td>\';\r\n  " +
-"              html += \'<td>\' + dots + \'</td>\';\r\n                html += \'<td><sp" +
-"an class=\"badge\">\' + s.successCount + \'</span></td>\';\r\n                html += \'" +
-"<td><span class=\"badge\">\' + s.failedCount + \'</span></td>\';\r\n                htm" +
-"l += \'<td>\' + lastExec + \'</td>\';\r\n                html += \'<td><button class=\"b" +
-"tn btn-xs btn-default view-history\" data-jobtype=\"\' + escapeHtml(s.jobType) + \'\"" +
-">View Full History</button></td>\';\r\n                html += \'</tr>\';\r\n          " +
-"  });\r\n            tbody.innerHTML = html;\r\n\r\n            // Asociar eventos a l" +
-"os nuevos botones\r\n            on(\'.view-history\', \'click\', function() {\r\n      " +
-"          var jobType = this.getAttribute(\'data-jobtype\');\r\n                show" +
-"Detail(jobType);\r\n            });\r\n        }\r\n\r\n        function showDetail(jobT" +
-"ype) {\r\n            currentJobType = jobType;\r\n            currentPage = 1;\r\n   " +
-"         $(\'summary-view\').style.display = \'none\';\r\n            $(\'detail-view\')" +
-".style.display = \'block\';\r\n            $(\'detail-jobtype-label\').textContent = j" +
-"obType;\r\n            loadDetail(jobType);\r\n        }\r\n\r\n        function loadDet" +
-"ail(jobType) {\r\n            var state = $(\'detail-state-filter\').value;\r\n       " +
-"     var url = detailApiUrl + \'?jobType=\' + encodeURIComponent(jobType);\r\n      " +
-"      if (state) url += \'&state=\' + encodeURIComponent(state);\r\n\r\n            $(" +
-"\'detail-body\').innerHTML = \'<tr><td colspan=\"6\" class=\"text-center text-muted\">L" +
-"oading...</td></tr>\';\r\n            $(\'detail-pagination\').innerHTML = \'\';\r\n\r\n   " +
-"         fetch(url)\r\n                .then(function(r) { return r.json(); })\r\n  " +
-"              .then(function(data) {\r\n                    allDetailJobs = data.j" +
-"obs || [];\r\n                    // Orden descendente por fecha de última ejecuci" +
-"ón (más reciente primero)\r\n                    allDetailJobs.sort(function(a, b)" +
-" {\r\n                        return new Date(b.lastTimestamp) - new Date(a.lastTi" +
-"mestamp);\r\n                    });\r\n                    currentPage = 1;\r\n      " +
-"              renderDetailPage();\r\n                })\r\n                .catch(fu" +
-"nction(err) {\r\n                    $(\'detail-body\').innerHTML = \'<tr><td colspan" +
-"=\"6\" class=\"text-center text-danger\">Error loading detail: \' + err.message + \'</" +
-"td></tr>\';\r\n                });\r\n        }\r\n\r\n        function renderDetailPage(" +
-") {\r\n            var total = allDetailJobs.length;\r\n            var start = (cur" +
-"rentPage - 1) * pageSize;\r\n            var end = start + pageSize;\r\n            " +
-"var pageJobs = allDetailJobs.slice(start, end);\r\n            renderDetail(pageJo" +
-"bs, total);\r\n        }\r\n\r\n        function renderDetail(jobs, total) {\r\n        " +
-"    var tbody = $(\'detail-body\');\r\n            var paginationDiv = $(\'detail-pag" +
-"ination\');\r\n            if (!jobs.length) {\r\n                tbody.innerHTML = \'" +
-"<tr><td colspan=\"6\" class=\"text-center text-muted\">No jobs found for this type.<" +
-"/td></tr>\';\r\n                paginationDiv.innerHTML = \'\';\r\n                retu" +
-"rn;\r\n            }\r\n\r\n            var html = \'\';\r\n            jobs.forEach(funct" +
-"ion(j) {\r\n                var shortId = j.jobId ? j.jobId.substring(0, 8) : \'\';\r" +
-"\n                var stateClass = j.lastState ? j.lastState.toLowerCase() : \'\';\r" +
-"\n                var badgeClass = stateClass === \'succeeded\' ? \'label label-succ" +
-"ess\' : \r\n                                 stateClass === \'failed\' ? \'label label" +
-"-danger\' : \'label label-default\';\r\n                var ts = j.lastTimestamp ? ne" +
-"w Date(j.lastTimestamp).toLocaleString() : \'\';\r\n                var error = j.er" +
-"rorMessage ? \'<span class=\"text-danger\" style=\"font-size:11px;\">\' + escapeHtml(j" +
-".errorMessage.substring(0, 80)) + \'</span>\' : \'\';\r\n\r\n                html += \'<t" +
-"r>\';\r\n                html += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" targe" +
-"t=\"_blank\">#\' + shortId + \'</a></td>\';\r\n                html += \'<td>\' + escapeH" +
-"tml(j.queue) + \'</td>\';\r\n                html += \'<td><span class=\"\' + badgeClas" +
-"s + \'\">\' + j.lastState + \'</span></td>\';\r\n                html += \'<td>\' + ts + " +
-"\'</td>\';\r\n                html += \'<td>\' + error + \'</td>\';\r\n                htm" +
-"l += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank\" class=\"btn btn" +
-"-xs btn-default\">History</a></td>\';\r\n                html += \'</tr>\';\r\n         " +
-"   });\r\n            tbody.innerHTML = html;\r\n\r\n            // Controles de pagin" +
-"ación\r\n            var totalPages = Math.ceil(total / pageSize);\r\n            va" +
-"r startCount = (currentPage - 1) * pageSize + 1;\r\n            var endCount = Mat" +
-"h.min(currentPage * pageSize, total);\r\n            var pagHtml = \'<div class=\"cl" +
-"earfix\">\';\r\n            pagHtml += \'<span class=\"pull-left\">Showing \' + startCou" +
-"nt + \' - \' + endCount + \' of \' + total + \' jobs</span>\';\r\n            pagHtml +=" +
-" \'<div class=\"pull-right\">\';\r\n            if (currentPage > 1) {\r\n              " +
-"  pagHtml += \'<button class=\"btn btn-default btn-xs\" id=\"prev-page\">Previous</bu" +
-"tton> \';\r\n            }\r\n            if (currentPage < totalPages) {\r\n          " +
-"      pagHtml += \'<button class=\"btn btn-default btn-xs\" id=\"next-page\">Next</bu" +
-"tton>\';\r\n            }\r\n            pagHtml += \'</div></div>\';\r\n            pagi" +
-"nationDiv.innerHTML = pagHtml;\r\n\r\n            // Asignar eventos a los botones d" +
-"e paginación\r\n            var prevBtn = $(\'prev-page\');\r\n            var nextBtn" +
-" = $(\'next-page\');\r\n            if (prevBtn) {\r\n                prevBtn.addEvent" +
-"Listener(\'click\', function() {\r\n                    currentPage--;\r\n            " +
-"        renderDetailPage();\r\n                });\r\n            }\r\n            if " +
-"(nextBtn) {\r\n                nextBtn.addEventListener(\'click\', function() {\r\n   " +
-"                 currentPage++;\r\n                    renderDetailPage();\r\n      " +
-"          });\r\n            }\r\n        }\r\n\r\n        function jobDetailUrl(jobId) " +
-"{\r\n            return \'");
+"var currentPage = 1;\r\n        var pageSize = 20;\r\n        var autoRefresh = true" +
+";\r\n        var refreshTimer = null;\r\n\r\n        // Acceso a elementos del DOM con" +
+" métodos nativos\r\n        function $(id) { return document.getElementById(id); }" +
+"\r\n        function on(selector, event, handler) {\r\n            var els = documen" +
+"t.querySelectorAll(selector);\r\n            for (var i = 0; i < els.length; i++) " +
+"{\r\n                els[i].addEventListener(event, handler);\r\n            }\r\n    " +
+"    }\r\n\r\n        function init() {\r\n            loadSummary();\r\n\r\n            $(" +
+"\'refresh-btn\').addEventListener(\'click\', function() {\r\n                if ($(\'su" +
+"mmary-view\').style.display !== \'none\') loadSummary();\r\n                else if (" +
+"currentJobType) loadDetail(currentJobType);\r\n            });\r\n            $(\'sum" +
+"mary-apply\').addEventListener(\'click\', loadSummary);\r\n            $(\'detail-appl" +
+"y\').addEventListener(\'click\', function() {\r\n                if (currentJobType) " +
+"loadDetail(currentJobType);\r\n            });\r\n            $(\'back-to-summary\').a" +
+"ddEventListener(\'click\', showSummary);\r\n\r\n            // Iniciar temporizador de" +
+" auto‑refresh (solo para el resumen)\r\n            refreshTimer = setInterval(fun" +
+"ction() {\r\n                if (autoRefresh && document.getElementById(\'summary-v" +
+"iew\').style.display !== \'none\') {\r\n                    loadSummary();\r\n         " +
+"       }\r\n            }, 30000); // 15 segundos\r\n\r\n            document.getEleme" +
+"ntById(\'toggle-auto-refresh\').addEventListener(\'click\', function() {\r\n          " +
+"      autoRefresh = !autoRefresh;\r\n                var icon = this.querySelector" +
+"(\'.glyphicon\');\r\n                if (autoRefresh) {\r\n                    icon.cl" +
+"assList.remove(\'glyphicon-play\');\r\n                    icon.classList.add(\'glyph" +
+"icon-pause\');\r\n                    this.innerHTML = \'<span class=\"glyphicon glyp" +
+"hicon-pause\"></span> Pause\';\r\n                } else {\r\n                    icon" +
+".classList.remove(\'glyphicon-pause\');\r\n                    icon.classList.add(\'g" +
+"lyphicon-play\');\r\n                    this.innerHTML = \'<span class=\"glyphicon g" +
+"lyphicon-play\"></span> Resume\';\r\n                }\r\n            });\r\n        }\r\n" +
+"\r\n        function showSummary() {\r\n            $(\'summary-view\').style.display " +
+"= \'block\';\r\n            $(\'detail-view\').style.display = \'none\';\r\n        }\r\n\r\n " +
+"       function loadSummary() {\r\n            var state = $(\'summary-state-filter" +
+"\').value;\r\n            var url = summaryApiUrl + (state ? \'?state=\' + encodeURIC" +
+"omponent(state) : \'\');\r\n\r\n            $(\'summary-body\').innerHTML = \'<tr><td col" +
+"span=\"6\" class=\"text-center text-muted\">Loading...</td></tr>\';\r\n            fetc" +
+"h(url)\r\n                .then(function(r) { return r.json(); })\r\n               " +
+" .then(function(data) {\r\n                    renderSummary(data.summaries || [])" +
+";\r\n                })\r\n                .catch(function(err) {\r\n                 " +
+"   $(\'summary-body\').innerHTML = \'<tr><td colspan=\"6\" class=\"text-center text-da" +
+"nger\">Error loading summary: \' + err.message + \'</td></tr>\';\r\n                })" +
+";\r\n        }\r\n\r\n        function renderSummary(summaries) {\r\n            var tbo" +
+"dy = $(\'summary-body\');\r\n            if (!summaries.length) {\r\n                t" +
+"body.innerHTML = \'<tr><td colspan=\"6\" class=\"text-center text-muted\">No job type" +
+"s found.</td></tr>\';\r\n                return;\r\n            }\r\n\r\n            var " +
+"html = \'\';\r\n            summaries.forEach(function(s) {\r\n                var dot" +
+"s = \'\';\r\n                if (s.recentExecutions) {\r\n                    s.recent" +
+"Executions.forEach(function(exec) {\r\n                        var cls = exec.stat" +
+"e ? exec.state.toLowerCase() : \'\';\r\n                        var title = exec.sta" +
+"te + \' at \' + new Date(exec.timestamp).toLocaleTimeString();\r\n                  " +
+"      dots += \'<span class=\"state-dot \' + cls + \'\" title=\"\' + title + \'\"></span>" +
+"\';\r\n                    });\r\n                }\r\n\r\n                var lastExec =" +
+" s.lastExecution ? new Date(s.lastExecution).toLocaleString() : \'N/A\';\r\n\r\n      " +
+"          html += \'<tr>\';\r\n                html += \'<td>\' + escapeHtml(s.jobType" +
+") + \'</td>\';\r\n                html += \'<td>\' + dots + \'</td>\';\r\n                " +
+"html += \'<td><span class=\"badge\">\' + s.successCount + \'</span></td>\';\r\n         " +
+"       html += \'<td><span class=\"badge\">\' + s.failedCount + \'</span></td>\';\r\n   " +
+"             html += \'<td>\' + lastExec + \'</td>\';\r\n                html += \'<td>" +
+"<button class=\"btn btn-xs btn-default view-history\" data-jobtype=\"\' + escapeHtml" +
+"(s.jobType) + \'\">View Full History</button></td>\';\r\n                html += \'</t" +
+"r>\';\r\n            });\r\n            tbody.innerHTML = html;\r\n\r\n            // Aso" +
+"ciar eventos a los nuevos botones\r\n            on(\'.view-history\', \'click\', func" +
+"tion() {\r\n                var jobType = this.getAttribute(\'data-jobtype\');\r\n    " +
+"            showDetail(jobType);\r\n            });\r\n        }\r\n\r\n        function" +
+" showDetail(jobType) {\r\n            currentJobType = jobType;\r\n            curre" +
+"ntPage = 1;\r\n            $(\'summary-view\').style.display = \'none\';\r\n            " +
+"$(\'detail-view\').style.display = \'block\';\r\n            $(\'detail-jobtype-label\')" +
+".textContent = jobType;\r\n            loadDetail(jobType);\r\n        }\r\n\r\n        " +
+"function loadDetail(jobType) {\r\n            var state = $(\'detail-state-filter\')" +
+".value;\r\n            var url = detailApiUrl + \'?jobType=\' + encodeURIComponent(j" +
+"obType);\r\n            if (state) url += \'&state=\' + encodeURIComponent(state);\r\n" +
+"\r\n            $(\'detail-body\').innerHTML = \'<tr><td colspan=\"6\" class=\"text-cent" +
+"er text-muted\">Loading...</td></tr>\';\r\n            $(\'detail-pagination\').innerH" +
+"TML = \'\';\r\n\r\n            fetch(url)\r\n                .then(function(r) { return " +
+"r.json(); })\r\n                .then(function(data) {\r\n                    allDet" +
+"ailJobs = data.jobs || [];\r\n                    // Orden descendente por fecha d" +
+"e última ejecución (más reciente primero)\r\n                    allDetailJobs.sor" +
+"t(function(a, b) {\r\n                        return new Date(b.lastTimestamp) - n" +
+"ew Date(a.lastTimestamp);\r\n                    });\r\n                    currentP" +
+"age = 1;\r\n                    renderDetailPage();\r\n                })\r\n         " +
+"       .catch(function(err) {\r\n                    $(\'detail-body\').innerHTML = " +
+"\'<tr><td colspan=\"6\" class=\"text-center text-danger\">Error loading detail: \' + e" +
+"rr.message + \'</td></tr>\';\r\n                });\r\n        }\r\n\r\n        function r" +
+"enderDetailPage() {\r\n            var total = allDetailJobs.length;\r\n            " +
+"var start = (currentPage - 1) * pageSize;\r\n            var end = start + pageSiz" +
+"e;\r\n            var pageJobs = allDetailJobs.slice(start, end);\r\n            ren" +
+"derDetail(pageJobs, total);\r\n        }\r\n\r\n        function renderDetail(jobs, to" +
+"tal) {\r\n            var tbody = $(\'detail-body\');\r\n            var paginationDiv" +
+" = $(\'detail-pagination\');\r\n            if (!jobs.length) {\r\n                tbo" +
+"dy.innerHTML = \'<tr><td colspan=\"6\" class=\"text-center text-muted\">No jobs found" +
+" for this type.</td></tr>\';\r\n                paginationDiv.innerHTML = \'\';\r\n    " +
+"            return;\r\n            }\r\n\r\n            var html = \'\';\r\n            jo" +
+"bs.forEach(function(j) {\r\n                var shortId = j.jobId ? j.jobId.substr" +
+"ing(0, 8) : \'\';\r\n                var stateClass = j.lastState ? j.lastState.toLo" +
+"werCase() : \'\';\r\n                var badgeClass = stateClass === \'succeeded\' ? \'" +
+"label label-success\' : \r\n                                 stateClass === \'failed" +
+"\' ? \'label label-danger\' : \'label label-default\';\r\n                var ts = j.la" +
+"stTimestamp ? new Date(j.lastTimestamp).toLocaleString() : \'\';\r\n                " +
+"var error = j.errorMessage ? \'<span class=\"text-danger\" style=\"font-size:11px;\">" +
+"\' + escapeHtml(j.errorMessage.substring(0, 80)) + \'</span>\' : \'\';\r\n\r\n           " +
+"     html += \'<tr>\';\r\n                html += \'<td><a href=\"\' + jobDetailUrl(j.j" +
+"obId) + \'\" target=\"_blank\">#\' + shortId + \'</a></td>\';\r\n                html += " +
+"\'<td>\' + escapeHtml(j.queue) + \'</td>\';\r\n                html += \'<td><span clas" +
+"s=\"\' + badgeClass + \'\">\' + j.lastState + \'</span></td>\';\r\n                html +" +
+"= \'<td>\' + ts + \'</td>\';\r\n                html += \'<td>\' + error + \'</td>\';\r\n   " +
+"             html += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank" +
+"\" class=\"btn btn-xs btn-default\">History</a></td>\';\r\n                html += \'</" +
+"tr>\';\r\n            });\r\n            tbody.innerHTML = html;\r\n\r\n            // Co" +
+"ntroles de paginación\r\n            var totalPages = Math.ceil(total / pageSize);" +
+"\r\n            var startCount = (currentPage - 1) * pageSize + 1;\r\n            va" +
+"r endCount = Math.min(currentPage * pageSize, total);\r\n            var pagHtml =" +
+" \'<div class=\"clearfix\">\';\r\n            pagHtml += \'<span class=\"pull-left\">Show" +
+"ing \' + startCount + \' - \' + endCount + \' of \' + total + \' jobs</span>\';\r\n      " +
+"      pagHtml += \'<div class=\"pull-right\">\';\r\n            if (currentPage > 1) {" +
+"\r\n                pagHtml += \'<button class=\"btn btn-default btn-xs\" id=\"prev-pa" +
+"ge\">Previous</button> \';\r\n            }\r\n            if (currentPage < totalPage" +
+"s) {\r\n                pagHtml += \'<button class=\"btn btn-default btn-xs\" id=\"nex" +
+"t-page\">Next</button>\';\r\n            }\r\n            pagHtml += \'</div></div>\';\r\n" +
+"            paginationDiv.innerHTML = pagHtml;\r\n\r\n            // Asignar eventos" +
+" a los botones de paginación\r\n            var prevBtn = $(\'prev-page\');\r\n       " +
+"     var nextBtn = $(\'next-page\');\r\n            if (prevBtn) {\r\n                " +
+"prevBtn.addEventListener(\'click\', function() {\r\n                    currentPage-" +
+"-;\r\n                    renderDetailPage();\r\n                });\r\n            }\r" +
+"\n            if (nextBtn) {\r\n                nextBtn.addEventListener(\'click\', f" +
+"unction() {\r\n                    currentPage++;\r\n                    renderDetai" +
+"lPage();\r\n                });\r\n            }\r\n        }\r\n\r\n        function jobD" +
+"etailUrl(jobId) {\r\n            return \'");
 
 
             
-            #line 323 "..\..\Pages\JobStatus.cshtml"
+            #line 349 "..\..\Pages\JobStatus.cshtml"
                Write(Url.To("/jobs/details"));
 
             

@@ -30,8 +30,11 @@
             <h3>
                 @JobStatus.Title
                 <small class="text-muted">@versionString</small>
-                <button class="btn btn-default btn-sm pull-right" id="refresh-btn">
+                <button class="btn btn-default btn-sm" id="refresh-btn">
                     <span class="glyphicon glyphicon-refresh"></span> Refresh
+                </button>
+                <button class="btn btn-default btn-sm" id="toggle-auto-refresh">
+                    <span class="glyphicon glyphicon-pause"></span> Pause
                 </button>
             </h3>
             <hr />
@@ -134,6 +137,8 @@
         var currentJobType = null;
         var currentPage = 1;
         var pageSize = 20;
+        var autoRefresh = true;
+        var refreshTimer = null;
 
         // Acceso a elementos del DOM con métodos nativos
         function $(id) { return document.getElementById(id); }
@@ -156,6 +161,27 @@
                 if (currentJobType) loadDetail(currentJobType);
             });
             $('back-to-summary').addEventListener('click', showSummary);
+
+            // Iniciar temporizador de auto‑refresh (solo para el resumen)
+            refreshTimer = setInterval(function() {
+                if (autoRefresh && document.getElementById('summary-view').style.display !== 'none') {
+                    loadSummary();
+                }
+            }, 30000); // 15 segundos
+
+            document.getElementById('toggle-auto-refresh').addEventListener('click', function() {
+                autoRefresh = !autoRefresh;
+                var icon = this.querySelector('.glyphicon');
+                if (autoRefresh) {
+                    icon.classList.remove('glyphicon-play');
+                    icon.classList.add('glyphicon-pause');
+                    this.innerHTML = '<span class="glyphicon glyphicon-pause"></span> Pause';
+                } else {
+                    icon.classList.remove('glyphicon-pause');
+                    icon.classList.add('glyphicon-play');
+                    this.innerHTML = '<span class="glyphicon glyphicon-play"></span> Resume';
+                }
+            });
         }
 
         function showSummary() {
