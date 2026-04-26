@@ -140,9 +140,15 @@
             });
             document.getElementById('summary-apply').addEventListener('click', loadSummary);
             document.getElementById('detail-apply').addEventListener('click', function() {
-                loadDetail(currentJobType);
+                currentPage = 1;
+                loadDetail(currentJobType, currentPage);
             });
             document.getElementById('back-to-summary').addEventListener('click', showSummary);
+
+            window.changeDetailPage = function(page) {
+                currentPage = page;
+                loadDetail(currentJobType, currentPage);
+            };
         }
 
         function showSummary() {
@@ -210,75 +216,65 @@
         }
 
         function loadDetail(jobType, page) {
-    var state = document.getElementById('detail-state-filter').value;
-    var params = new URLSearchParams();
-    params.append('jobType', jobType);
-    if (state) params.append('state', state);
-    params.append('limit', pageSize);
-    params.append('offset', (page - 1) * pageSize);
+            var state = document.getElementById('detail-state-filter').value;
+            var params = new URLSearchParams();
+            params.append('jobType', jobType);
+            if (state) params.append('state', state);
+            params.append('limit', pageSize);
+            params.append('offset', (page - 1) * pageSize);
 
-    document.getElementById('detail-loading').style.display = 'block';
-    fetch(detailApiUrl + '?' + params.toString())
-        .then(r => r.json())
-        .then(data => {
-            renderDetail(data.jobs || [], data.total || 0);
-            document.getElementById('detail-loading').style.display = 'none';
-        });
-}
+            document.getElementById('detail-loading').style.display = 'block';
+            fetch(detailApiUrl + '?' + params.toString())
+                .then(r => r.json())
+                .then(data => {
+                    renderDetail(data.jobs || [], data.total || 0);
+                    document.getElementById('detail-loading').style.display = 'none';
+                });
+        }
 
         function renderDetail(jobs, total) {
-    var tbody = document.getElementById('detail-body');
-    var paginationDiv = document.getElementById('detail-pagination');
-    if (!jobs.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6c757d;">No jobs found for this type.</td></tr>';
-        if (paginationDiv) paginationDiv.innerHTML = '';
-        return;
-    }
+            var tbody = document.getElementById('detail-body');
+            var paginationDiv = document.getElementById('detail-pagination');
+            if (!jobs.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6c757d;">No jobs found for this type.</td></tr>';
+                if (paginationDiv) paginationDiv.innerHTML = '';
+                return;
+            }
 
-    var html = '';
-    jobs.forEach(function(j) {
-        var shortId = j.jobId ? j.jobId.substring(0, 8) : '';
-        var stateClass = j.lastState ? j.lastState.toLowerCase() : '';
-        var ts = j.lastTimestamp ? new Date(j.lastTimestamp).toLocaleString() : '';
-        var error = j.errorMessage ? '<span style="color:#dc3545;font-size:11px;">' + escapeHtml(j.errorMessage.substring(0, 50)) + '</span>' : '';
+            var html = '';
+            jobs.forEach(function(j) {
+                var shortId = j.jobId ? j.jobId.substring(0, 8) : '';
+                var stateClass = j.lastState ? j.lastState.toLowerCase() : '';
+                var ts = j.lastTimestamp ? new Date(j.lastTimestamp).toLocaleString() : '';
+                var error = j.errorMessage ? '<span style="color:#dc3545;font-size:11px;">' + escapeHtml(j.errorMessage.substring(0, 50)) + '</span>' : '';
 
-        html += '<tr>';
-        html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank">#' + shortId + '</a></td>';
-        html += '<td>' + escapeHtml(j.queue) + '</td>';
-        html += '<td><span class="state-badge ' + stateClass + '">' + j.lastState + '</span></td>';
-        html += '<td>' + ts + '</td>';
-        html += '<td>' + error + '</td>';
-        html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank" class="btn btn-xs btn-default">History</a></td>';
-        html += '</tr>';
-    });
-    tbody.innerHTML = html;
+                html += '<tr>';
+                html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank">#' + shortId + '</a></td>';
+                html += '<td>' + escapeHtml(j.queue) + '</td>';
+                html += '<td><span class="state-badge ' + stateClass + '">' + j.lastState + '</span></td>';
+                html += '<td>' + ts + '</td>';
+                html += '<td>' + error + '</td>';
+                html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank" class="btn btn-xs btn-default">History</a></td>';
+                html += '</tr>';
+            });
+            tbody.innerHTML = html;
 
-    // Paginación
-    var totalPages = Math.ceil(total / pageSize);
-    var start = (currentPage - 1) * pageSize + 1;
-    var end = Math.min(currentPage * pageSize, total);
-    var pagHtml = '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">';
-    pagHtml += '<span>Showing ' + start + ' - ' + end + ' of ' + total + ' jobs</span>';
-    pagHtml += '<div>';
-    if (currentPage > 1) {
-        pagHtml += '<button class="btn btn-xs btn-default" onclick="changeDetailPage(' + (currentPage - 1) + ')">Previous</button> ';
-    }
-    if (currentPage < totalPages) {
-        pagHtml += '<button class="btn btn-xs btn-default" onclick="changeDetailPage(' + (currentPage + 1) + ')">Next</button>';
-    }
-    pagHtml += '</div></div>';
-    if (paginationDiv) paginationDiv.innerHTML = pagHtml;
-}
-
-document.getElementById('detail-apply').addEventListener('click', function() {
-    currentPage = 1;
-    loadDetail(currentJobType, currentPage);
-});
-
-window.changeDetailPage = function(page) {
-    currentPage = page;
-    loadDetail(currentJobType, currentPage);
-};
+            // Paginación
+            var totalPages = Math.ceil(total / pageSize);
+            var start = (currentPage - 1) * pageSize + 1;
+            var end = Math.min(currentPage * pageSize, total);
+            var pagHtml = '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">';
+            pagHtml += '<span>Showing ' + start + ' - ' + end + ' of ' + total + ' jobs</span>';
+            pagHtml += '<div>';
+            if (currentPage > 1) {
+                pagHtml += '<button class="btn btn-xs btn-default" onclick="changeDetailPage(' + (currentPage - 1) + ')">Previous</button> ';
+            }
+            if (currentPage < totalPages) {
+                pagHtml += '<button class="btn btn-xs btn-default" onclick="changeDetailPage(' + (currentPage + 1) + ')">Next</button>';
+            }
+            pagHtml += '</div></div>';
+            if (paginationDiv) paginationDiv.innerHTML = pagHtml;
+        }
 
         function jobDetailUrl(jobId) {
             return '@Url.To("/jobs/details")' + '/' + jobId;

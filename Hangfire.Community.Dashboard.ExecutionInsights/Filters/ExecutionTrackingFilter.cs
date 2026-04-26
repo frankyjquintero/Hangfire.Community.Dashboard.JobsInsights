@@ -1,45 +1,53 @@
-﻿using Hangfire.States;
+﻿using Hangfire.Community.Dashboard.ExecutionInsights.Services;
+using Hangfire.States;
 using Hangfire.Storage;
-using Hangfire.Community.Dashboard.ExecutionInsights.Services;
 
-namespace Hangfire.Community.Dashboard.ExecutionInsights.Filters
+public class ExecutionTrackingFilter : IApplyStateFilter
 {
-    public class ExecutionTrackingFilter : IApplyStateFilter
+    private const string QueueParameterKey = "ExecutionInsights.Queue";
+    private const string JobTypeParameterKey = "ExecutionInsights.JobType";
+
+    public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
     {
-        private const string QueueParameterKey = "ExecutionInsights.Queue";
-        private const string JobTypeParameterKey = "ExecutionInsights.JobType";
+        var stateName = context.NewState.Name;
 
-        public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
+        // 1. Al encolar, guardar la cola y el tipo de job
+        if (context.NewState is EnqueuedState enqueuedState)
         {
-            var stateName = context.NewState.Name;
+            string queueInitial = enqueuedState.Queue ?? "default";
+            context.Connection.SetJobParameter(context.BackgroundJob.Id, QueueParameterKey, queueInitial);
 
-            // Solo estados finales
-            if (stateName != SucceededState.StateName && stateName != FailedState.StateName)
-                return;
+            string jobTypeInitial = GetJobType(context.BackgroundJob.Job);
+            if (!string.IsNullOrEmpty(jobTypeInitial))
+                context.Connection.SetJobParameter(context.BackgroundJob.Id, JobTypeParameterKey, jobTypeInitial);
 
-            var queue = GetStoredParameter(context.Connection, context.BackgroundJob.Id, QueueParameterKey) ?? "default";
-            var jobType = GetStoredParameter(context.Connection, context.BackgroundJob.Id, JobTypeParameterKey);
-
-            if (string.IsNullOrEmpty(jobType))
-            {
-                jobType = GetJobType(context.BackgroundJob.Job) ?? "Unknown";
-            }
-
-            JobResultService.RecordResult(transaction, jobType, context.BackgroundJob.Id, queue, stateName, context.NewState);
+            return; // No necesitamos registrar nada más en este estado
         }
 
-        public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction) { }
+        // 2. Solo estados finales para registrar resultados
+        if (stateName != SucceededState.StateName && stateName != FailedState.StateName)
+            return;
 
-        private static string GetStoredParameter(IStorageConnection connection, string jobId, string parameter)
+        string queue = GetStoredParameter(context.Connection, context.BackgroundJob.Id, QueueParameterKey) ?? "default";
+        string jobType = GetStoredParameter(context.Connection, context.BackgroundJob.Id, JobTypeParameterKey);
+
+        if (string.IsNullOrEmpty(jobType))
         {
-            return connection.GetJobParameter(jobId, parameter);
+            jobType = GetJobType(context.BackgroundJob.Job) ?? "Unknown";
         }
 
-        private static string GetJobType(global::Hangfire.Common.Job job)
-        {
-            if (job == null || job.Method == null) return null;
-            var type = job.Method.DeclaringType;
-            return type != null ? $"{type.FullName}.{job.Method.Name}" : job.Method.Name;
-        }
+        JobResultService.RecordResult(transaction, jobType, context.BackgroundJob.Id, queue, stateName, context.NewState);
+    }
+
+    public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction) { }
+
+    private static string GetStoredParameter(IStorageConnection connection, string jobId, string parameter) =>
+        connection.GetJobParameter(jobId, parameter);
+
+    private static string GetJobType(global::Hangfire.Common.Job job)
+    {
+        if (job == null || job.Method == null) return null;
+        var type = job.Method.DeclaringType;
+        return type != null ? $"{type.FullName}.{job.Method.Name}" : job.Method.Name;
     }
 }

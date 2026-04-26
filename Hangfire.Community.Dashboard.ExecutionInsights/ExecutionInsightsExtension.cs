@@ -1,6 +1,5 @@
 ﻿using Hangfire;
 using Hangfire.Dashboard;
-using Hangfire.Community.Dashboard.ExecutionInsights.Filters;
 using Hangfire.Community.Dashboard.ExecutionInsights.Apis;
 using Hangfire.Community.Dashboard.ExecutionInsights.Pages;
 

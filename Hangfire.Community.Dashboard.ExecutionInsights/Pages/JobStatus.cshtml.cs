@@ -186,91 +186,96 @@ WriteLiteral("\';\r\n        var currentJobType = null;\r\n        var currentPa
 "-view\').style.display !== \'none\') loadSummary();\r\n                else loadDetai" +
 "l(currentJobType);\r\n            });\r\n            document.getElementById(\'summar" +
 "y-apply\').addEventListener(\'click\', loadSummary);\r\n            document.getEleme" +
-"ntById(\'detail-apply\').addEventListener(\'click\', function() {\r\n                l" +
-"oadDetail(currentJobType);\r\n            });\r\n            document.getElementById" +
-"(\'back-to-summary\').addEventListener(\'click\', showSummary);\r\n        }\r\n\r\n      " +
-"  function showSummary() {\r\n            document.getElementById(\'summary-view\')." +
-"style.display = \'block\';\r\n            document.getElementById(\'detail-view\').sty" +
-"le.display = \'none\';\r\n        }\r\n\r\n        function loadSummary() {\r\n           " +
-" var state = document.getElementById(\'summary-state-filter\').value;\r\n           " +
-" var params = new URLSearchParams();\r\n            if (state) params.append(\'stat" +
-"e\', state);\r\n\r\n            document.getElementById(\'summary-loading\').style.disp" +
-"lay = \'block\';\r\n            fetch(summaryApiUrl + \'?\' + params.toString())\r\n    " +
-"            .then(r => r.json())\r\n                .then(data => {\r\n             " +
-"       renderSummary(data.summaries || []);\r\n                    document.getEle" +
-"mentById(\'summary-loading\').style.display = \'none\';\r\n                });\r\n      " +
-"  }\r\n\r\n        function renderSummary(summaries) {\r\n            var tbody = docu" +
-"ment.getElementById(\'summary-body\');\r\n            if (!summaries.length) {\r\n    " +
-"            tbody.innerHTML = \'<tr><td colspan=\"6\" style=\"text-align:center;colo" +
-"r:#6c757d;\">No job types found.</td></tr>\';\r\n                return;\r\n          " +
-"  }\r\n\r\n            var html = \'\';\r\n            summaries.forEach(function(s) {\r\n" +
-"                var dots = \'\';\r\n                s.recentExecutions.forEach(funct" +
-"ion(exec) {\r\n                    var cls = exec.state ? exec.state.toLowerCase()" +
-" : \'\';\r\n                    dots += \'<span class=\"state-dot \' + cls + \'\" title=\"" +
-"\' + exec.state + \' at \' + new Date(exec.timestamp).toLocaleTimeString() + \'\"></s" +
-"pan>\';\r\n                });\r\n\r\n                var lastExec = s.lastExecution ? " +
-"new Date(s.lastExecution).toLocaleString() : \'N/A\';\r\n\r\n                html += \'" +
-"<tr>\';\r\n                html += \'<td>\' + escapeHtml(s.jobType) + \'</td>\';\r\n     " +
-"           html += \'<td>\' + dots + \'</td>\';\r\n                html += \'<td>\' + s." +
-"successCount + \'</td>\';\r\n                html += \'<td>\' + s.failedCount + \'</td>" +
-"\';\r\n                html += \'<td>\' + lastExec + \'</td>\';\r\n                html +" +
-"= \'<td><button class=\"btn btn-xs btn-default view-history\" data-jobtype=\"\' + esc" +
-"apeHtml(s.jobType) + \'\">View Full History</button></td>\';\r\n                html " +
-"+= \'</tr>\';\r\n            });\r\n            tbody.innerHTML = html;\r\n\r\n           " +
-" document.querySelectorAll(\'.view-history\').forEach(function(btn) {\r\n           " +
-"     btn.addEventListener(\'click\', function() {\r\n                    var jobType" +
-" = this.getAttribute(\'data-jobtype\');\r\n                    showDetail(jobType);\r" +
-"\n                });\r\n            });\r\n        }\r\n\r\n        function showDetail(" +
-"jobType) {\r\n            currentJobType = jobType;\r\n            currentPage = 1;\r" +
-"\n            document.getElementById(\'summary-view\').style.display = \'none\';\r\n  " +
-"          document.getElementById(\'detail-view\').style.display = \'block\';\r\n     " +
-"       document.getElementById(\'detail-jobtype-label\').textContent = jobType;\r\n " +
-"           loadDetail(jobType, currentPage);\r\n        }\r\n\r\n        function load" +
-"Detail(jobType, page) {\r\n    var state = document.getElementById(\'detail-state-f" +
-"ilter\').value;\r\n    var params = new URLSearchParams();\r\n    params.append(\'jobT" +
-"ype\', jobType);\r\n    if (state) params.append(\'state\', state);\r\n    params.appen" +
-"d(\'limit\', pageSize);\r\n    params.append(\'offset\', (page - 1) * pageSize);\r\n\r\n  " +
-"  document.getElementById(\'detail-loading\').style.display = \'block\';\r\n    fetch(" +
-"detailApiUrl + \'?\' + params.toString())\r\n        .then(r => r.json())\r\n        ." +
-"then(data => {\r\n            renderDetail(data.jobs || [], data.total || 0);\r\n   " +
-"         document.getElementById(\'detail-loading\').style.display = \'none\';\r\n    " +
-"    });\r\n}\r\n\r\n        function renderDetail(jobs, total) {\r\n    var tbody = docu" +
-"ment.getElementById(\'detail-body\');\r\n    var paginationDiv = document.getElement" +
-"ById(\'detail-pagination\');\r\n    if (!jobs.length) {\r\n        tbody.innerHTML = \'" +
-"<tr><td colspan=\"6\" style=\"text-align:center;color:#6c757d;\">No jobs found for t" +
-"his type.</td></tr>\';\r\n        if (paginationDiv) paginationDiv.innerHTML = \'\';\r" +
-"\n        return;\r\n    }\r\n\r\n    var html = \'\';\r\n    jobs.forEach(function(j) {\r\n " +
-"       var shortId = j.jobId ? j.jobId.substring(0, 8) : \'\';\r\n        var stateC" +
-"lass = j.lastState ? j.lastState.toLowerCase() : \'\';\r\n        var ts = j.lastTim" +
-"estamp ? new Date(j.lastTimestamp).toLocaleString() : \'\';\r\n        var error = j" +
-".errorMessage ? \'<span style=\"color:#dc3545;font-size:11px;\">\' + escapeHtml(j.er" +
-"rorMessage.substring(0, 50)) + \'</span>\' : \'\';\r\n\r\n        html += \'<tr>\';\r\n     " +
-"   html += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank\">#\' + sho" +
-"rtId + \'</a></td>\';\r\n        html += \'<td>\' + escapeHtml(j.queue) + \'</td>\';\r\n  " +
-"      html += \'<td><span class=\"state-badge \' + stateClass + \'\">\' + j.lastState " +
-"+ \'</span></td>\';\r\n        html += \'<td>\' + ts + \'</td>\';\r\n        html += \'<td>" +
-"\' + error + \'</td>\';\r\n        html += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + " +
-"\'\" target=\"_blank\" class=\"btn btn-xs btn-default\">History</a></td>\';\r\n        ht" +
-"ml += \'</tr>\';\r\n    });\r\n    tbody.innerHTML = html;\r\n\r\n    // Paginación\r\n    v" +
-"ar totalPages = Math.ceil(total / pageSize);\r\n    var start = (currentPage - 1) " +
-"* pageSize + 1;\r\n    var end = Math.min(currentPage * pageSize, total);\r\n    var" +
-" pagHtml = \'<div style=\"display:flex; justify-content:space-between; align-items" +
-":center; margin-top:10px;\">\';\r\n    pagHtml += \'<span>Showing \' + start + \' - \' +" +
-" end + \' of \' + total + \' jobs</span>\';\r\n    pagHtml += \'<div>\';\r\n    if (curren" +
-"tPage > 1) {\r\n        pagHtml += \'<button class=\"btn btn-xs btn-default\" onclick" +
-"=\"changeDetailPage(\' + (currentPage - 1) + \')\">Previous</button> \';\r\n    }\r\n    " +
-"if (currentPage < totalPages) {\r\n        pagHtml += \'<button class=\"btn btn-xs b" +
-"tn-default\" onclick=\"changeDetailPage(\' + (currentPage + 1) + \')\">Next</button>\'" +
-";\r\n    }\r\n    pagHtml += \'</div></div>\';\r\n    if (paginationDiv) paginationDiv.i" +
-"nnerHTML = pagHtml;\r\n}\r\n\r\ndocument.getElementById(\'detail-apply\').addEventListen" +
-"er(\'click\', function() {\r\n    currentPage = 1;\r\n    loadDetail(currentJobType, c" +
-"urrentPage);\r\n});\r\n\r\nwindow.changeDetailPage = function(page) {\r\n    currentPage" +
-" = page;\r\n    loadDetail(currentJobType, currentPage);\r\n};\r\n\r\n        function j" +
-"obDetailUrl(jobId) {\r\n            return \'");
+"ntById(\'detail-apply\').addEventListener(\'click\', function() {\r\n                c" +
+"urrentPage = 1;\r\n                loadDetail(currentJobType, currentPage);\r\n     " +
+"       });\r\n            document.getElementById(\'back-to-summary\').addEventListe" +
+"ner(\'click\', showSummary);\r\n\r\n            window.changeDetailPage = function(pag" +
+"e) {\r\n                currentPage = page;\r\n                loadDetail(currentJob" +
+"Type, currentPage);\r\n            };\r\n        }\r\n\r\n        function showSummary()" +
+" {\r\n            document.getElementById(\'summary-view\').style.display = \'block\';" +
+"\r\n            document.getElementById(\'detail-view\').style.display = \'none\';\r\n  " +
+"      }\r\n\r\n        function loadSummary() {\r\n            var state = document.ge" +
+"tElementById(\'summary-state-filter\').value;\r\n            var params = new URLSea" +
+"rchParams();\r\n            if (state) params.append(\'state\', state);\r\n\r\n         " +
+"   document.getElementById(\'summary-loading\').style.display = \'block\';\r\n        " +
+"    fetch(summaryApiUrl + \'?\' + params.toString())\r\n                .then(r => r" +
+".json())\r\n                .then(data => {\r\n                    renderSummary(dat" +
+"a.summaries || []);\r\n                    document.getElementById(\'summary-loadin" +
+"g\').style.display = \'none\';\r\n                });\r\n        }\r\n\r\n        function " +
+"renderSummary(summaries) {\r\n            var tbody = document.getElementById(\'sum" +
+"mary-body\');\r\n            if (!summaries.length) {\r\n                tbody.innerH" +
+"TML = \'<tr><td colspan=\"6\" style=\"text-align:center;color:#6c757d;\">No job types" +
+" found.</td></tr>\';\r\n                return;\r\n            }\r\n\r\n            var h" +
+"tml = \'\';\r\n            summaries.forEach(function(s) {\r\n                var dots" +
+" = \'\';\r\n                s.recentExecutions.forEach(function(exec) {\r\n           " +
+"         var cls = exec.state ? exec.state.toLowerCase() : \'\';\r\n                " +
+"    dots += \'<span class=\"state-dot \' + cls + \'\" title=\"\' + exec.state + \' at \' " +
+"+ new Date(exec.timestamp).toLocaleTimeString() + \'\"></span>\';\r\n                " +
+"});\r\n\r\n                var lastExec = s.lastExecution ? new Date(s.lastExecution" +
+").toLocaleString() : \'N/A\';\r\n\r\n                html += \'<tr>\';\r\n                " +
+"html += \'<td>\' + escapeHtml(s.jobType) + \'</td>\';\r\n                html += \'<td>" +
+"\' + dots + \'</td>\';\r\n                html += \'<td>\' + s.successCount + \'</td>\';\r" +
+"\n                html += \'<td>\' + s.failedCount + \'</td>\';\r\n                html" +
+" += \'<td>\' + lastExec + \'</td>\';\r\n                html += \'<td><button class=\"bt" +
+"n btn-xs btn-default view-history\" data-jobtype=\"\' + escapeHtml(s.jobType) + \'\">" +
+"View Full History</button></td>\';\r\n                html += \'</tr>\';\r\n           " +
+" });\r\n            tbody.innerHTML = html;\r\n\r\n            document.querySelectorA" +
+"ll(\'.view-history\').forEach(function(btn) {\r\n                btn.addEventListene" +
+"r(\'click\', function() {\r\n                    var jobType = this.getAttribute(\'da" +
+"ta-jobtype\');\r\n                    showDetail(jobType);\r\n                });\r\n  " +
+"          });\r\n        }\r\n\r\n        function showDetail(jobType) {\r\n            " +
+"currentJobType = jobType;\r\n            currentPage = 1;\r\n            document.ge" +
+"tElementById(\'summary-view\').style.display = \'none\';\r\n            document.getEl" +
+"ementById(\'detail-view\').style.display = \'block\';\r\n            document.getEleme" +
+"ntById(\'detail-jobtype-label\').textContent = jobType;\r\n            loadDetail(jo" +
+"bType, currentPage);\r\n        }\r\n\r\n        function loadDetail(jobType, page) {\r" +
+"\n            var state = document.getElementById(\'detail-state-filter\').value;\r\n" +
+"            var params = new URLSearchParams();\r\n            params.append(\'jobT" +
+"ype\', jobType);\r\n            if (state) params.append(\'state\', state);\r\n        " +
+"    params.append(\'limit\', pageSize);\r\n            params.append(\'offset\', (page" +
+" - 1) * pageSize);\r\n\r\n            document.getElementById(\'detail-loading\').styl" +
+"e.display = \'block\';\r\n            fetch(detailApiUrl + \'?\' + params.toString())\r" +
+"\n                .then(r => r.json())\r\n                .then(data => {\r\n        " +
+"            renderDetail(data.jobs || [], data.total || 0);\r\n                   " +
+" document.getElementById(\'detail-loading\').style.display = \'none\';\r\n            " +
+"    });\r\n        }\r\n\r\n        function renderDetail(jobs, total) {\r\n            " +
+"var tbody = document.getElementById(\'detail-body\');\r\n            var paginationD" +
+"iv = document.getElementById(\'detail-pagination\');\r\n            if (!jobs.length" +
+") {\r\n                tbody.innerHTML = \'<tr><td colspan=\"6\" style=\"text-align:ce" +
+"nter;color:#6c757d;\">No jobs found for this type.</td></tr>\';\r\n                i" +
+"f (paginationDiv) paginationDiv.innerHTML = \'\';\r\n                return;\r\n      " +
+"      }\r\n\r\n            var html = \'\';\r\n            jobs.forEach(function(j) {\r\n " +
+"               var shortId = j.jobId ? j.jobId.substring(0, 8) : \'\';\r\n          " +
+"      var stateClass = j.lastState ? j.lastState.toLowerCase() : \'\';\r\n          " +
+"      var ts = j.lastTimestamp ? new Date(j.lastTimestamp).toLocaleString() : \'\'" +
+";\r\n                var error = j.errorMessage ? \'<span style=\"color:#dc3545;font" +
+"-size:11px;\">\' + escapeHtml(j.errorMessage.substring(0, 50)) + \'</span>\' : \'\';\r\n" +
+"\r\n                html += \'<tr>\';\r\n                html += \'<td><a href=\"\' + job" +
+"DetailUrl(j.jobId) + \'\" target=\"_blank\">#\' + shortId + \'</a></td>\';\r\n           " +
+"     html += \'<td>\' + escapeHtml(j.queue) + \'</td>\';\r\n                html += \'<" +
+"td><span class=\"state-badge \' + stateClass + \'\">\' + j.lastState + \'</span></td>\'" +
+";\r\n                html += \'<td>\' + ts + \'</td>\';\r\n                html += \'<td>" +
+"\' + error + \'</td>\';\r\n                html += \'<td><a href=\"\' + jobDetailUrl(j.j" +
+"obId) + \'\" target=\"_blank\" class=\"btn btn-xs btn-default\">History</a></td>\';\r\n  " +
+"              html += \'</tr>\';\r\n            });\r\n            tbody.innerHTML = h" +
+"tml;\r\n\r\n            // Paginación\r\n            var totalPages = Math.ceil(total " +
+"/ pageSize);\r\n            var start = (currentPage - 1) * pageSize + 1;\r\n       " +
+"     var end = Math.min(currentPage * pageSize, total);\r\n            var pagHtml" +
+" = \'<div style=\"display:flex; justify-content:space-between; align-items:center;" +
+" margin-top:10px;\">\';\r\n            pagHtml += \'<span>Showing \' + start + \' - \' +" +
+" end + \' of \' + total + \' jobs</span>\';\r\n            pagHtml += \'<div>\';\r\n      " +
+"      if (currentPage > 1) {\r\n                pagHtml += \'<button class=\"btn btn" +
+"-xs btn-default\" onclick=\"changeDetailPage(\' + (currentPage - 1) + \')\">Previous<" +
+"/button> \';\r\n            }\r\n            if (currentPage < totalPages) {\r\n       " +
+"         pagHtml += \'<button class=\"btn btn-xs btn-default\" onclick=\"changeDetai" +
+"lPage(\' + (currentPage + 1) + \')\">Next</button>\';\r\n            }\r\n            pa" +
+"gHtml += \'</div></div>\';\r\n            if (paginationDiv) paginationDiv.innerHTML" +
+" = pagHtml;\r\n        }\r\n\r\n        function jobDetailUrl(jobId) {\r\n            re" +
+"turn \'");
 
 
             
-            #line 284 "..\..\Pages\JobStatus.cshtml"
+            #line 280 "..\..\Pages\JobStatus.cshtml"
                Write(Url.To("/jobs/details"));
 
             
