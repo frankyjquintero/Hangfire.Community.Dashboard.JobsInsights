@@ -23,19 +23,12 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
             {
                 var jobType = context.Request.GetQuery("jobType");
                 var stateFilter = context.Request.GetQuery("state");
-                var limitParam = context.Request.GetQuery("limit");
-                var offsetParam = context.Request.GetQuery("offset");
 
                 if (string.IsNullOrEmpty(jobType))
                 {
                     await WriteError(context, "jobType required");
                     return;
                 }
-
-                int limit = 50;
-                if (!string.IsNullOrEmpty(limitParam)) int.TryParse(limitParam, out limit);
-                int offset = 0;
-                if (!string.IsNullOrEmpty(offsetParam)) int.TryParse(offsetParam, out offset);
 
                 using (var connection = context.Storage.GetConnection())
                 {
@@ -46,16 +39,8 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
                         return;
                     }
 
-                    // Ordenar claves (ticks-jobId) descendente (más reciente primero)
-                    var sortedKeys = entries.Keys
-                        .OrderByDescending(k => k)   // orden lexicográfico correcto porque empieza por ticks
-                        .ToList();
-
-                    int total = sortedKeys.Count;
-                    var pageKeys = sortedKeys.Skip(offset).Take(limit);
-
-                    var jobs = new List<object>();
-                    foreach (var key in pageKeys)
+                    var allJobs = new List<object>();
+                    foreach (var key in entries.Keys)
                     {
                         var value = entries[key];
                         var result = JsonSerializer.Deserialize<JobResult>(value, JsonOptions);
@@ -65,7 +50,7 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
                             !result.State.Equals(stateFilter, StringComparison.OrdinalIgnoreCase))
                             continue;
 
-                        jobs.Add(new
+                        allJobs.Add(new
                         {
                             jobId = result.JobId,
                             queue = result.Queue,
@@ -75,7 +60,7 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
                         });
                     }
 
-                    await WriteJson(context, new { jobs, total });
+                    await WriteJson(context, new { jobs = allJobs, total = allJobs.Count });
                 }
             }
             catch (Exception ex)
