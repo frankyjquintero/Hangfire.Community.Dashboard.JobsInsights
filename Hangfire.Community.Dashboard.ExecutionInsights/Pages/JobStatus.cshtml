@@ -1,0 +1,300 @@
+﻿@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.ExecutionInsights.Pages *@
+@using Hangfire.Dashboard
+@using Hangfire.Community.Dashboard.ExecutionInsights
+@using Hangfire.Community.Dashboard.ExecutionInsights.Pages
+@using Hangfire.Dashboard.Pages
+@inherits Hangfire.Dashboard.RazorPage
+@{
+    Layout = new LayoutPage(JobStatus.Title);
+    var summaryApiUrl = $"{Url.To(ExecutionInsightsExtension.RouteBase)}/api/jobtype-summary";
+    var detailApiUrl = $"{Url.To(ExecutionInsightsExtension.RouteBase)}/api/jobtype-detail";
+    var version = typeof(ExecutionInsightsExtension).Assembly.GetName().Version;
+    var versionString = $"v{version.Major}.{version.Minor}.{version.Build}";
+}
+
+<style>
+    .job-status-container { padding: 20px; color: #333; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .header h2 { margin: 0; font-size: 20px; font-weight: 600; }
+    .version-badge { font-size: 12px; color: #6c757d; background: #f0f0f0; padding: 2px 8px; border-radius: 3px; margin-left: 8px; }
+
+    .filters {
+        display: flex; flex-wrap: wrap; gap: 10px;
+        background: #f8f9fa; padding: 10px 15px;
+        border-radius: 6px; border: 1px solid #dee2e6; margin-bottom: 20px;
+    }
+    .filters label { font-size: 12px; font-weight: 500; margin-right: 4px; }
+    .filters select { padding: 4px 8px; border: 1px solid #ced4da; border-radius: 4px; font-size: 13px; }
+
+    .summary-table, .detail-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+    .summary-table th, .detail-table th { background: #f1f3f5; font-weight: 600; color: #495057; padding: 8px; text-align: left; border-bottom: 2px solid #dee2e6; font-size: 13px; }
+    .summary-table td, .detail-table td { padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
+    .summary-table tr:hover, .detail-table tr:hover { background: #f8f9fa; }
+
+    .state-dot {
+        display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 2px;
+        background-color: #e9ecef;
+    }
+    .state-dot.succeeded { background-color: #28a745; }
+    .state-dot.failed { background-color: #dc3545; }
+
+    .state-badge {
+        display: inline-block; padding: 2px 8px; border-radius: 10px;
+        font-weight: 600; font-size: 11px; text-transform: uppercase;
+    }
+    .state-badge.succeeded { background: #d4edda; color: #155724; }
+    .state-badge.failed { background: #f8d7da; color: #721c24; }
+
+    .back-link { cursor: pointer; color: #007bff; margin-bottom: 10px; display: inline-block; }
+
+    #detail-view { display: none; }
+
+    @@media (prefers-color-scheme: dark) {
+        .job-status-container { color: #e9ecef; }
+        .filters, .summary-table, .detail-table { background: #1a1a2e; border-color: #2d2d44; }
+        .summary-table th, .detail-table th { background: #16213e; color: #e9ecef; border-color: #2d2d44; }
+        .summary-table td, .detail-table td { border-color: #2d2d44; color: #e9ecef; }
+        .summary-table tr:hover, .detail-table tr:hover { background: #2d2d44; }
+    }
+</style>
+
+<div class="job-status-container">
+    <div class="header">
+        <h2>@JobStatus.Title <span class="version-badge">@versionString</span></h2>
+        <button class="btn btn-sm btn-default" id="refresh-btn"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+    </div>
+
+    <!-- VISTA RESUMEN -->
+    <div id="summary-view">
+        <div class="filters">
+            <label>State:</label>
+            <select id="summary-state-filter">
+                <option value="">All</option>
+                <option value="Succeeded">Success</option>
+                <option value="Failed">Failed</option>
+            </select>
+            <button class="btn btn-sm btn-primary" id="summary-apply">Apply</button>
+        </div>
+
+        <table class="summary-table" id="summary-table">
+            <thead>
+                <tr>
+                    <th>Job Type</th>
+                    <th>Last 15 Executions</th>
+                    <th>Success</th>
+                    <th>Failed</th>
+                    <th>Last Execution</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="summary-body"></tbody>
+        </table>
+        <div id="summary-loading" style="text-align:center;padding:20px;">Loading...</div>
+    </div>
+
+    <!-- VISTA DETALLE -->
+    <div id="detail-view">
+        <span class="back-link" id="back-to-summary">← Back to Summary</span>
+        <h4>Full History: <span id="detail-jobtype-label"></span></h4>
+        <div class="filters">
+            <label>State:</label>
+            <select id="detail-state-filter">
+                <option value="">All</option>
+                <option value="Succeeded">Success</option>
+                <option value="Failed">Failed</option>
+            </select>
+            <button class="btn btn-sm btn-primary" id="detail-apply">Apply</button>
+        </div>
+
+        <table class="detail-table" id="detail-table">
+            <thead>
+                <tr>
+                    <th>Job ID</th>
+                    <th>Queue</th>
+                    <th>Last State</th>
+                    <th>Last Execution</th>
+                    <th>Error</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="detail-body"></tbody>
+        </table>
+        <div id="detail-loading" style="text-align:center;padding:20px;">Loading...</div>
+        <div id="detail-pagination"></div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        var summaryApiUrl = '@summaryApiUrl';
+        var detailApiUrl = '@detailApiUrl';
+        var currentJobType = null;
+        var currentPage = 1;
+        var pageSize = 20; // trabajos por página
+
+        function init() {
+            loadSummary();
+            document.getElementById('refresh-btn').addEventListener('click', function() {
+                if (document.getElementById('summary-view').style.display !== 'none') loadSummary();
+                else loadDetail(currentJobType);
+            });
+            document.getElementById('summary-apply').addEventListener('click', loadSummary);
+            document.getElementById('detail-apply').addEventListener('click', function() {
+                loadDetail(currentJobType);
+            });
+            document.getElementById('back-to-summary').addEventListener('click', showSummary);
+        }
+
+        function showSummary() {
+            document.getElementById('summary-view').style.display = 'block';
+            document.getElementById('detail-view').style.display = 'none';
+        }
+
+        function loadSummary() {
+            var state = document.getElementById('summary-state-filter').value;
+            var params = new URLSearchParams();
+            if (state) params.append('state', state);
+
+            document.getElementById('summary-loading').style.display = 'block';
+            fetch(summaryApiUrl + '?' + params.toString())
+                .then(r => r.json())
+                .then(data => {
+                    renderSummary(data.summaries || []);
+                    document.getElementById('summary-loading').style.display = 'none';
+                });
+        }
+
+        function renderSummary(summaries) {
+            var tbody = document.getElementById('summary-body');
+            if (!summaries.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6c757d;">No job types found.</td></tr>';
+                return;
+            }
+
+            var html = '';
+            summaries.forEach(function(s) {
+                var dots = '';
+                s.recentExecutions.forEach(function(exec) {
+                    var cls = exec.state ? exec.state.toLowerCase() : '';
+                    dots += '<span class="state-dot ' + cls + '" title="' + exec.state + ' at ' + new Date(exec.timestamp).toLocaleTimeString() + '"></span>';
+                });
+
+                var lastExec = s.lastExecution ? new Date(s.lastExecution).toLocaleString() : 'N/A';
+
+                html += '<tr>';
+                html += '<td>' + escapeHtml(s.jobType) + '</td>';
+                html += '<td>' + dots + '</td>';
+                html += '<td>' + s.successCount + '</td>';
+                html += '<td>' + s.failedCount + '</td>';
+                html += '<td>' + lastExec + '</td>';
+                html += '<td><button class="btn btn-xs btn-default view-history" data-jobtype="' + escapeHtml(s.jobType) + '">View Full History</button></td>';
+                html += '</tr>';
+            });
+            tbody.innerHTML = html;
+
+            document.querySelectorAll('.view-history').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var jobType = this.getAttribute('data-jobtype');
+                    showDetail(jobType);
+                });
+            });
+        }
+
+        function showDetail(jobType) {
+            currentJobType = jobType;
+            currentPage = 1;
+            document.getElementById('summary-view').style.display = 'none';
+            document.getElementById('detail-view').style.display = 'block';
+            document.getElementById('detail-jobtype-label').textContent = jobType;
+            loadDetail(jobType, currentPage);
+        }
+
+        function loadDetail(jobType, page) {
+    var state = document.getElementById('detail-state-filter').value;
+    var params = new URLSearchParams();
+    params.append('jobType', jobType);
+    if (state) params.append('state', state);
+    params.append('limit', pageSize);
+    params.append('offset', (page - 1) * pageSize);
+
+    document.getElementById('detail-loading').style.display = 'block';
+    fetch(detailApiUrl + '?' + params.toString())
+        .then(r => r.json())
+        .then(data => {
+            renderDetail(data.jobs || [], data.total || 0);
+            document.getElementById('detail-loading').style.display = 'none';
+        });
+}
+
+        function renderDetail(jobs, total) {
+    var tbody = document.getElementById('detail-body');
+    var paginationDiv = document.getElementById('detail-pagination');
+    if (!jobs.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#6c757d;">No jobs found for this type.</td></tr>';
+        if (paginationDiv) paginationDiv.innerHTML = '';
+        return;
+    }
+
+    var html = '';
+    jobs.forEach(function(j) {
+        var shortId = j.jobId ? j.jobId.substring(0, 8) : '';
+        var stateClass = j.lastState ? j.lastState.toLowerCase() : '';
+        var ts = j.lastTimestamp ? new Date(j.lastTimestamp).toLocaleString() : '';
+        var error = j.errorMessage ? '<span style="color:#dc3545;font-size:11px;">' + escapeHtml(j.errorMessage.substring(0, 50)) + '</span>' : '';
+
+        html += '<tr>';
+        html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank">#' + shortId + '</a></td>';
+        html += '<td>' + escapeHtml(j.queue) + '</td>';
+        html += '<td><span class="state-badge ' + stateClass + '">' + j.lastState + '</span></td>';
+        html += '<td>' + ts + '</td>';
+        html += '<td>' + error + '</td>';
+        html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank" class="btn btn-xs btn-default">History</a></td>';
+        html += '</tr>';
+    });
+    tbody.innerHTML = html;
+
+    // Paginación
+    var totalPages = Math.ceil(total / pageSize);
+    var start = (currentPage - 1) * pageSize + 1;
+    var end = Math.min(currentPage * pageSize, total);
+    var pagHtml = '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">';
+    pagHtml += '<span>Showing ' + start + ' - ' + end + ' of ' + total + ' jobs</span>';
+    pagHtml += '<div>';
+    if (currentPage > 1) {
+        pagHtml += '<button class="btn btn-xs btn-default" onclick="changeDetailPage(' + (currentPage - 1) + ')">Previous</button> ';
+    }
+    if (currentPage < totalPages) {
+        pagHtml += '<button class="btn btn-xs btn-default" onclick="changeDetailPage(' + (currentPage + 1) + ')">Next</button>';
+    }
+    pagHtml += '</div></div>';
+    if (paginationDiv) paginationDiv.innerHTML = pagHtml;
+}
+
+document.getElementById('detail-apply').addEventListener('click', function() {
+    currentPage = 1;
+    loadDetail(currentJobType, currentPage);
+});
+
+window.changeDetailPage = function(page) {
+    currentPage = page;
+    loadDetail(currentJobType, currentPage);
+};
+
+        function jobDetailUrl(jobId) {
+            return '@Url.To("/jobs/details")' + '/' + jobId;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>

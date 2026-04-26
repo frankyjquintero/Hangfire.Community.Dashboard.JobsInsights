@@ -12,13 +12,13 @@
     <PackageReference Include="Hangfire.MemoryStorage" Version="1.8.1.2" />
     <PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hangfire.Community.Dashboard.Heatmap\src\Hangfire.Community.Dashboard.Heatmap.csproj" />
-    <ProjectReference Include="..\Hangfire.ExecutionInsights\Hangfire.ExecutionInsights.csproj" />
+    <ProjectReference Include="..\Hangfire.Community.Dashboard.ExecutionInsights\Hangfire.Community.Dashboard.ExecutionInsights.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
 using Hangfire;
+using Hangfire.States;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hangfire.APMJobs.Controllers
@@ -15,13 +19,44 @@ namespace Hangfire.APMJobs.Controllers
         }
 
         /// <summary>
-        /// Dispara un job fire-and-forget.
+        /// Dispara un job fire-and-forget simple en la cola especificada.
         /// </summary>
         [HttpPost("fire-and-forget")]
-        public IActionResult FireAndForget()
+        public IActionResult FireAndForget(string queue = "default")
         {
-            _backgroundJobClient.Enqueue(() => Console.WriteLine($"Job fire-and-forget ejecutado a las {DateTime.Now}"));
+            _backgroundJobClient.Enqueue(queue, () => Console.WriteLine($"Job fire-and-forget ejecutado a las {DateTime.Now} en la cola {queue}"));
             return Ok("Job fire-and-forget encolado");
+        }
+
+        /// <summary>
+        /// Dispara los 17 jobs de simulación en una sola llamada.
+        /// </summary>
+        [HttpPost("simulate-all")]
+        public IActionResult SimulateAll()
+        {
+            var jobs = new List<string>();
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.SendWelcomeEmail()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.ProcessOrderPayment()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.GenerateMonthlyReport()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.CleanupExpiredTokens()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.ImportCustomerData()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.SyncProductCatalog()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.CreateBackup()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.ValidateEmailAddresses()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.UpdateExchangeRates()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.PurgeOldLogs()));
+            // Los siguientes fallarán a propósito
+            //jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.FailingJob_ProcessRefund()));
+            //jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.FailingJob_ChargeCreditCard()));
+            //jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.FailingJob_UpdateInventory()));
+            // Jobs con algo de demora para aparecer como "Processing"
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.SlowJob_GenerateInvoice()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.SlowJob_ResizeImages()));
+            // Más jobs exitosos
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.NotifyUsersAboutDowntime()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.RebuildSearchIndex()));
+
+            return Ok(new { message = "17 jobs encolados", jobIds = jobs });
         }
 
         /// <summary>
@@ -33,5 +68,43 @@ namespace Hangfire.APMJobs.Controllers
             RecurringJob.AddOrUpdate("job-recurrente", () => Console.WriteLine($"Job recurrente ejecutado a las {DateTime.Now}"), Cron.Minutely);
             return Ok("Job recurrente programado (cada minuto)");
         }
+    }
+
+    /// <summary>
+    /// Tareas simuladas que representan distintos tipos de trabajo.
+    /// </summary>
+    public static class SimulatedTasks
+    {
+        public static void SendWelcomeEmail() => Console.WriteLine($"[{DateTime.Now}] Welcome email sent.");
+        public static void ProcessOrderPayment() => Console.WriteLine($"[{DateTime.Now}] Order payment processed.");
+        public static void GenerateMonthlyReport() => Console.WriteLine($"[{DateTime.Now}] Monthly report generated.");
+        public static void CleanupExpiredTokens() => Console.WriteLine($"[{DateTime.Now}] Expired tokens cleaned up.");
+        public static void ImportCustomerData() => Console.WriteLine($"[{DateTime.Now}] Customer data imported.");
+        public static void SyncProductCatalog() => Console.WriteLine($"[{DateTime.Now}] Product catalog synced.");
+        public static void CreateBackup() => Console.WriteLine($"[{DateTime.Now}] Backup created successfully.");
+        public static void ValidateEmailAddresses() => Console.WriteLine($"[{DateTime.Now}] Email addresses validated.");
+        public static void UpdateExchangeRates() => Console.WriteLine($"[{DateTime.Now}] Exchange rates updated.");
+        public static void PurgeOldLogs() => Console.WriteLine($"[{DateTime.Now}] Old logs purged.");
+
+        // Jobs que fallan
+        public static void FailingJob_ProcessRefund() => throw new InvalidOperationException("Refund processing failed: transaction not found.");
+        public static void FailingJob_ChargeCreditCard() => throw new Exception("Credit card charge declined.");
+        public static void FailingJob_UpdateInventory() => throw new InvalidOperationException("Inventory update failed: insufficient stock.");
+
+        // Jobs lentos (simulan trabajo que tarda unos segundos)
+        public static void SlowJob_GenerateInvoice()
+        {
+            Thread.Sleep(3000);
+            Console.WriteLine($"[{DateTime.Now}] Invoice generated after delay.");
+        }
+        public static void SlowJob_ResizeImages()
+        {
+            Thread.Sleep(5000);
+            Console.WriteLine($"[{DateTime.Now}] Images resized after delay.");
+        }
+
+        // Más jobs exitosos
+        public static void NotifyUsersAboutDowntime() => Console.WriteLine($"[{DateTime.Now}] Users notified about planned downtime.");
+        public static void RebuildSearchIndex() => Console.WriteLine($"[{DateTime.Now}] Search index rebuilt.");
     }
 }

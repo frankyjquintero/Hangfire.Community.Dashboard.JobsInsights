@@ -1,7 +1,8 @@
 using Hangfire;
+using Hangfire.Community.Dashboard.ExecutionInsights;
+using Hangfire.Community.Dashboard.ExecutionInsights.Services;
 using Hangfire.MemoryStorage;
-using Hangfire.ExecutionInsights.Extensions;
-using Hangfire.Community.Dashboard.Heatmap;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,11 +22,11 @@ builder.Services.AddHangfire(config =>
 {
     if (storageType == "SqlServer")
     {
-        config.UseSqlServerStorage(sqlConn).UseExecutionInsightsPage().UseHeatmapPage();
+        config.UseSqlServerStorage(sqlConn).UseExecutionInsights();
     }
     else
     {
-        config.UseMemoryStorage().UseExecutionInsightsPage().UseHeatmapPage();
+        config.UseMemoryStorage().UseExecutionInsights();
     }
 });
 builder.Services.AddHangfireServer();
@@ -47,5 +48,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();
