@@ -68,6 +68,7 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
                             queue = result.Queue,
                             lastState = result.State,
                             lastTimestamp = result.Timestamp,
+                            duration = result.Duration,
                             errorMessage = result.ErrorMessage
                         });
                     }

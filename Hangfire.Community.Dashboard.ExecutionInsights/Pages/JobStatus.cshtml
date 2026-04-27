@@ -18,59 +18,102 @@
         display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 3px;
         background-color: #ccc;
         cursor: pointer;
+        transition: transform 0.15s ease;
     }
-    .state-dot.succeeded { background-color: #5cb85c; }
-    .state-dot.failed    { background-color: #d9534f; }
+    .state-dot:hover { transform: scale(1.4); }
+    .state-dot.succeeded  { background-color: #5cb85c; }
+    .state-dot.failed     { background-color: #d9534f; }
     .state-dot.processing { background-color: #f0ad4e; }
 
     /* ===== Cabeceras ordenables ===== */
     th.sortable { cursor: pointer; user-select: none; }
     th.sortable:hover { background-color: #e0e0e0; }
-    th.sortable::after {
-        content: " ⇅";
-        opacity: 0.3;
-    }
-    th.sortable.asc::after {
-        content: " ↑";
-        opacity: 1;
-    }
-    th.sortable.desc::after {
-        content: " ↓";
-        opacity: 1;
-    }
+    th.sortable::after        { content: " ⇅"; opacity: 0.3; }
+    th.sortable.asc::after    { content: " ↑"; opacity: 1; }
+    th.sortable.desc::after   { content: " ↓"; opacity: 1; }
 
     /* ===== Animación de fade-in ===== */
-    @@keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .fade-in { animation: fadeIn 0.3s; }
+
+    /* ===== MEJORA 5: Sticky header ===== */
+    #summary-table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f5f5f5;
+        z-index: 10;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+
+    /* ===== Fila danger si último estado es Failed ===== */
+    tr.last-failed td { background-color: rgba(217, 83, 79, 0.08) !important; }
+
+    /* ===== Badge de fallos consecutivos ===== */
+    .consecutive-badge {
+        margin-left: 4px;
+        font-size: 11px;
+        vertical-align: middle;
+    }
+
+    /* ===== Avg Duration coloreado ===== */
+    .dur-green { color: #3c763d; font-weight: bold; }
+    .dur-yellow { color: #8a6d3b; font-weight: bold; }
+    .dur-red { color: #a94442; font-weight: bold; }
+
+    /* ===== Tooltip ===== */
+    #dot-tooltip a { color: #adf; }
 </style>
 
 <div id="dot-tooltip" style="display:none; position:fixed; background:#333; color:#fff; padding:8px 12px; border-radius:4px; font-size:12px; z-index:9999; pointer-events:none;"></div>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <h3>
                 @JobStatus.Title
                 <small class="text-muted">@versionString</small>
+
+                <!-- MEJORA 3: Intervalo de auto-refresh configurable -->
+                <div class="btn-group pull-right" style="margin-left:5px;">
+                    <button class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-time"></span>
+                        <span id="refresh-interval-label">15s</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="5">Every 5s</a></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="15">Every 15s</a></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="30">Every 30s</a></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="60">Every 60s</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="0">
+                            <span class="glyphicon glyphicon-pause"></span> Paused
+                        </a></li>
+                    </ul>
+                </div>
+
+                <!-- MEJORA 4: Exportar CSV -->
+                <button class="btn btn-default btn-sm pull-right" id="export-csv" style="margin-left:5px;" title="Export current view to CSV">
+                    <span class="glyphicon glyphicon-download-alt"></span> Export CSV
+                </button>
+
                 <button class="btn btn-default btn-sm pull-right" id="refresh-btn">
                     <span class="glyphicon glyphicon-refresh"></span> Refresh
                 </button>
-                <button class="btn btn-default btn-sm pull-right" id="toggle-auto-refresh">
-                    <span class="glyphicon glyphicon-pause"></span> Pause
-                </button>                 
             </h3>
             <hr />
         </div>
     </div>
+
     <!-- VISTA RESUMEN -->
     <div id="summary-view">
-         <div class="row" id="cleanup-section">
+        <div class="row" id="cleanup-section">
+            <!-- Filtro por nombre de job -->
             <div class="col-md-3">
                 <input type="text" class="form-control input-sm" id="summary-jobtype-filter" placeholder="Filter by job type...">
             </div>
-            <!-- Filtro de estado -->
+
+            <!-- Filtro de estado + Apply -->
             <div class="col-md-3">
                 <div class="input-group">
                     <select class="form-control input-sm" id="summary-state-filter">
@@ -84,10 +127,11 @@
                 </div>
             </div>
 
-            <div class="col-md-2">
+            <!-- Retention days + Delete -->
+            <div class="col-md-3 col-md-offset-3">
                 <div class="input-group">
                     <span class="input-group-addon">Retention days</span>
-                    <input type="number" class="form-control input-sm" id="retention-days" value="30" min="1" style="width:90px" maxlength="2"/>
+                    <input type="number" class="form-control input-sm" id="retention-days" value="30" min="1" max="99" maxlength="2" style="width:45px;" />
                     <span class="input-group-btn">
                         <button class="btn btn-danger btn-sm" id="cleanup-btn">Delete older</button>
                     </span>
@@ -95,8 +139,10 @@
                 <span id="cleanup-msg" class="text-muted small"></span>
             </div>
         </div>
+
         <br/>
-         <!-- Estadísticas rápidas -->
+
+        <!-- Estadísticas rápidas -->
         <div class="row" style="margin-bottom:15px;">
             <div class="col-md-3">
                 <span class="label label-default">Types: <strong id="stat-types">-</strong></span>
@@ -129,7 +175,7 @@
                         </thead>
                         <tbody id="summary-body">
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Loading...</td>
+                                <td colspan="7" class="text-center text-muted">Loading...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -148,6 +194,7 @@
                 <h4>Full History: <span id="detail-jobtype-label"></span></h4>
             </div>
         </div>
+
         <!-- Filtros del detalle -->
         <div class="row">
             <div class="col-md-3">
@@ -163,9 +210,12 @@
             <div class="col-md-2">
                 <button class="btn btn-primary btn-sm" id="detail-apply">Apply</button>
                 <button class="btn btn-default btn-sm" id="detail-clear">Clear</button>
-                <button class="btn btn-default btn-sm" id="detail-reload"><span class="glyphicon glyphicon-refresh"></span></button>
+                <button class="btn btn-default btn-sm" id="detail-reload">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
             </div>
         </div>
+
         <div class="row" style="margin-top:15px;">
             <div class="col-md-12">
                 <div class="table-responsive">
@@ -196,27 +246,28 @@
 <script>
     (function() {
         var summaryApiUrl = '@summaryApiUrl';
-        var detailApiUrl = '@detailApiUrl';
-        var adminApiBase = '@Url.To(ExecutionInsightsExtension.RouteBase) + "/api/admin"';
-        var allDetailJobs = [];
-        var filteredJobs = [];
-        var currentJobType = null;
-        var currentPage = 1;
-        var pageSize = 20;
-        var autoRefresh = true;
-        var refreshTimer = null;
-        var currentSort = { field: 'lastTimestamp', direction: 'desc' };
-        var tooltipDiv = document.getElementById('dot-tooltip');
+        var detailApiUrl  = '@detailApiUrl';
+        var adminApiBase  = '@Url.To(ExecutionInsightsExtension.RouteBase)' + '/api/admin';
 
-        // Helpers nativos
+        var allDetailJobs  = [];
+        var filteredJobs   = [];
+        var currentJobType = null;
+        var currentPage    = 1;
+        var pageSize       = 20;
+        var refreshSeconds = 15;
+        var refreshTimer   = null;
+        var currentSort    = { field: 'lastTimestamp', direction: 'desc' };
+        var tooltipDiv     = document.getElementById('dot-tooltip');
+
+        // ── Helpers ─────────────────────────────────────────────
         function $(id) { return document.getElementById(id); }
         function on(selector, event, handler) {
-            var els = document.querySelectorAll(selector);
-            for (var i = 0; i < els.length; i++) {
-                els[i].addEventListener(event, handler);
-            }
+            document.querySelectorAll(selector).forEach(function(el) {
+                el.addEventListener(event, handler);
+            });
         }
 
+        // ── Init ─────────────────────────────────────────────────
         function init() {
             loadSummary();
 
@@ -224,40 +275,39 @@
                 if ($('summary-view').style.display !== 'none') loadSummary();
                 else if (currentJobType) loadDetail(currentJobType);
             });
+
             $('summary-apply').addEventListener('click', loadSummary);
+
             $('detail-apply').addEventListener('click', function() {
                 if (currentJobType) loadDetail(currentJobType);
             });
+
             $('detail-clear').addEventListener('click', function() {
                 $('detail-search').value = '';
                 $('detail-state-filter').value = '';
                 loadDetail(currentJobType);
             });
+
             $('detail-reload').addEventListener('click', function() {
                 if (currentJobType) loadDetail(currentJobType);
             });
+
             $('back-to-summary').addEventListener('click', showSummary);
 
-            // Auto-refresh
-            refreshTimer = setInterval(function() {
-                if (autoRefresh && $('summary-view').style.display !== 'none') {
-                    loadSummary();
-                }
-            }, 15000);
-
-            $('toggle-auto-refresh').addEventListener('click', function() {
-                autoRefresh = !autoRefresh;
-                var icon = this.querySelector('.glyphicon');
-                if (autoRefresh) {
-                    icon.className = 'glyphicon glyphicon-pause';
-                    this.innerHTML = '<span class="glyphicon glyphicon-pause"></span> Pause';
-                } else {
-                    icon.className = 'glyphicon glyphicon-play';
-                    this.innerHTML = '<span class="glyphicon glyphicon-play"></span> Resume';
-                }
+            // ── MEJORA 3: intervalo configurable ──────────────────
+            startRefreshTimer();
+            on('.refresh-interval-opt', 'click', function(e) {
+                e.preventDefault();
+                refreshSeconds = parseInt(this.getAttribute('data-seconds'));
+                var label = refreshSeconds > 0 ? refreshSeconds + 's' : 'Paused';
+                $('refresh-interval-label').textContent = label;
+                startRefreshTimer();
             });
 
-            // Ordenación de columnas en la tabla de detalle
+            // ── MEJORA 4: export CSV ──────────────────────────────
+            $('export-csv').addEventListener('click', exportCsv);
+
+            // ── Ordenación de columnas en detalle ────────────────
             on('#detail-table th.sortable', 'click', function() {
                 var field = this.getAttribute('data-sort');
                 if (currentSort.field === field) {
@@ -271,17 +321,15 @@
                 updateSortIndicators();
             });
 
-            // Botón de limpieza
+            // ── Cleanup ───────────────────────────────────────────
             $('cleanup-btn').addEventListener('click', function() {
                 var days = parseInt($('retention-days').value);
                 if (!confirm('Delete all job results older than ' + days + ' days?')) return;
-    
                 $('cleanup-msg').textContent = 'Cleaning...';
                 fetch(adminApiBase + '/cleanup?days=' + encodeURIComponent(days), { method: 'POST' })
                     .then(function(r) { return r.json(); })
                     .then(function(data) {
                         $('cleanup-msg').innerHTML = '<span class="label label-success">Removed ' + data.removed + ' jobs.</span>';
-                        // Opcional: refrescar estadísticas y resumen tras limpieza
                         loadSummary();
                     })
                     .catch(function(err) {
@@ -290,22 +338,59 @@
             });
         }
 
-        function showSummary() {
-            $('summary-view').style.display = 'block';
-            $('detail-view').style.display = 'none';
+        // ── MEJORA 3: timer helper ────────────────────────────────
+        function startRefreshTimer() {
+            clearInterval(refreshTimer);
+            if (refreshSeconds > 0) {
+                refreshTimer = setInterval(function() {
+                    if ($('summary-view').style.display !== 'none') loadSummary();
+                }, refreshSeconds * 1000);
+            }
         }
 
-        function loadSummary() {
-            var state = $('summary-state-filter').value;
-            var jobTypeFilter = ($('summary-jobtype-filter').value || '').toLowerCase();
-            var url = summaryApiUrl + (state ? '?state=' + encodeURIComponent(state) : '');
+        // ── MEJORA 4: export CSV ──────────────────────────────────
+        function exportCsv() {
+            var rows = [['Job Type', 'Success', 'Failed', 'Avg Duration', 'Last Execution']];
+            document.querySelectorAll('#summary-body tr').forEach(function(tr) {
+                var cells = tr.querySelectorAll('td');
+                if (cells.length >= 6) {
+                    rows.push([
+                        '"' + (cells[0].textContent || '').replace(/"/g, '""') + '"',
+                        (cells[2].textContent || '').trim(),
+                        (cells[3].textContent || '').trim(),
+                        (cells[5].textContent || '').trim(),
+                        (cells[4].textContent || '').trim()
+                    ]);
+                }
+            });
+            var csv  = rows.map(function(r) { return r.join(','); }).join('\n');
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var a    = document.createElement('a');
+            a.href   = URL.createObjectURL(blob);
+            a.download = 'job-insights-' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
 
-            $('summary-body').innerHTML = '<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>';
+        // ── Views ─────────────────────────────────────────────────
+        function showSummary() {
+            $('summary-view').style.display = 'block';
+            $('detail-view').style.display  = 'none';
+        }
+
+        // ── Load Summary ──────────────────────────────────────────
+        function loadSummary() {
+            var state         = $('summary-state-filter').value;
+            var jobTypeFilter = ($('summary-jobtype-filter').value || '').toLowerCase();
+            var url           = summaryApiUrl + (state ? '?state=' + encodeURIComponent(state) : '');
+
+            $('summary-body').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>';
+
             fetch(url)
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     var summaries = data.summaries || [];
-                    // Filtrar por tipo de job si hay texto
                     if (jobTypeFilter) {
                         summaries = summaries.filter(function(s) {
                             return s.jobType.toLowerCase().indexOf(jobTypeFilter) !== -1;
@@ -314,121 +399,150 @@
                     renderSummary(summaries);
                 })
                 .catch(function(err) {
-                    $('summary-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
+                    $('summary-body').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
                 });
         }
 
+        // ── Render Summary ────────────────────────────────────────
         function renderSummary(summaries) {
             var tbody = $('summary-body');
             if (!summaries.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No job types found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No job types found.</td></tr>';
                 updateStats(0, 0, 0);
                 return;
             }
 
             var html = '';
             var totalSuccess = 0, totalFailed = 0;
+
             summaries.forEach(function(s) {
+                // ── Dots ─────────────────────────────────────────
                 var dots = '';
                 if (s.recentExecutions) {
                     s.recentExecutions.forEach(function(exec) {
                         var cls = exec.state ? exec.state.toLowerCase() : '';
-                        var title = exec.state + ' at ' + new Date(exec.timestamp).toLocaleTimeString();
-                        dots += '<span class="state-dot ' + cls + '" data-state="' + exec.state + '" data-time="' + new Date(exec.timestamp).toLocaleString() + '" data-jobid="' + (exec.jobId || '') + '" data-duration="' + (exec.duration != null ? exec.duration.toFixed(1)+'s' : '') + '"></span>';
+                        dots += '<span class="state-dot ' + cls + '"'
+                              + ' data-state="'    + exec.state + '"'
+                              + ' data-time="'     + new Date(exec.timestamp).toLocaleString() + '"'
+                              + ' data-jobid="'    + (exec.jobId || '') + '"'
+                              + ' data-duration="' + (exec.duration != null ? exec.duration.toFixed(1) + 's' : '') + '"'
+                              + '></span>';
                     });
                 }
-                var lastExec = s.lastExecution ? relativeTime(new Date(s.lastExecution)) : 'N/A';
-                var avgDuration = s.avgDuration ? (s.avgDuration.toFixed(1) + 's') : 'N/A';
 
-                html += '<tr>';
+                // ── MEJORA 2: fila roja si el último es Failed ───
+                var lastState = '';
+                if (s.recentExecutions && s.recentExecutions.length > 0) {
+                    lastState = s.recentExecutions[s.recentExecutions.length - 1].state || '';
+                }
+                var rowClass = lastState === 'Failed' ? ' last-failed' : '';
+
+                // ── MEJORA 6: fallos consecutivos ────────────────
+                var consecutive = 0;
+                if (s.recentExecutions) {
+                    for (var i = s.recentExecutions.length - 1; i >= 0; i--) {
+                        if (s.recentExecutions[i].state === 'Failed') consecutive++;
+                        else break;
+                    }
+                }
+                var failBadge = '';
+                if (consecutive >= 2) {
+                    failBadge = ' <span class="label label-danger consecutive-badge" title="' + consecutive + ' consecutive failures">🔥 ' + consecutive + '</span>';
+                }
+
+                // ── MEJORA 1: Avg Duration con color ─────────────
+                var avgDuration = 'N/A';
+                if (s.avgDuration != null) {
+                    var secs     = s.avgDuration;
+                    var durClass = secs < 1 ? 'dur-green' : secs < 5 ? 'dur-yellow' : 'dur-red';
+                    avgDuration  = '<span class="' + durClass + '">' + secs.toFixed(1) + 's</span>';
+                }
+
+                var lastExec = s.lastExecution ? relativeTime(new Date(s.lastExecution)) : 'N/A';
+
+                html += '<tr class="' + rowClass + '">';
                 html += '<td>' + escapeHtml(s.jobType) + '</td>';
                 html += '<td>' + dots + '</td>';
                 html += '<td><span class="badge">' + s.successCount + '</span></td>';
-                html += '<td><span class="badge">' + s.failedCount + '</span></td>';
+                html += '<td><span class="badge">' + s.failedCount + '</span>' + failBadge + '</td>';
                 html += '<td>' + lastExec + '</td>';
                 html += '<td>' + avgDuration + '</td>';
                 html += '<td><button class="btn btn-xs btn-default view-history" data-jobtype="' + escapeHtml(s.jobType) + '">View Full History</button></td>';
                 html += '</tr>';
-                totalSuccess += s.successCount;
-                totalFailed += s.failedCount;
-            });
-            tbody.innerHTML = html;
 
+                totalSuccess += s.successCount;
+                totalFailed  += s.failedCount;
+            });
+
+            tbody.innerHTML = html;
             updateStats(summaries.length, totalSuccess, totalFailed);
 
-            // Tooltip en los puntos
-            var dots = document.querySelectorAll('#summary-body .state-dot');
-            for (var i = 0; i < dots.length; i++) {
-                (function(dot) {
-                    dot.addEventListener('mouseenter', function(e) {
-                        var el = e.target;
-                        var state = el.getAttribute('data-state');
-                        var time = el.getAttribute('data-time');
-                        var jobId = el.getAttribute('data-jobid');
-                        var duration = el.getAttribute('data-duration');
-                        var html = '<strong>' + state + '</strong><br>' + time;
-                        if (duration) html += '<br>Duration: ' + duration;
-                        if (jobId) html += '<br>Job: <a href="' + jobDetailUrl(jobId) + '" target="_blank">#' + jobId.substring(0,8) + '</a>';
-                        tooltipDiv.innerHTML = html;
-                        tooltipDiv.style.display = 'block';
-                        var rect = el.getBoundingClientRect();
-                        var left = rect.left + window.scrollX + rect.width/2 - tooltipDiv.offsetWidth/2;
-                        var top = rect.top + window.scrollY - tooltipDiv.offsetHeight - 8;
-                        tooltipDiv.style.left = left + 'px';
-                        tooltipDiv.style.top = top + 'px';
-                    });
-                    dot.addEventListener('mouseleave', function() {
-                        tooltipDiv.style.display = 'none';
-                    });
-                })(dots[i]);
-            }
-
-            // Click en puntos de colores para ir al detalle filtrado
-            on('.state-dot', 'click', function() {
-                var state = this.getAttribute('data-state');
-                var jobType = this.closest('tr').querySelector('.view-history').getAttribute('data-jobtype');
-                showDetail(jobType);
-                setTimeout(function() {
-                    $('detail-state-filter').value = state;
-                    loadDetail(jobType);
-                }, 200);
+            // ── Tooltips en los dots ──────────────────────────────
+            document.querySelectorAll('#summary-body .state-dot').forEach(function(dot) {
+                dot.addEventListener('mouseenter', function(e) {
+                    var el       = e.target;
+                    var state    = el.getAttribute('data-state');
+                    var time     = el.getAttribute('data-time');
+                    var jobId    = el.getAttribute('data-jobid');
+                    var duration = el.getAttribute('data-duration');
+                    var ttHtml   = '<strong>' + state + '</strong><br>' + time;
+                    if (duration) ttHtml += '<br>Duration: ' + duration;
+                    if (jobId)    ttHtml += '<br>Job: <a href="' + jobDetailUrl(jobId) + '" target="_blank">#' + jobId.substring(0, 8) + '</a>';
+                    tooltipDiv.innerHTML      = ttHtml;
+                    tooltipDiv.style.display  = 'block';
+                    var rect = el.getBoundingClientRect();
+                    tooltipDiv.style.left = (rect.left + window.scrollX + rect.width / 2 - tooltipDiv.offsetWidth / 2) + 'px';
+                    tooltipDiv.style.top  = (rect.top  + window.scrollY - tooltipDiv.offsetHeight - 8) + 'px';
+                });
+                dot.addEventListener('mouseleave', function() {
+                    tooltipDiv.style.display = 'none';
+                });
             });
 
-            // Evento para los botones "View Full History"
+            // ── Click en dot -> detalle filtrado por id ────────
+            document.querySelectorAll('#summary-body .state-dot').forEach(function(dot) {
+                dot.addEventListener('click', function(e) {
+                    var jobId = this.getAttribute('data-jobid');
+                    if (jobId) {
+                        window.open(jobDetailUrl(jobId), '_blank');
+                    }
+                });
+            });
+
+            // ── View Full History ─────────────────────────────────
             on('.view-history', 'click', function() {
-                var jobType = this.getAttribute('data-jobtype');
-                showDetail(jobType);
+                showDetail(this.getAttribute('data-jobtype'));
             });
         }
 
+        // ── Stats ─────────────────────────────────────────────────
         function updateStats(types, success, failed) {
             var total = success + failed;
-            $('stat-types').textContent = types;
-            $('stat-total').textContent = total;
-            var rate = total ? (success / total * 100).toFixed(1) + '%' : '-';
-            $('stat-rate').textContent = rate;
+            $('stat-types').textContent   = types;
+            $('stat-total').textContent   = total;
+            $('stat-rate').textContent    = total ? (success / total * 100).toFixed(1) + '%' : '-';
             $('stat-updated').textContent = new Date().toLocaleTimeString();
         }
 
+        // ── Detail ────────────────────────────────────────────────
         function showDetail(jobType) {
             currentJobType = jobType;
-            currentPage = 1;
-            // Reiniciar ordenación y filtro
-            currentSort = { field: 'lastTimestamp', direction: 'desc' };
-            $('detail-search').value = '';
+            currentPage    = 1;
+            currentSort    = { field: 'lastTimestamp', direction: 'desc' };
+            $('detail-search').value      = '';
             $('detail-state-filter').value = '';
             $('summary-view').style.display = 'none';
-            $('detail-view').style.display = 'block';
+            $('detail-view').style.display  = 'block';
             $('detail-jobtype-label').textContent = jobType;
             loadDetail(jobType);
         }
 
         function loadDetail(jobType) {
             var state = $('detail-state-filter').value;
-            var url = detailApiUrl + '?jobType=' + encodeURIComponent(jobType);
+            var url   = detailApiUrl + '?jobType=' + encodeURIComponent(jobType);
             if (state) url += '&state=' + encodeURIComponent(state);
 
-            $('detail-body').innerHTML = '<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>';
+            $('detail-body').innerHTML     = '<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>';
             $('detail-pagination').innerHTML = '';
 
             fetch(url)
@@ -445,17 +559,15 @@
 
         function sortAndFilter() {
             var search = ($('detail-search').value || '').toLowerCase();
-            // Filtrar primero
             filteredJobs = allDetailJobs.filter(function(j) {
                 if (!search) return true;
-                return (j.jobId && j.jobId.toLowerCase().indexOf(search) !== -1) ||
+                return (j.jobId        && j.jobId.toLowerCase().indexOf(search)        !== -1) ||
                        (j.errorMessage && j.errorMessage.toLowerCase().indexOf(search) !== -1) ||
-                       (j.queue && j.queue.toLowerCase().indexOf(search) !== -1);
+                       (j.queue        && j.queue.toLowerCase().indexOf(search)        !== -1);
             });
 
-            // Ordenar
             var field = currentSort.field;
-            var dir = currentSort.direction;
+            var dir   = currentSort.direction;
             filteredJobs.sort(function(a, b) {
                 var valA = a[field] || '';
                 var valB = b[field] || '';
@@ -467,41 +579,41 @@
                     valB = valB.toString().toLowerCase();
                 }
                 if (valA < valB) return dir === 'asc' ? -1 : 1;
-                if (valA > valB) return dir === 'asc' ? 1 : -1;
+                if (valA > valB) return dir === 'asc' ?  1 : -1;
                 return 0;
             });
         }
 
         function renderDetailPage() {
-            var total = filteredJobs.length;
-            var start = (currentPage - 1) * pageSize;
-            var end = start + pageSize;
-            var pageJobs = filteredJobs.slice(start, end);
-            renderDetail(pageJobs, total);
+            var start    = (currentPage - 1) * pageSize;
+            var pageJobs = filteredJobs.slice(start, start + pageSize);
+            renderDetail(pageJobs, filteredJobs.length);
         }
 
         function renderDetail(jobs, total) {
-            var tbody = $('detail-body');
+            var tbody         = $('detail-body');
             var paginationDiv = $('detail-pagination');
+
             if (!jobs.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No jobs found.</td></tr>';
+                tbody.innerHTML         = '<tr><td colspan="6" class="text-center text-muted">No jobs found.</td></tr>';
                 paginationDiv.innerHTML = '';
                 return;
             }
 
             var html = '';
             jobs.forEach(function(j) {
-                var shortId = j.jobId ? j.jobId.substring(0, 8) : '';
+                var shortId    = j.jobId ? j.jobId.substring(0, 8) : '';
                 var stateClass = j.lastState ? j.lastState.toLowerCase() : '';
                 var badgeClass = stateClass === 'succeeded' ? 'label label-success' :
-                                 stateClass === 'failed' ? 'label label-danger' : 'label label-default';
+                                 stateClass === 'failed'    ? 'label label-danger'  : 'label label-default';
                 var ts = j.lastTimestamp ? relativeTime(new Date(j.lastTimestamp)) : '';
+
                 var errorHtml = '';
                 if (j.errorMessage) {
                     if (j.errorMessage.length > 80) {
-                        errorHtml = '<span class="error-short">' + escapeHtml(j.errorMessage.substring(0, 80)) + '…</span>' +
-                                    '<span class="error-full" style="display:none;">' + escapeHtml(j.errorMessage) + '</span> ' +
-                                    '<a href="javascript:void(0)" class="error-toggle small">more</a>';
+                        errorHtml = '<span class="error-short">'  + escapeHtml(j.errorMessage.substring(0, 80)) + '…</span>'
+                                  + '<span class="error-full" style="display:none;">' + escapeHtml(j.errorMessage) + '</span> '
+                                  + '<a href="javascript:void(0)" class="error-toggle small">more</a>';
                     } else {
                         errorHtml = escapeHtml(j.errorMessage);
                     }
@@ -509,7 +621,7 @@
 
                 html += '<tr class="detail-row ' + stateClass + ' fade-in">';
                 html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank">#' + shortId + '</a></td>';
-                html += '<td><a href="' + queueUrl(j.queue) + '" target="_blank" class="text-muted">' + escapeHtml(j.queue) + '</a></td>';
+                html += '<td><a href="' + queueUrl(j.queue)     + '" target="_blank" class="text-muted">' + escapeHtml(j.queue) + '</a></td>';
                 html += '<td><span class="' + badgeClass + '">' + j.lastState + '</span></td>';
                 html += '<td>' + ts + '</td>';
                 html += '<td>' + errorHtml + '</td>';
@@ -518,48 +630,41 @@
             });
             tbody.innerHTML = html;
 
-            // Paginación
+            // ── Paginación ────────────────────────────────────────
             var totalPages = Math.ceil(total / pageSize);
             var startCount = (currentPage - 1) * pageSize + 1;
-            var endCount = Math.min(currentPage * pageSize, total);
-            var pagHtml = '<div class="clearfix">';
-            pagHtml += '<span class="pull-left">Showing ' + startCount + ' - ' + endCount + ' of ' + total + ' jobs</span>';
+            var endCount   = Math.min(currentPage * pageSize, total);
+            var pagHtml    = '<div class="clearfix">';
+            pagHtml += '<span class="pull-left">Showing ' + startCount + ' – ' + endCount + ' of ' + total + ' jobs</span>';
             pagHtml += '<div class="pull-right">';
-            if (currentPage > 1) {
-                pagHtml += '<button class="btn btn-default btn-xs" id="prev-page">Previous</button> ';
-            }
-            if (currentPage < totalPages) {
-                pagHtml += '<button class="btn btn-default btn-xs" id="next-page">Next</button>';
-            }
+            if (currentPage > 1)          pagHtml += '<button class="btn btn-default btn-xs" id="prev-page">Previous</button> ';
+            if (currentPage < totalPages) pagHtml += '<button class="btn btn-default btn-xs" id="next-page">Next</button>';
             pagHtml += '</div></div>';
             paginationDiv.innerHTML = pagHtml;
 
             var prevBtn = $('prev-page');
             var nextBtn = $('next-page');
-            if (prevBtn) {
-                prevBtn.addEventListener('click', function() { currentPage--; renderDetailPage(); });
-            }
-            if (nextBtn) {
-                nextBtn.addEventListener('click', function() { currentPage++; renderDetailPage(); });
-            }
+            if (prevBtn) prevBtn.addEventListener('click', function() { currentPage--; renderDetailPage(); });
+            if (nextBtn) nextBtn.addEventListener('click', function() { currentPage++; renderDetailPage(); });
 
-            // Toggle error messages
+            // ── Toggle error ──────────────────────────────────────
             on('.error-toggle', 'click', function() {
-                var cell = this.parentNode;
+                var cell  = this.parentNode;
                 var short = cell.querySelector('.error-short');
-                var full = cell.querySelector('.error-full');
+                var full  = cell.querySelector('.error-full');
                 if (short.style.display !== 'none') {
                     short.style.display = 'none';
-                    full.style.display = 'inline';
-                    this.textContent = 'less';
+                    full.style.display  = 'inline';
+                    this.textContent    = 'less';
                 } else {
                     short.style.display = 'inline';
-                    full.style.display = 'none';
-                    this.textContent = 'more';
+                    full.style.display  = 'none';
+                    this.textContent    = 'more';
                 }
             });
         }
 
+        // ── Sort indicators ───────────────────────────────────────
         function updateSortIndicators() {
             document.querySelectorAll('#detail-table th.sortable').forEach(function(th) {
                 th.classList.remove('asc', 'desc');
@@ -569,26 +674,23 @@
             });
         }
 
-        function jobDetailUrl(jobId) {
-            return '@Url.To("/jobs/details")' + '/' + jobId;
-        }
+        // ── URL helpers ───────────────────────────────────────────
+        function jobDetailUrl(jobId) { return '@Url.To("/jobs/details")' + '/' + jobId; }
+        function queueUrl(queue)     { return '@Url.To("/jobs/enqueued")' + '/' + encodeURIComponent(queue); }
 
-        function queueUrl(queue) {
-            return '@Url.To("/jobs/enqueued")' + '/' + encodeURIComponent(queue);
-        }
-
+        // ── Time helper ───────────────────────────────────────────
         function relativeTime(date) {
-            var now = new Date();
-            var diff = now - date;
+            var diff    = new Date() - date;
             var seconds = Math.floor(diff / 1000);
-            if (seconds < 60) return 'just now';
+            if (seconds < 60)   return 'just now';
             var minutes = Math.floor(seconds / 60);
-            if (minutes < 60) return minutes + 'm ago';
-            var hours = Math.floor(minutes / 60);
-            if (hours < 24) return hours + 'h ago';
+            if (minutes < 60)   return minutes + 'm ago';
+            var hours   = Math.floor(minutes / 60);
+            if (hours   < 24)   return hours + 'h ago';
             return date.toLocaleDateString();
         }
 
+        // ── Escape HTML ───────────────────────────────────────────
         function escapeHtml(text) {
             if (!text) return '';
             var div = document.createElement('div');
@@ -596,6 +698,7 @@
             return div.innerHTML;
         }
 
+        // ── Boot ──────────────────────────────────────────────────
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
