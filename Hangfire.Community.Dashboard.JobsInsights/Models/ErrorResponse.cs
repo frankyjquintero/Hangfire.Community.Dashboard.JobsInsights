@@ -1,4 +1,4 @@
-namespace Hangfire.Community.Dashboard.ExecutionInsights.Models
+namespace Hangfire.Community.Dashboard.JobsInsights.Models
 {
     internal class ErrorResponse
     {

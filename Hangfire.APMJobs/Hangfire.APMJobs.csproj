@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hangfire.Community.Dashboard.ExecutionInsights\Hangfire.Community.Dashboard.ExecutionInsights.csproj" />
+    <ProjectReference Include="..\Hangfire.Community.Dashboard.JobsInsights\Hangfire.Community.Dashboard.JobsInsights.csproj" />
   </ItemGroup>
 
 </Project>

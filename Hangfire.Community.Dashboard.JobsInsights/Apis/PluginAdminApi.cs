@@ -2,10 +2,10 @@
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Hangfire.Community.Dashboard.JobsInsights.Services;
 using Hangfire.Dashboard;
-using Hangfire.Community.Dashboard.ExecutionInsights.Services;
 
-namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
+namespace Hangfire.Community.Dashboard.JobsInsights.Apis
 {
     internal class PluginAdminApi : IDashboardDispatcher
     {

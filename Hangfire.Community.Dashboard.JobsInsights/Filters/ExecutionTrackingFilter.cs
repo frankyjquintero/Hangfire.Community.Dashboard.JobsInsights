@@ -1,4 +1,4 @@
-﻿using Hangfire.Community.Dashboard.ExecutionInsights.Services;
+﻿using Hangfire.Community.Dashboard.JobsInsights.Services;
 using Hangfire.States;
 using Hangfire.Storage;
 using System;
@@ -12,7 +12,7 @@ public class ExecutionTrackingFilter : IApplyStateFilter
     {
         var stateName = context.NewState.Name;
 
-        // 1. Al encolar, guardar cola y tipo de job
+        // Al encolar, guardar cola y tipo de job
         if (context.NewState is EnqueuedState enqueuedState)
         {
             var queueInitial = enqueuedState.Queue ?? "default";
@@ -25,7 +25,7 @@ public class ExecutionTrackingFilter : IApplyStateFilter
             return;
         }
 
-        // 2. Al empezar a procesar, guardar el timestamp de inicio
+        // Al empezar a procesar, guardar el timestamp de inicio
         if (context.NewState is ProcessingState)
         {
             var processingStartedAt = DateTime.UtcNow.ToString("O");
@@ -33,11 +33,11 @@ public class ExecutionTrackingFilter : IApplyStateFilter
             return;
         }
 
-        // 3. Solo procesamos estados finales
+        // Solo procesamos estados finales
         if (stateName != SucceededState.StateName && stateName != FailedState.StateName)
             return;
 
-        // 4. Obtener cola y tipo de job almacenados
+        // Obtener cola y tipo de job almacenados
         var queue = GetStoredParameter(context.Connection, context.BackgroundJob.Id, QueueParameterKey) ?? "default";
         var jobType = GetStoredParameter(context.Connection, context.BackgroundJob.Id, JobTypeParameterKey);
 
@@ -46,7 +46,7 @@ public class ExecutionTrackingFilter : IApplyStateFilter
             jobType = GetJobType(context.BackgroundJob.Job) ?? "Unknown";
         }
 
-        // 5. Recuperar el momento de inicio del procesamiento
+        // Recuperar el momento de inicio del procesamiento
         var startedAtStr = context.Connection.GetJobParameter(context.BackgroundJob.Id, "ExecutionInsights.ProcessingStartedAt");
         DateTime? startedAt = null;
         if (!string.IsNullOrEmpty(startedAtStr))
@@ -55,7 +55,7 @@ public class ExecutionTrackingFilter : IApplyStateFilter
                 startedAt = parsed;
         }
 
-        // 6. Registrar resultado final (con duración si existe)
+        // Registrar resultado final (con duración si existe)
         JobResultService.RecordResult(transaction, jobType, context.BackgroundJob.Id, queue, stateName, context.NewState, startedAt);
     }
 

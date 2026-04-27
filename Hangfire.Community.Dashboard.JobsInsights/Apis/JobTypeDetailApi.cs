@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Hangfire.Dashboard;
-using Hangfire.Community.Dashboard.ExecutionInsights.Services;
+using Hangfire.Community.Dashboard.JobsInsights.Services;
 
-namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
+namespace Hangfire.Community.Dashboard.JobsInsights.Apis
 {
     internal class JobTypeDetailApi : IDashboardDispatcher
     {

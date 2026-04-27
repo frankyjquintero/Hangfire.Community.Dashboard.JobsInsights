@@ -1,25 +1,52 @@
-﻿# Hangfire.Community.Dashboard.Heatmap
+# Hangfire.Community.Dashboard.JobsInsights
 
-![MIT License](https://img.shields.io/badge/license-MIT-orange.svg)
-![NuGet](https://img.shields.io/nuget/v/Hangfire.Community.Dashboard.Heatmap.svg)
+![License](https://img.shields.io/badge/license-MIT-orange.svg)
+![NuGet](https://img.shields.io/nuget/v/Hangfire.Community.Dashboard.JobsInsights.svg)
 
-Hangfire.Community.Dashboard.Heatmap adds a visual timeline and heatmap view to your Hangfire Dashboard, letting you see exactly when your recurring jobs are scheduled to run throughout the day.
-
----
-
-Visualize your recurring job schedules at a glance with an timeline showing past and upcoming executions, or switch to the heatmap view to visualize execution density by hour.
-
-<img width="1865" height="876" alt="image" src="https://github.com/user-attachments/assets/5368b8a6-e8a8-4dcd-a813-f882a34585d7" />
-<img width="1853" height="872" alt="image" src="https://github.com/user-attachments/assets/d69b0f15-4e9e-4042-b49b-9c254a883251" />
+​**JobsInsights** adds a powerful operational observability page to the Hangfire Dashboard.  
+Monitor the health and performance of your background jobs at a glance, with a live summary grouped by job type, detailed historical views, interactive charts, and built‑in data management.
 
 ---
 
+### ✨ Features
+
+- **Job Type Summary**  
+  See every job type with its last 15 execution results (green = success, red = failure) and average duration.  
+  Quickly filter by state or job type name.
+
+- **Full History**  
+  Drill down into any job type to view all tracked executions with client‑side pagination, search, and sortable columns.  
+  Errors are expandable, and each job links directly to its Hangfire details page.
+
+- **Interactive Charts** *(per job type detail)*
+  - **Duration Trends** – Explore avg duration over time (last 100 exec, 1h, 7d, 15d, 30d, 45d).  
+  - **Throughput** – View total executions and success rate per hour for the last 24h.  
+  - Configurable **alert threshold** – the chart turns red and a warning banner appears when the average duration exceeds your limit.  
+  - Built‑in stats: min, max, P95, and a dashed average line on the chart.  
+  - Export the chart as PNG image.
+
+- **Data Management**  
+  Set a retention period and delete older execution data directly from the dashboard.
+
+- **Native Integration**  
+  Uses only Hangfire’s own storage – no external databases, no additional infrastructure.  
+  Blends seamlessly into the existing dashboard design with Bootstrap 3 and native JavaScript.
+
+---
+
+### 📸 Screenshots
+
+
+![Summary view](https://user-images.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/summary.png)  
+![Detail view with chart](https://user-images.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/detail.png)
+
+---
 
 ## Setup for ASP.NET Core
 
 ```csharp
 using Hangfire;
-using Hangfire.Community.Dashboard.Heatmap;
+using Hangfire.Community.Dashboard.JobsInsights;
 
 namespace Application
 {
@@ -30,9 +57,8 @@ namespace Application
             services.AddHangfire(configuration =>
             {
                 configuration
-                    .UseMemoryStorage() 
-                    ... // Your other stuff
-                    .UseHeatmapPage(); // Add the Cron Heatmap page
+                    .UseMemoryStorage()          // or your storage
+                    .UseJobsInsights();          // Add the Jobs Insights page
             });
 
             services.AddHangfireServer();
@@ -45,7 +71,7 @@ namespace Application
 
 ```csharp
 using Hangfire;
-using Hangfire.Community.Dashboard.Heatmap;
+using Hangfire.Community.Dashboard.JobsInsights;
 
 namespace Application
 {
@@ -54,29 +80,40 @@ namespace Application
         public void Configuration(IAppBuilder app)
         {
             GlobalConfiguration.Configuration
-                .UseHeatmapPage(); // Add the Cron Heatmap page
+                .UseJobsInsights();             // Add the Jobs Insights page
 
             app.UseHangfireDashboard();
         }
     }
 }
+
 ```
 
----
-
 ## Requirements
+Hangfire 1.7.0 or later
 
-- Hangfire 1.7.0 or later
-- .NET Standard 2.0 / .NET Framework 4.6.1 / .NET Core 2.0 or later
----
+.NET Standard 2.0 / .NET Framework 4.6.1 / .NET Core 2.0 or later
 
-## Contributing
-
+Contributing
 Contributions are welcome! Please open an issue or pull request for new features, bug fixes, or suggestions.
 
-## License
 
-Copyright (c) 2026
+---
+
+## 🙏 Acknowledgments
+
+This project was heavily inspired by the architectural patterns and dashboard extension techniques demonstrated in 
+[Hangfire.Community.Dashboard.Heatmap](https://github.com/brodrigz/Hangfire.Community.Dashboard.Heatmap) by [brodrigz](https://github.com/brodrigz). 
+
+The Heatmap plugin served as a reference for integrating Razor-based pages, custom API dispatchers, and navigation menus within the Hangfire Dashboard ecosystem.
+Many of the foundational approaches used in JobsInsights — such as `IDashboardDispatcher`, embedded Razor views, and native storage usage — were adapted 
+from that excellent work. Thank you for sharing it with the community!
+
+
+## License
+MIT License
+
+Copyright (c) 2025 FrankyJquintero
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

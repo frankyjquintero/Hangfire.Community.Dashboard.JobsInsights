@@ -1,6 +1,6 @@
 using Hangfire;
-using Hangfire.Community.Dashboard.ExecutionInsights;
-using Hangfire.Community.Dashboard.ExecutionInsights.Services;
+using Hangfire.Community.Dashboard.JobsInsights.Services;
+using Hangfire.Community.Dashboard.JobsInsights;
 using Hangfire.MemoryStorage;
 
 
@@ -22,11 +22,11 @@ builder.Services.AddHangfire(config =>
 {
     if (storageType == "SqlServer")
     {
-        config.UseSqlServerStorage(sqlConn).UseExecutionInsights();
+        config.UseSqlServerStorage(sqlConn).UseJobsInsights();
     }
     else
     {
-        config.UseMemoryStorage().UseExecutionInsights();
+        config.UseMemoryStorage().UseJobsInsights();
     }
 });
 builder.Services.AddHangfireServer();

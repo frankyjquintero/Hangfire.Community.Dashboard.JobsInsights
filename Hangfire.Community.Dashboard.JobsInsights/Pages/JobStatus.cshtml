@@ -1,14 +1,14 @@
-﻿@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.ExecutionInsights.Pages *@
+﻿@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.JobsInsights.Pages *@
 @using Hangfire.Dashboard
-@using Hangfire.Community.Dashboard.ExecutionInsights
-@using Hangfire.Community.Dashboard.ExecutionInsights.Pages
+@using Hangfire.Community.Dashboard.JobsInsights
+@using Hangfire.Community.Dashboard.JobsInsights.Pages
 @using Hangfire.Dashboard.Pages
 @inherits Hangfire.Dashboard.RazorPage
 @{
     Layout = new LayoutPage(JobStatus.Title);
-    var summaryApiUrl = $"{Url.To(ExecutionInsightsExtension.RouteBase)}/api/jobtype-summary";
-    var detailApiUrl = $"{Url.To(ExecutionInsightsExtension.RouteBase)}/api/jobtype-detail";
-    var version = typeof(ExecutionInsightsExtension).Assembly.GetName().Version;
+    var summaryApiUrl = $"{Url.To(JobsInsightsExtension.RouteBase)}/api/jobtype-summary";
+    var detailApiUrl = $"{Url.To(JobsInsightsExtension.RouteBase)}/api/jobtype-detail";
+    var version = typeof(JobsInsightsExtension).Assembly.GetName().Version;
     var versionString = $"v{version.Major}.{version.Minor}.{version.Build}";
 }
 
@@ -314,7 +314,7 @@
     (function() {
         var summaryApiUrl = '@summaryApiUrl';
         var detailApiUrl  = '@detailApiUrl';
-        var adminApiBase  = '@Url.To(ExecutionInsightsExtension.RouteBase)' + '/api/admin';
+        var adminApiBase  = '@Url.To(JobsInsightsExtension.RouteBase)' + '/api/admin';
 
         var allDetailJobs  = [];
         var filteredJobs   = [];

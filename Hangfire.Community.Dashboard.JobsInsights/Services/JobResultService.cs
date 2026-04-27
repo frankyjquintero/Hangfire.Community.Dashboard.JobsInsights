@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 
-namespace Hangfire.Community.Dashboard.ExecutionInsights.Services
+namespace Hangfire.Community.Dashboard.JobsInsights.Services
 {
     internal static class JobResultService
     {

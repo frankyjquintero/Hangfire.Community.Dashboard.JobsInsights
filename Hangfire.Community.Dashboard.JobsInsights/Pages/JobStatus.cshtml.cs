@@ -9,7 +9,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Hangfire.Community.Dashboard.ExecutionInsights.Pages
+namespace Hangfire.Community.Dashboard.JobsInsights.Pages
 {
     using System;
     using System.Collections.Generic;
@@ -17,13 +17,13 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Pages
     using System.Text;
     
     #line 3 "..\..\Pages\JobStatus.cshtml"
-    using Hangfire.Community.Dashboard.ExecutionInsights;
+    using Hangfire.Community.Dashboard.JobsInsights;
     
     #line default
     #line hidden
     
     #line 4 "..\..\Pages\JobStatus.cshtml"
-    using Hangfire.Community.Dashboard.ExecutionInsights.Pages;
+    using Hangfire.Community.Dashboard.JobsInsights.Pages;
     
     #line default
     #line hidden
@@ -61,9 +61,9 @@ WriteLiteral("\r\n");
             #line 7 "..\..\Pages\JobStatus.cshtml"
   
     Layout = new LayoutPage(JobStatus.Title);
-    var summaryApiUrl = $"{Url.To(ExecutionInsightsExtension.RouteBase)}/api/jobtype-summary";
-    var detailApiUrl = $"{Url.To(ExecutionInsightsExtension.RouteBase)}/api/jobtype-detail";
-    var version = typeof(ExecutionInsightsExtension).Assembly.GetName().Version;
+    var summaryApiUrl = $"{Url.To(JobsInsightsExtension.RouteBase)}/api/jobtype-summary";
+    var detailApiUrl = $"{Url.To(JobsInsightsExtension.RouteBase)}/api/jobtype-detail";
+    var version = typeof(JobsInsightsExtension).Assembly.GetName().Version;
     var versionString = $"v{version.Major}.{version.Minor}.{version.Build}";
 
 
@@ -300,7 +300,7 @@ WriteLiteral("\';\r\n        var adminApiBase  = \'");
 
             
             #line 317 "..\..\Pages\JobStatus.cshtml"
-                        Write(Url.To(ExecutionInsightsExtension.RouteBase));
+                        Write(Url.To(JobsInsightsExtension.RouteBase));
 
             
             #line default

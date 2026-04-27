@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using Hangfire.Storage;
 
-namespace Hangfire.Community.Dashboard.ExecutionInsights.Services
+namespace Hangfire.Community.Dashboard.JobsInsights.Services
 {
     internal class PluginStatsService
     {

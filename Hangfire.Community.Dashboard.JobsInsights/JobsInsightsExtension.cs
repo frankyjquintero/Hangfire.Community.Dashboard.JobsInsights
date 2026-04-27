@@ -1,15 +1,14 @@
-﻿using Hangfire;
-using Hangfire.Dashboard;
-using Hangfire.Community.Dashboard.ExecutionInsights.Apis;
-using Hangfire.Community.Dashboard.ExecutionInsights.Pages;
+﻿using Hangfire.Dashboard;
+using Hangfire.Community.Dashboard.JobsInsights.Pages;
+using Hangfire.Community.Dashboard.JobsInsights.Apis;
 
-namespace Hangfire.Community.Dashboard.ExecutionInsights
+namespace Hangfire.Community.Dashboard.JobsInsights
 {
-    public static class ExecutionInsightsExtension
+    public static class JobsInsightsExtension
     {
-        public static string RouteBase = "/execution-insights";
+        public static string RouteBase = "/jobs-insights";
 
-        public static IGlobalConfiguration UseExecutionInsights(this IGlobalConfiguration config)
+        public static IGlobalConfiguration UseJobsInsights(this IGlobalConfiguration config)
         {
             GlobalJobFilters.Filters.Add(new ExecutionTrackingFilter());
 

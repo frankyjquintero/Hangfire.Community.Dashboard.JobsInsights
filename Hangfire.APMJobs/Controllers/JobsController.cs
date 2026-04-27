@@ -46,7 +46,7 @@ namespace Hangfire.APMJobs.Controllers
             jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.UpdateExchangeRates()));
             jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.PurgeOldLogs()));
             // Los siguientes fallarán a propósito
-            //jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.FailingJob_ProcessRefund()));
+            jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.FailingJob_ProcessRefund()));
             //jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.FailingJob_ChargeCreditCard()));
             //jobs.Add(_backgroundJobClient.Enqueue(() => SimulatedTasks.FailingJob_UpdateInventory()));
             // Jobs con algo de demora para aparecer como "Processing"
@@ -129,7 +129,7 @@ namespace Hangfire.APMJobs.Controllers
         public static void FailingJob_ProcessRefund()
         {
             Thread.Sleep(_random.Next(1000, 5000));
-            throw new InvalidOperationException("Refund processing failed: transaction not found.");
+            Console.WriteLine($"[{DateTime.Now}] ProcessRefund.");
         }
         public static void FailingJob_ChargeCreditCard()
         {
