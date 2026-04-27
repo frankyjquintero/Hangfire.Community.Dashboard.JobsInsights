@@ -47,6 +47,7 @@
     .fade-in { animation: fadeIn 0.3s; }
 </style>
 
+<div id="dot-tooltip" style="display:none; position:fixed; background:#333; color:#fff; padding:8px 12px; border-radius:4px; font-size:12px; z-index:9999; pointer-events:none;"></div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
@@ -122,6 +123,7 @@
                                 <th>Success</th>
                                 <th>Failed</th>
                                 <th>Last Execution</th>
+                                <th>Avg Duration</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -204,6 +206,7 @@
         var autoRefresh = true;
         var refreshTimer = null;
         var currentSort = { field: 'lastTimestamp', direction: 'desc' };
+        var tooltipDiv = document.getElementById('dot-tooltip');
 
         // Helpers nativos
         function $(id) { return document.getElementById(id); }
@@ -331,16 +334,19 @@
                     s.recentExecutions.forEach(function(exec) {
                         var cls = exec.state ? exec.state.toLowerCase() : '';
                         var title = exec.state + ' at ' + new Date(exec.timestamp).toLocaleTimeString();
-                        dots += '<span class="state-dot ' + cls + '" title="' + title + '" data-state="' + exec.state + '"></span>';
+                        dots += '<span class="state-dot ' + cls + '" data-state="' + exec.state + '" data-time="' + new Date(exec.timestamp).toLocaleString() + '" data-jobid="' + (exec.jobId || '') + '" data-duration="' + (exec.duration != null ? exec.duration.toFixed(1)+'s' : '') + '"></span>';
                     });
                 }
                 var lastExec = s.lastExecution ? relativeTime(new Date(s.lastExecution)) : 'N/A';
+                var avgDuration = s.avgDuration ? (s.avgDuration.toFixed(1) + 's') : 'N/A';
+
                 html += '<tr>';
                 html += '<td>' + escapeHtml(s.jobType) + '</td>';
                 html += '<td>' + dots + '</td>';
                 html += '<td><span class="badge">' + s.successCount + '</span></td>';
                 html += '<td><span class="badge">' + s.failedCount + '</span></td>';
                 html += '<td>' + lastExec + '</td>';
+                html += '<td>' + avgDuration + '</td>';
                 html += '<td><button class="btn btn-xs btn-default view-history" data-jobtype="' + escapeHtml(s.jobType) + '">View Full History</button></td>';
                 html += '</tr>';
                 totalSuccess += s.successCount;
@@ -349,6 +355,33 @@
             tbody.innerHTML = html;
 
             updateStats(summaries.length, totalSuccess, totalFailed);
+
+            // Tooltip en los puntos
+            var dots = document.querySelectorAll('#summary-body .state-dot');
+            for (var i = 0; i < dots.length; i++) {
+                (function(dot) {
+                    dot.addEventListener('mouseenter', function(e) {
+                        var el = e.target;
+                        var state = el.getAttribute('data-state');
+                        var time = el.getAttribute('data-time');
+                        var jobId = el.getAttribute('data-jobid');
+                        var duration = el.getAttribute('data-duration');
+                        var html = '<strong>' + state + '</strong><br>' + time;
+                        if (duration) html += '<br>Duration: ' + duration;
+                        if (jobId) html += '<br>Job: <a href="' + jobDetailUrl(jobId) + '" target="_blank">#' + jobId.substring(0,8) + '</a>';
+                        tooltipDiv.innerHTML = html;
+                        tooltipDiv.style.display = 'block';
+                        var rect = el.getBoundingClientRect();
+                        var left = rect.left + window.scrollX + rect.width/2 - tooltipDiv.offsetWidth/2;
+                        var top = rect.top + window.scrollY - tooltipDiv.offsetHeight - 8;
+                        tooltipDiv.style.left = left + 'px';
+                        tooltipDiv.style.top = top + 'px';
+                    });
+                    dot.addEventListener('mouseleave', function() {
+                        tooltipDiv.style.display = 'none';
+                    });
+                })(dots[i]);
+            }
 
             // Click en puntos de colores para ir al detalle filtrado
             on('.state-dot', 'click', function() {

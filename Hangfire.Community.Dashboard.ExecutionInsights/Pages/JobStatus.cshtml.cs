@@ -109,6 +109,7 @@ WriteLiteral(@"@keyframes fadeIn {
     .fade-in { animation: fadeIn 0.3s; }
 </style>
 
+<div id=""dot-tooltip"" style=""display:none; position:fixed; background:#333; color:#fff; padding:8px 12px; border-radius:4px; font-size:12px; z-index:9999; pointer-events:none;""></div>
 <div class=""container-fluid"">
     <div class=""row"">
         <div class=""col-md-12"">
@@ -117,7 +118,7 @@ WriteLiteral(@"@keyframes fadeIn {
 
 
             
-            #line 54 "..\..\Pages\JobStatus.cshtml"
+            #line 55 "..\..\Pages\JobStatus.cshtml"
            Write(JobStatus.Title);
 
             
@@ -127,7 +128,7 @@ WriteLiteral("\r\n                <small class=\"text-muted\">");
 
 
             
-            #line 55 "..\..\Pages\JobStatus.cshtml"
+            #line 56 "..\..\Pages\JobStatus.cshtml"
                                      Write(versionString);
 
             
@@ -175,51 +176,52 @@ WriteLiteral("</small>\r\n                <button class=\"btn btn-default btn-sm
 "                <th>Job Type</th>\r\n                                <th>Last 15 E" +
 "xecutions</th>\r\n                                <th>Success</th>\r\n              " +
 "                  <th>Failed</th>\r\n                                <th>Last Exec" +
-"ution</th>\r\n                                <th>Actions</th>\r\n                  " +
-"          </tr>\r\n                        </thead>\r\n                        <tbod" +
-"y id=\"summary-body\">\r\n                            <tr>\r\n                        " +
-"        <td colspan=\"6\" class=\"text-center text-muted\">Loading...</td>\r\n        " +
-"                    </tr>\r\n                        </tbody>\r\n                   " +
-" </table>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div" +
-">\r\n\r\n    <!-- VISTA DETALLE (Full History) -->\r\n    <div id=\"detail-view\" style=" +
-"\"display:none;\">\r\n        <div class=\"row\">\r\n            <div class=\"col-md-12\">" +
-"\r\n                <button class=\"btn btn-link btn-sm\" id=\"back-to-summary\">\r\n   " +
-"                 <span class=\"glyphicon glyphicon-chevron-left\"></span> Back to " +
-"Summary\r\n                </button>\r\n                <h4>Full History: <span id=\"" +
-"detail-jobtype-label\"></span></h4>\r\n            </div>\r\n        </div>\r\n        " +
-"<!-- Filtros del detalle -->\r\n        <div class=\"row\">\r\n            <div class=" +
-"\"col-md-3\">\r\n                <select class=\"form-control input-sm\" id=\"detail-st" +
-"ate-filter\">\r\n                    <option value=\"\">All States</option>\r\n        " +
-"            <option value=\"Succeeded\">Success</option>\r\n                    <opt" +
-"ion value=\"Failed\">Failed</option>\r\n                </select>\r\n            </div" +
-">\r\n            <div class=\"col-md-3\">\r\n                <input type=\"text\" class=" +
-"\"form-control input-sm\" id=\"detail-search\" placeholder=\"Search by ID, error, que" +
-"ue...\">\r\n            </div>\r\n            <div class=\"col-md-2\">\r\n               " +
-" <button class=\"btn btn-primary btn-sm\" id=\"detail-apply\">Apply</button>\r\n      " +
-"          <button class=\"btn btn-default btn-sm\" id=\"detail-clear\">Clear</button" +
-">\r\n                <button class=\"btn btn-default btn-sm\" id=\"detail-reload\"><sp" +
-"an class=\"glyphicon glyphicon-refresh\"></span></button>\r\n            </div>\r\n   " +
-"     </div>\r\n        <div class=\"row\" style=\"margin-top:15px;\">\r\n            <di" +
-"v class=\"col-md-12\">\r\n                <div class=\"table-responsive\">\r\n          " +
-"          <table class=\"table table-hover\" id=\"detail-table\">\r\n                 " +
-"       <thead>\r\n                            <tr>\r\n                              " +
-"  <th class=\"sortable\" data-sort=\"jobId\">Job ID</th>\r\n                          " +
-"      <th class=\"sortable\" data-sort=\"queue\">Queue</th>\r\n                       " +
-"         <th class=\"sortable\" data-sort=\"lastState\">Last State</th>\r\n           " +
-"                     <th class=\"sortable\" data-sort=\"lastTimestamp\">Last Executi" +
-"on</th>\r\n                                <th>Error</th>\r\n                       " +
-"         <th>Actions</th>\r\n                            </tr>\r\n                  " +
-"      </thead>\r\n                        <tbody id=\"detail-body\">\r\n              " +
-"              <tr>\r\n                                <td colspan=\"6\" class=\"text-" +
-"center text-muted\">Loading...</td>\r\n                            </tr>\r\n         " +
-"               </tbody>\r\n                    </table>\r\n                </div>\r\n " +
-"               <div id=\"detail-pagination\" class=\"text-right\"></div>\r\n          " +
-"  </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n<script>\r\n    (function() {\r\n   " +
-"     var summaryApiUrl = \'");
+"ution</th>\r\n                                <th>Avg Duration</th>\r\n             " +
+"                   <th>Actions</th>\r\n                            </tr>\r\n        " +
+"                </thead>\r\n                        <tbody id=\"summary-body\">\r\n   " +
+"                         <tr>\r\n                                <td colspan=\"6\" c" +
+"lass=\"text-center text-muted\">Loading...</td>\r\n                            </tr>" +
+"\r\n                        </tbody>\r\n                    </table>\r\n              " +
+"  </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <!-- VISTA DETAL" +
+"LE (Full History) -->\r\n    <div id=\"detail-view\" style=\"display:none;\">\r\n       " +
+" <div class=\"row\">\r\n            <div class=\"col-md-12\">\r\n                <button" +
+" class=\"btn btn-link btn-sm\" id=\"back-to-summary\">\r\n                    <span cl" +
+"ass=\"glyphicon glyphicon-chevron-left\"></span> Back to Summary\r\n                " +
+"</button>\r\n                <h4>Full History: <span id=\"detail-jobtype-label\"></s" +
+"pan></h4>\r\n            </div>\r\n        </div>\r\n        <!-- Filtros del detalle " +
+"-->\r\n        <div class=\"row\">\r\n            <div class=\"col-md-3\">\r\n            " +
+"    <select class=\"form-control input-sm\" id=\"detail-state-filter\">\r\n           " +
+"         <option value=\"\">All States</option>\r\n                    <option value" +
+"=\"Succeeded\">Success</option>\r\n                    <option value=\"Failed\">Failed" +
+"</option>\r\n                </select>\r\n            </div>\r\n            <div class" +
+"=\"col-md-3\">\r\n                <input type=\"text\" class=\"form-control input-sm\" i" +
+"d=\"detail-search\" placeholder=\"Search by ID, error, queue...\">\r\n            </di" +
+"v>\r\n            <div class=\"col-md-2\">\r\n                <button class=\"btn btn-p" +
+"rimary btn-sm\" id=\"detail-apply\">Apply</button>\r\n                <button class=\"" +
+"btn btn-default btn-sm\" id=\"detail-clear\">Clear</button>\r\n                <butto" +
+"n class=\"btn btn-default btn-sm\" id=\"detail-reload\"><span class=\"glyphicon glyph" +
+"icon-refresh\"></span></button>\r\n            </div>\r\n        </div>\r\n        <div" +
+" class=\"row\" style=\"margin-top:15px;\">\r\n            <div class=\"col-md-12\">\r\n   " +
+"             <div class=\"table-responsive\">\r\n                    <table class=\"t" +
+"able table-hover\" id=\"detail-table\">\r\n                        <thead>\r\n         " +
+"                   <tr>\r\n                                <th class=\"sortable\" da" +
+"ta-sort=\"jobId\">Job ID</th>\r\n                                <th class=\"sortable" +
+"\" data-sort=\"queue\">Queue</th>\r\n                                <th class=\"sorta" +
+"ble\" data-sort=\"lastState\">Last State</th>\r\n                                <th " +
+"class=\"sortable\" data-sort=\"lastTimestamp\">Last Execution</th>\r\n                " +
+"                <th>Error</th>\r\n                                <th>Actions</th>" +
+"\r\n                            </tr>\r\n                        </thead>\r\n         " +
+"               <tbody id=\"detail-body\">\r\n                            <tr>\r\n     " +
+"                           <td colspan=\"6\" class=\"text-center text-muted\">Loadin" +
+"g...</td>\r\n                            </tr>\r\n                        </tbody>\r\n" +
+"                    </table>\r\n                </div>\r\n                <div id=\"d" +
+"etail-pagination\" class=\"text-right\"></div>\r\n            </div>\r\n        </div>\r" +
+"\n    </div>\r\n</div>\r\n\r\n<script>\r\n    (function() {\r\n        var summaryApiUrl = " +
+"\'");
 
 
             
-            #line 196 "..\..\Pages\JobStatus.cshtml"
+            #line 198 "..\..\Pages\JobStatus.cshtml"
                         Write(summaryApiUrl);
 
             
@@ -229,7 +231,7 @@ WriteLiteral("\';\r\n        var detailApiUrl = \'");
 
 
             
-            #line 197 "..\..\Pages\JobStatus.cshtml"
+            #line 199 "..\..\Pages\JobStatus.cshtml"
                        Write(detailApiUrl);
 
             
@@ -239,7 +241,7 @@ WriteLiteral("\';\r\n        var adminApiBase = \'");
 
 
             
-            #line 198 "..\..\Pages\JobStatus.cshtml"
+            #line 200 "..\..\Pages\JobStatus.cshtml"
                        Write(Url.To(ExecutionInsightsExtension.RouteBase));
 
             
@@ -248,210 +250,235 @@ WriteLiteral("\';\r\n        var adminApiBase = \'");
 WriteLiteral(" + \"/api/admin\"\';\r\n        var allDetailJobs = [];\r\n        var filteredJobs = []" +
 ";\r\n        var currentJobType = null;\r\n        var currentPage = 1;\r\n        var" +
 " pageSize = 20;\r\n        var autoRefresh = true;\r\n        var refreshTimer = nul" +
-"l;\r\n        var currentSort = { field: \'lastTimestamp\', direction: \'desc\' };\r\n\r\n" +
-"        // Helpers nativos\r\n        function $(id) { return document.getElementB" +
-"yId(id); }\r\n        function on(selector, event, handler) {\r\n            var els" +
-" = document.querySelectorAll(selector);\r\n            for (var i = 0; i < els.len" +
-"gth; i++) {\r\n                els[i].addEventListener(event, handler);\r\n         " +
-"   }\r\n        }\r\n\r\n        function init() {\r\n            loadSummary();\r\n\r\n    " +
-"        $(\'refresh-btn\').addEventListener(\'click\', function() {\r\n               " +
-" if ($(\'summary-view\').style.display !== \'none\') loadSummary();\r\n               " +
-" else if (currentJobType) loadDetail(currentJobType);\r\n            });\r\n        " +
-"    $(\'summary-apply\').addEventListener(\'click\', loadSummary);\r\n            $(\'d" +
-"etail-apply\').addEventListener(\'click\', function() {\r\n                if (curren" +
-"tJobType) loadDetail(currentJobType);\r\n            });\r\n            $(\'detail-cl" +
-"ear\').addEventListener(\'click\', function() {\r\n                $(\'detail-search\')" +
-".value = \'\';\r\n                $(\'detail-state-filter\').value = \'\';\r\n            " +
-"    loadDetail(currentJobType);\r\n            });\r\n            $(\'detail-reload\')" +
-".addEventListener(\'click\', function() {\r\n                if (currentJobType) loa" +
-"dDetail(currentJobType);\r\n            });\r\n            $(\'back-to-summary\').addE" +
-"ventListener(\'click\', showSummary);\r\n\r\n            // Auto-refresh\r\n            " +
-"refreshTimer = setInterval(function() {\r\n                if (autoRefresh && $(\'s" +
-"ummary-view\').style.display !== \'none\') {\r\n                    loadSummary();\r\n " +
-"               }\r\n            }, 15000);\r\n\r\n            $(\'toggle-auto-refresh\')" +
-".addEventListener(\'click\', function() {\r\n                autoRefresh = !autoRefr" +
-"esh;\r\n                var icon = this.querySelector(\'.glyphicon\');\r\n            " +
-"    if (autoRefresh) {\r\n                    icon.className = \'glyphicon glyphico" +
-"n-pause\';\r\n                    this.innerHTML = \'<span class=\"glyphicon glyphico" +
-"n-pause\"></span> Pause\';\r\n                } else {\r\n                    icon.cla" +
-"ssName = \'glyphicon glyphicon-play\';\r\n                    this.innerHTML = \'<spa" +
-"n class=\"glyphicon glyphicon-play\"></span> Resume\';\r\n                }\r\n        " +
-"    });\r\n\r\n            // Ordenación de columnas en la tabla de detalle\r\n       " +
-"     on(\'#detail-table th.sortable\', \'click\', function() {\r\n                var " +
-"field = this.getAttribute(\'data-sort\');\r\n                if (currentSort.field =" +
-"== field) {\r\n                    currentSort.direction = currentSort.direction =" +
-"== \'asc\' ? \'desc\' : \'asc\';\r\n                } else {\r\n                    curren" +
-"tSort.field = field;\r\n                    currentSort.direction = \'asc\';\r\n      " +
-"          }\r\n                sortAndFilter();\r\n                renderDetailPage(" +
-");\r\n                updateSortIndicators();\r\n            });\r\n\r\n            // B" +
-"otón de limpieza\r\n            $(\'cleanup-btn\').addEventListener(\'click\', functio" +
-"n() {\r\n                var days = parseInt($(\'retention-days\').value);\r\n        " +
-"        if (!confirm(\'Delete all job results older than \' + days + \' days?\')) re" +
-"turn;\r\n    \r\n                $(\'cleanup-msg\').textContent = \'Cleaning...\';\r\n    " +
-"            fetch(adminApiBase + \'/cleanup?days=\' + encodeURIComponent(days), { " +
-"method: \'POST\' })\r\n                    .then(function(r) { return r.json(); })\r\n" +
-"                    .then(function(data) {\r\n                        $(\'cleanup-m" +
-"sg\').innerHTML = \'<span class=\"label label-success\">Removed \' + data.removed + \'" +
-" jobs.</span>\';\r\n                        // Opcional: refrescar estadísticas y r" +
-"esumen tras limpieza\r\n                        loadSummary();\r\n                  " +
-"  })\r\n                    .catch(function(err) {\r\n                        $(\'cle" +
-"anup-msg\').innerHTML = \'<span class=\"label label-danger\">Error: \' + err.message " +
-"+ \'</span>\';\r\n                    });\r\n            });\r\n        }\r\n\r\n        fun" +
-"ction showSummary() {\r\n            $(\'summary-view\').style.display = \'block\';\r\n " +
-"           $(\'detail-view\').style.display = \'none\';\r\n        }\r\n\r\n        functi" +
-"on loadSummary() {\r\n            var state = $(\'summary-state-filter\').value;\r\n  " +
-"          var jobTypeFilter = ($(\'summary-jobtype-filter\').value || \'\').toLowerC" +
-"ase();\r\n            var url = summaryApiUrl + (state ? \'?state=\' + encodeURIComp" +
-"onent(state) : \'\');\r\n\r\n            $(\'summary-body\').innerHTML = \'<tr><td colspa" +
-"n=\"6\" class=\"text-center text-muted\">Loading...</td></tr>\';\r\n            fetch(u" +
-"rl)\r\n                .then(function(r) { return r.json(); })\r\n                .t" +
-"hen(function(data) {\r\n                    var summaries = data.summaries || [];\r" +
-"\n                    // Filtrar por tipo de job si hay texto\r\n                  " +
-"  if (jobTypeFilter) {\r\n                        summaries = summaries.filter(fun" +
-"ction(s) {\r\n                            return s.jobType.toLowerCase().indexOf(j" +
-"obTypeFilter) !== -1;\r\n                        });\r\n                    }\r\n     " +
-"               renderSummary(summaries);\r\n                })\r\n                .c" +
-"atch(function(err) {\r\n                    $(\'summary-body\').innerHTML = \'<tr><td" +
-" colspan=\"6\" class=\"text-center text-danger\">Error: \' + err.message + \'</td></tr" +
-">\';\r\n                });\r\n        }\r\n\r\n        function renderSummary(summaries)" +
-" {\r\n            var tbody = $(\'summary-body\');\r\n            if (!summaries.lengt" +
+"l;\r\n        var currentSort = { field: \'lastTimestamp\', direction: \'desc\' };\r\n  " +
+"      var tooltipDiv = document.getElementById(\'dot-tooltip\');\r\n\r\n        // Hel" +
+"pers nativos\r\n        function $(id) { return document.getElementById(id); }\r\n  " +
+"      function on(selector, event, handler) {\r\n            var els = document.qu" +
+"erySelectorAll(selector);\r\n            for (var i = 0; i < els.length; i++) {\r\n " +
+"               els[i].addEventListener(event, handler);\r\n            }\r\n        " +
+"}\r\n\r\n        function init() {\r\n            loadSummary();\r\n\r\n            $(\'ref" +
+"resh-btn\').addEventListener(\'click\', function() {\r\n                if ($(\'summar" +
+"y-view\').style.display !== \'none\') loadSummary();\r\n                else if (curr" +
+"entJobType) loadDetail(currentJobType);\r\n            });\r\n            $(\'summary" +
+"-apply\').addEventListener(\'click\', loadSummary);\r\n            $(\'detail-apply\')." +
+"addEventListener(\'click\', function() {\r\n                if (currentJobType) load" +
+"Detail(currentJobType);\r\n            });\r\n            $(\'detail-clear\').addEvent" +
+"Listener(\'click\', function() {\r\n                $(\'detail-search\').value = \'\';\r\n" +
+"                $(\'detail-state-filter\').value = \'\';\r\n                loadDetail" +
+"(currentJobType);\r\n            });\r\n            $(\'detail-reload\').addEventListe" +
+"ner(\'click\', function() {\r\n                if (currentJobType) loadDetail(curren" +
+"tJobType);\r\n            });\r\n            $(\'back-to-summary\').addEventListener(\'" +
+"click\', showSummary);\r\n\r\n            // Auto-refresh\r\n            refreshTimer =" +
+" setInterval(function() {\r\n                if (autoRefresh && $(\'summary-view\')." +
+"style.display !== \'none\') {\r\n                    loadSummary();\r\n               " +
+" }\r\n            }, 15000);\r\n\r\n            $(\'toggle-auto-refresh\').addEventListe" +
+"ner(\'click\', function() {\r\n                autoRefresh = !autoRefresh;\r\n        " +
+"        var icon = this.querySelector(\'.glyphicon\');\r\n                if (autoRe" +
+"fresh) {\r\n                    icon.className = \'glyphicon glyphicon-pause\';\r\n   " +
+"                 this.innerHTML = \'<span class=\"glyphicon glyphicon-pause\"></spa" +
+"n> Pause\';\r\n                } else {\r\n                    icon.className = \'glyp" +
+"hicon glyphicon-play\';\r\n                    this.innerHTML = \'<span class=\"glyph" +
+"icon glyphicon-play\"></span> Resume\';\r\n                }\r\n            });\r\n\r\n   " +
+"         // Ordenación de columnas en la tabla de detalle\r\n            on(\'#deta" +
+"il-table th.sortable\', \'click\', function() {\r\n                var field = this.g" +
+"etAttribute(\'data-sort\');\r\n                if (currentSort.field === field) {\r\n " +
+"                   currentSort.direction = currentSort.direction === \'asc\' ? \'de" +
+"sc\' : \'asc\';\r\n                } else {\r\n                    currentSort.field = " +
+"field;\r\n                    currentSort.direction = \'asc\';\r\n                }\r\n " +
+"               sortAndFilter();\r\n                renderDetailPage();\r\n          " +
+"      updateSortIndicators();\r\n            });\r\n\r\n            // Botón de limpie" +
+"za\r\n            $(\'cleanup-btn\').addEventListener(\'click\', function() {\r\n       " +
+"         var days = parseInt($(\'retention-days\').value);\r\n                if (!c" +
+"onfirm(\'Delete all job results older than \' + days + \' days?\')) return;\r\n    \r\n " +
+"               $(\'cleanup-msg\').textContent = \'Cleaning...\';\r\n                fe" +
+"tch(adminApiBase + \'/cleanup?days=\' + encodeURIComponent(days), { method: \'POST\'" +
+" })\r\n                    .then(function(r) { return r.json(); })\r\n              " +
+"      .then(function(data) {\r\n                        $(\'cleanup-msg\').innerHTML" +
+" = \'<span class=\"label label-success\">Removed \' + data.removed + \' jobs.</span>\'" +
+";\r\n                        // Opcional: refrescar estadísticas y resumen tras li" +
+"mpieza\r\n                        loadSummary();\r\n                    })\r\n        " +
+"            .catch(function(err) {\r\n                        $(\'cleanup-msg\').inn" +
+"erHTML = \'<span class=\"label label-danger\">Error: \' + err.message + \'</span>\';\r\n" +
+"                    });\r\n            });\r\n        }\r\n\r\n        function showSumm" +
+"ary() {\r\n            $(\'summary-view\').style.display = \'block\';\r\n            $(\'" +
+"detail-view\').style.display = \'none\';\r\n        }\r\n\r\n        function loadSummary" +
+"() {\r\n            var state = $(\'summary-state-filter\').value;\r\n            var " +
+"jobTypeFilter = ($(\'summary-jobtype-filter\').value || \'\').toLowerCase();\r\n      " +
+"      var url = summaryApiUrl + (state ? \'?state=\' + encodeURIComponent(state) :" +
+" \'\');\r\n\r\n            $(\'summary-body\').innerHTML = \'<tr><td colspan=\"6\" class=\"t" +
+"ext-center text-muted\">Loading...</td></tr>\';\r\n            fetch(url)\r\n         " +
+"       .then(function(r) { return r.json(); })\r\n                .then(function(d" +
+"ata) {\r\n                    var summaries = data.summaries || [];\r\n             " +
+"       // Filtrar por tipo de job si hay texto\r\n                    if (jobTypeF" +
+"ilter) {\r\n                        summaries = summaries.filter(function(s) {\r\n  " +
+"                          return s.jobType.toLowerCase().indexOf(jobTypeFilter) " +
+"!== -1;\r\n                        });\r\n                    }\r\n                   " +
+" renderSummary(summaries);\r\n                })\r\n                .catch(function(" +
+"err) {\r\n                    $(\'summary-body\').innerHTML = \'<tr><td colspan=\"6\" c" +
+"lass=\"text-center text-danger\">Error: \' + err.message + \'</td></tr>\';\r\n         " +
+"       });\r\n        }\r\n\r\n        function renderSummary(summaries) {\r\n          " +
+"  var tbody = $(\'summary-body\');\r\n            if (!summaries.length) {\r\n        " +
+"        tbody.innerHTML = \'<tr><td colspan=\"6\" class=\"text-center text-muted\">No" +
+" job types found.</td></tr>\';\r\n                updateStats(0, 0, 0);\r\n          " +
+"      return;\r\n            }\r\n\r\n            var html = \'\';\r\n            var tota" +
+"lSuccess = 0, totalFailed = 0;\r\n            summaries.forEach(function(s) {\r\n   " +
+"             var dots = \'\';\r\n                if (s.recentExecutions) {\r\n        " +
+"            s.recentExecutions.forEach(function(exec) {\r\n                       " +
+" var cls = exec.state ? exec.state.toLowerCase() : \'\';\r\n                        " +
+"var title = exec.state + \' at \' + new Date(exec.timestamp).toLocaleTimeString();" +
+"\r\n                        dots += \'<span class=\"state-dot \' + cls + \'\" data-stat" +
+"e=\"\' + exec.state + \'\" data-time=\"\' + new Date(exec.timestamp).toLocaleString() " +
+"+ \'\" data-jobid=\"\' + (exec.jobId || \'\') + \'\" data-duration=\"\' + (exec.duration !" +
+"= null ? exec.duration.toFixed(1)+\'s\' : \'\') + \'\"></span>\';\r\n                    " +
+"});\r\n                }\r\n                var lastExec = s.lastExecution ? relativ" +
+"eTime(new Date(s.lastExecution)) : \'N/A\';\r\n                var avgDuration = s.a" +
+"vgDuration ? (s.avgDuration.toFixed(1) + \'s\') : \'N/A\';\r\n\r\n                html +" +
+"= \'<tr>\';\r\n                html += \'<td>\' + escapeHtml(s.jobType) + \'</td>\';\r\n  " +
+"              html += \'<td>\' + dots + \'</td>\';\r\n                html += \'<td><sp" +
+"an class=\"badge\">\' + s.successCount + \'</span></td>\';\r\n                html += \'" +
+"<td><span class=\"badge\">\' + s.failedCount + \'</span></td>\';\r\n                htm" +
+"l += \'<td>\' + lastExec + \'</td>\';\r\n                html += \'<td>\' + avgDuration " +
+"+ \'</td>\';\r\n                html += \'<td><button class=\"btn btn-xs btn-default v" +
+"iew-history\" data-jobtype=\"\' + escapeHtml(s.jobType) + \'\">View Full History</but" +
+"ton></td>\';\r\n                html += \'</tr>\';\r\n                totalSuccess += s" +
+".successCount;\r\n                totalFailed += s.failedCount;\r\n            });\r\n" +
+"            tbody.innerHTML = html;\r\n\r\n            updateStats(summaries.length," +
+" totalSuccess, totalFailed);\r\n\r\n            // Tooltip en los puntos\r\n          " +
+"  var dots = document.querySelectorAll(\'#summary-body .state-dot\');\r\n           " +
+" for (var i = 0; i < dots.length; i++) {\r\n                (function(dot) {\r\n    " +
+"                dot.addEventListener(\'mouseenter\', function(e) {\r\n              " +
+"          var el = e.target;\r\n                        var state = el.getAttribut" +
+"e(\'data-state\');\r\n                        var time = el.getAttribute(\'data-time\'" +
+");\r\n                        var jobId = el.getAttribute(\'data-jobid\');\r\n        " +
+"                var duration = el.getAttribute(\'data-duration\');\r\n              " +
+"          var html = \'<strong>\' + state + \'</strong><br>\' + time;\r\n             " +
+"           if (duration) html += \'<br>Duration: \' + duration;\r\n                 " +
+"       if (jobId) html += \'<br>Job: <a href=\"\' + jobDetailUrl(jobId) + \'\" target" +
+"=\"_blank\">#\' + jobId.substring(0,8) + \'</a>\';\r\n                        tooltipDi" +
+"v.innerHTML = html;\r\n                        tooltipDiv.style.display = \'block\';" +
+"\r\n                        var rect = el.getBoundingClientRect();\r\n              " +
+"          var left = rect.left + window.scrollX + rect.width/2 - tooltipDiv.offs" +
+"etWidth/2;\r\n                        var top = rect.top + window.scrollY - toolti" +
+"pDiv.offsetHeight - 8;\r\n                        tooltipDiv.style.left = left + \'" +
+"px\';\r\n                        tooltipDiv.style.top = top + \'px\';\r\n              " +
+"      });\r\n                    dot.addEventListener(\'mouseleave\', function() {\r\n" +
+"                        tooltipDiv.style.display = \'none\';\r\n                    " +
+"});\r\n                })(dots[i]);\r\n            }\r\n\r\n            // Click en punt" +
+"os de colores para ir al detalle filtrado\r\n            on(\'.state-dot\', \'click\'," +
+" function() {\r\n                var state = this.getAttribute(\'data-state\');\r\n   " +
+"             var jobType = this.closest(\'tr\').querySelector(\'.view-history\').get" +
+"Attribute(\'data-jobtype\');\r\n                showDetail(jobType);\r\n              " +
+"  setTimeout(function() {\r\n                    $(\'detail-state-filter\').value = " +
+"state;\r\n                    loadDetail(jobType);\r\n                }, 200);\r\n    " +
+"        });\r\n\r\n            // Evento para los botones \"View Full History\"\r\n     " +
+"       on(\'.view-history\', \'click\', function() {\r\n                var jobType = " +
+"this.getAttribute(\'data-jobtype\');\r\n                showDetail(jobType);\r\n      " +
+"      });\r\n        }\r\n\r\n        function updateStats(types, success, failed) {\r\n" +
+"            var total = success + failed;\r\n            $(\'stat-types\').textConte" +
+"nt = types;\r\n            $(\'stat-total\').textContent = total;\r\n            var r" +
+"ate = total ? (success / total * 100).toFixed(1) + \'%\' : \'-\';\r\n            $(\'st" +
+"at-rate\').textContent = rate;\r\n            $(\'stat-updated\').textContent = new D" +
+"ate().toLocaleTimeString();\r\n        }\r\n\r\n        function showDetail(jobType) {" +
+"\r\n            currentJobType = jobType;\r\n            currentPage = 1;\r\n         " +
+"   // Reiniciar ordenación y filtro\r\n            currentSort = { field: \'lastTim" +
+"estamp\', direction: \'desc\' };\r\n            $(\'detail-search\').value = \'\';\r\n     " +
+"       $(\'detail-state-filter\').value = \'\';\r\n            $(\'summary-view\').style" +
+".display = \'none\';\r\n            $(\'detail-view\').style.display = \'block\';\r\n     " +
+"       $(\'detail-jobtype-label\').textContent = jobType;\r\n            loadDetail(" +
+"jobType);\r\n        }\r\n\r\n        function loadDetail(jobType) {\r\n            var " +
+"state = $(\'detail-state-filter\').value;\r\n            var url = detailApiUrl + \'?" +
+"jobType=\' + encodeURIComponent(jobType);\r\n            if (state) url += \'&state=" +
+"\' + encodeURIComponent(state);\r\n\r\n            $(\'detail-body\').innerHTML = \'<tr>" +
+"<td colspan=\"6\" class=\"text-center text-muted\">Loading...</td></tr>\';\r\n         " +
+"   $(\'detail-pagination\').innerHTML = \'\';\r\n\r\n            fetch(url)\r\n           " +
+"     .then(function(r) { return r.json(); })\r\n                .then(function(dat" +
+"a) {\r\n                    allDetailJobs = data.jobs || [];\r\n                    " +
+"sortAndFilter();\r\n                    renderDetailPage();\r\n                })\r\n " +
+"               .catch(function(err) {\r\n                    $(\'detail-body\').inne" +
+"rHTML = \'<tr><td colspan=\"6\" class=\"text-center text-danger\">Error: \' + err.mess" +
+"age + \'</td></tr>\';\r\n                });\r\n        }\r\n\r\n        function sortAndF" +
+"ilter() {\r\n            var search = ($(\'detail-search\').value || \'\').toLowerCase" +
+"();\r\n            // Filtrar primero\r\n            filteredJobs = allDetailJobs.fi" +
+"lter(function(j) {\r\n                if (!search) return true;\r\n                r" +
+"eturn (j.jobId && j.jobId.toLowerCase().indexOf(search) !== -1) ||\r\n            " +
+"           (j.errorMessage && j.errorMessage.toLowerCase().indexOf(search) !== -" +
+"1) ||\r\n                       (j.queue && j.queue.toLowerCase().indexOf(search) " +
+"!== -1);\r\n            });\r\n\r\n            // Ordenar\r\n            var field = cur" +
+"rentSort.field;\r\n            var dir = currentSort.direction;\r\n            filte" +
+"redJobs.sort(function(a, b) {\r\n                var valA = a[field] || \'\';\r\n     " +
+"           var valB = b[field] || \'\';\r\n                if (field === \'lastTimest" +
+"amp\') {\r\n                    valA = new Date(a.lastTimestamp).getTime();\r\n      " +
+"              valB = new Date(b.lastTimestamp).getTime();\r\n                } els" +
+"e {\r\n                    valA = valA.toString().toLowerCase();\r\n                " +
+"    valB = valB.toString().toLowerCase();\r\n                }\r\n                if" +
+" (valA < valB) return dir === \'asc\' ? -1 : 1;\r\n                if (valA > valB) " +
+"return dir === \'asc\' ? 1 : -1;\r\n                return 0;\r\n            });\r\n    " +
+"    }\r\n\r\n        function renderDetailPage() {\r\n            var total = filtered" +
+"Jobs.length;\r\n            var start = (currentPage - 1) * pageSize;\r\n           " +
+" var end = start + pageSize;\r\n            var pageJobs = filteredJobs.slice(star" +
+"t, end);\r\n            renderDetail(pageJobs, total);\r\n        }\r\n\r\n        funct" +
+"ion renderDetail(jobs, total) {\r\n            var tbody = $(\'detail-body\');\r\n    " +
+"        var paginationDiv = $(\'detail-pagination\');\r\n            if (!jobs.lengt" +
 "h) {\r\n                tbody.innerHTML = \'<tr><td colspan=\"6\" class=\"text-center " +
-"text-muted\">No job types found.</td></tr>\';\r\n                updateStats(0, 0, 0" +
-");\r\n                return;\r\n            }\r\n\r\n            var html = \'\';\r\n      " +
-"      var totalSuccess = 0, totalFailed = 0;\r\n            summaries.forEach(func" +
-"tion(s) {\r\n                var dots = \'\';\r\n                if (s.recentExecution" +
-"s) {\r\n                    s.recentExecutions.forEach(function(exec) {\r\n         " +
-"               var cls = exec.state ? exec.state.toLowerCase() : \'\';\r\n          " +
-"              var title = exec.state + \' at \' + new Date(exec.timestamp).toLocal" +
-"eTimeString();\r\n                        dots += \'<span class=\"state-dot \' + cls " +
-"+ \'\" title=\"\' + title + \'\" data-state=\"\' + exec.state + \'\"></span>\';\r\n          " +
-"          });\r\n                }\r\n                var lastExec = s.lastExecution" +
-" ? relativeTime(new Date(s.lastExecution)) : \'N/A\';\r\n                html += \'<t" +
-"r>\';\r\n                html += \'<td>\' + escapeHtml(s.jobType) + \'</td>\';\r\n       " +
-"         html += \'<td>\' + dots + \'</td>\';\r\n                html += \'<td><span cl" +
-"ass=\"badge\">\' + s.successCount + \'</span></td>\';\r\n                html += \'<td><" +
-"span class=\"badge\">\' + s.failedCount + \'</span></td>\';\r\n                html += " +
-"\'<td>\' + lastExec + \'</td>\';\r\n                html += \'<td><button class=\"btn bt" +
-"n-xs btn-default view-history\" data-jobtype=\"\' + escapeHtml(s.jobType) + \'\">View" +
-" Full History</button></td>\';\r\n                html += \'</tr>\';\r\n               " +
-" totalSuccess += s.successCount;\r\n                totalFailed += s.failedCount;\r" +
-"\n            });\r\n            tbody.innerHTML = html;\r\n\r\n            updateStats" +
-"(summaries.length, totalSuccess, totalFailed);\r\n\r\n            // Click en puntos" +
-" de colores para ir al detalle filtrado\r\n            on(\'.state-dot\', \'click\', f" +
-"unction() {\r\n                var state = this.getAttribute(\'data-state\');\r\n     " +
-"           var jobType = this.closest(\'tr\').querySelector(\'.view-history\').getAt" +
-"tribute(\'data-jobtype\');\r\n                showDetail(jobType);\r\n                " +
-"setTimeout(function() {\r\n                    $(\'detail-state-filter\').value = st" +
-"ate;\r\n                    loadDetail(jobType);\r\n                }, 200);\r\n      " +
-"      });\r\n\r\n            // Evento para los botones \"View Full History\"\r\n       " +
-"     on(\'.view-history\', \'click\', function() {\r\n                var jobType = th" +
-"is.getAttribute(\'data-jobtype\');\r\n                showDetail(jobType);\r\n        " +
-"    });\r\n        }\r\n\r\n        function updateStats(types, success, failed) {\r\n  " +
-"          var total = success + failed;\r\n            $(\'stat-types\').textContent" +
-" = types;\r\n            $(\'stat-total\').textContent = total;\r\n            var rat" +
-"e = total ? (success / total * 100).toFixed(1) + \'%\' : \'-\';\r\n            $(\'stat" +
-"-rate\').textContent = rate;\r\n            $(\'stat-updated\').textContent = new Dat" +
-"e().toLocaleTimeString();\r\n        }\r\n\r\n        function showDetail(jobType) {\r\n" +
-"            currentJobType = jobType;\r\n            currentPage = 1;\r\n           " +
-" // Reiniciar ordenación y filtro\r\n            currentSort = { field: \'lastTimes" +
-"tamp\', direction: \'desc\' };\r\n            $(\'detail-search\').value = \'\';\r\n       " +
-"     $(\'detail-state-filter\').value = \'\';\r\n            $(\'summary-view\').style.d" +
-"isplay = \'none\';\r\n            $(\'detail-view\').style.display = \'block\';\r\n       " +
-"     $(\'detail-jobtype-label\').textContent = jobType;\r\n            loadDetail(jo" +
-"bType);\r\n        }\r\n\r\n        function loadDetail(jobType) {\r\n            var st" +
-"ate = $(\'detail-state-filter\').value;\r\n            var url = detailApiUrl + \'?jo" +
-"bType=\' + encodeURIComponent(jobType);\r\n            if (state) url += \'&state=\' " +
-"+ encodeURIComponent(state);\r\n\r\n            $(\'detail-body\').innerHTML = \'<tr><t" +
-"d colspan=\"6\" class=\"text-center text-muted\">Loading...</td></tr>\';\r\n           " +
-" $(\'detail-pagination\').innerHTML = \'\';\r\n\r\n            fetch(url)\r\n             " +
-"   .then(function(r) { return r.json(); })\r\n                .then(function(data)" +
-" {\r\n                    allDetailJobs = data.jobs || [];\r\n                    so" +
-"rtAndFilter();\r\n                    renderDetailPage();\r\n                })\r\n   " +
-"             .catch(function(err) {\r\n                    $(\'detail-body\').innerH" +
-"TML = \'<tr><td colspan=\"6\" class=\"text-center text-danger\">Error: \' + err.messag" +
-"e + \'</td></tr>\';\r\n                });\r\n        }\r\n\r\n        function sortAndFil" +
-"ter() {\r\n            var search = ($(\'detail-search\').value || \'\').toLowerCase()" +
-";\r\n            // Filtrar primero\r\n            filteredJobs = allDetailJobs.filt" +
-"er(function(j) {\r\n                if (!search) return true;\r\n                ret" +
-"urn (j.jobId && j.jobId.toLowerCase().indexOf(search) !== -1) ||\r\n              " +
-"         (j.errorMessage && j.errorMessage.toLowerCase().indexOf(search) !== -1)" +
-" ||\r\n                       (j.queue && j.queue.toLowerCase().indexOf(search) !=" +
-"= -1);\r\n            });\r\n\r\n            // Ordenar\r\n            var field = curre" +
-"ntSort.field;\r\n            var dir = currentSort.direction;\r\n            filtere" +
-"dJobs.sort(function(a, b) {\r\n                var valA = a[field] || \'\';\r\n       " +
-"         var valB = b[field] || \'\';\r\n                if (field === \'lastTimestam" +
-"p\') {\r\n                    valA = new Date(a.lastTimestamp).getTime();\r\n        " +
-"            valB = new Date(b.lastTimestamp).getTime();\r\n                } else " +
-"{\r\n                    valA = valA.toString().toLowerCase();\r\n                  " +
-"  valB = valB.toString().toLowerCase();\r\n                }\r\n                if (" +
-"valA < valB) return dir === \'asc\' ? -1 : 1;\r\n                if (valA > valB) re" +
-"turn dir === \'asc\' ? 1 : -1;\r\n                return 0;\r\n            });\r\n      " +
-"  }\r\n\r\n        function renderDetailPage() {\r\n            var total = filteredJo" +
-"bs.length;\r\n            var start = (currentPage - 1) * pageSize;\r\n            v" +
-"ar end = start + pageSize;\r\n            var pageJobs = filteredJobs.slice(start," +
-" end);\r\n            renderDetail(pageJobs, total);\r\n        }\r\n\r\n        functio" +
-"n renderDetail(jobs, total) {\r\n            var tbody = $(\'detail-body\');\r\n      " +
-"      var paginationDiv = $(\'detail-pagination\');\r\n            if (!jobs.length)" +
-" {\r\n                tbody.innerHTML = \'<tr><td colspan=\"6\" class=\"text-center te" +
-"xt-muted\">No jobs found.</td></tr>\';\r\n                paginationDiv.innerHTML = " +
-"\'\';\r\n                return;\r\n            }\r\n\r\n            var html = \'\';\r\n     " +
-"       jobs.forEach(function(j) {\r\n                var shortId = j.jobId ? j.job" +
-"Id.substring(0, 8) : \'\';\r\n                var stateClass = j.lastState ? j.lastS" +
-"tate.toLowerCase() : \'\';\r\n                var badgeClass = stateClass === \'succe" +
-"eded\' ? \'label label-success\' :\r\n                                 stateClass ===" +
-" \'failed\' ? \'label label-danger\' : \'label label-default\';\r\n                var t" +
-"s = j.lastTimestamp ? relativeTime(new Date(j.lastTimestamp)) : \'\';\r\n           " +
-"     var errorHtml = \'\';\r\n                if (j.errorMessage) {\r\n               " +
-"     if (j.errorMessage.length > 80) {\r\n                        errorHtml = \'<sp" +
-"an class=\"error-short\">\' + escapeHtml(j.errorMessage.substring(0, 80)) + \'…</spa" +
-"n>\' +\r\n                                    \'<span class=\"error-full\" style=\"disp" +
-"lay:none;\">\' + escapeHtml(j.errorMessage) + \'</span> \' +\r\n                      " +
-"              \'<a href=\"javascript:void(0)\" class=\"error-toggle small\">more</a>\'" +
-";\r\n                    } else {\r\n                        errorHtml = escapeHtml(" +
-"j.errorMessage);\r\n                    }\r\n                }\r\n\r\n                ht" +
-"ml += \'<tr class=\"detail-row \' + stateClass + \' fade-in\">\';\r\n                htm" +
-"l += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank\">#\' + shortId +" +
-" \'</a></td>\';\r\n                html += \'<td><a href=\"\' + queueUrl(j.queue) + \'\" " +
-"target=\"_blank\" class=\"text-muted\">\' + escapeHtml(j.queue) + \'</a></td>\';\r\n     " +
-"           html += \'<td><span class=\"\' + badgeClass + \'\">\' + j.lastState + \'</sp" +
-"an></td>\';\r\n                html += \'<td>\' + ts + \'</td>\';\r\n                html" +
-" += \'<td>\' + errorHtml + \'</td>\';\r\n                html += \'<td><a href=\"\' + job" +
-"DetailUrl(j.jobId) + \'\" target=\"_blank\" class=\"btn btn-xs btn-default\">History</" +
-"a></td>\';\r\n                html += \'</tr>\';\r\n            });\r\n            tbody." +
-"innerHTML = html;\r\n\r\n            // Paginación\r\n            var totalPages = Mat" +
-"h.ceil(total / pageSize);\r\n            var startCount = (currentPage - 1) * page" +
-"Size + 1;\r\n            var endCount = Math.min(currentPage * pageSize, total);\r\n" +
-"            var pagHtml = \'<div class=\"clearfix\">\';\r\n            pagHtml += \'<sp" +
-"an class=\"pull-left\">Showing \' + startCount + \' - \' + endCount + \' of \' + total " +
-"+ \' jobs</span>\';\r\n            pagHtml += \'<div class=\"pull-right\">\';\r\n         " +
-"   if (currentPage > 1) {\r\n                pagHtml += \'<button class=\"btn btn-de" +
-"fault btn-xs\" id=\"prev-page\">Previous</button> \';\r\n            }\r\n            if" +
-" (currentPage < totalPages) {\r\n                pagHtml += \'<button class=\"btn bt" +
-"n-default btn-xs\" id=\"next-page\">Next</button>\';\r\n            }\r\n            pag" +
-"Html += \'</div></div>\';\r\n            paginationDiv.innerHTML = pagHtml;\r\n\r\n     " +
-"       var prevBtn = $(\'prev-page\');\r\n            var nextBtn = $(\'next-page\');\r" +
-"\n            if (prevBtn) {\r\n                prevBtn.addEventListener(\'click\', f" +
-"unction() { currentPage--; renderDetailPage(); });\r\n            }\r\n            i" +
-"f (nextBtn) {\r\n                nextBtn.addEventListener(\'click\', function() { cu" +
-"rrentPage++; renderDetailPage(); });\r\n            }\r\n\r\n            // Toggle err" +
-"or messages\r\n            on(\'.error-toggle\', \'click\', function() {\r\n            " +
-"    var cell = this.parentNode;\r\n                var short = cell.querySelector(" +
-"\'.error-short\');\r\n                var full = cell.querySelector(\'.error-full\');\r" +
-"\n                if (short.style.display !== \'none\') {\r\n                    shor" +
-"t.style.display = \'none\';\r\n                    full.style.display = \'inline\';\r\n " +
-"                   this.textContent = \'less\';\r\n                } else {\r\n       " +
-"             short.style.display = \'inline\';\r\n                    full.style.dis" +
-"play = \'none\';\r\n                    this.textContent = \'more\';\r\n                " +
-"}\r\n            });\r\n        }\r\n\r\n        function updateSortIndicators() {\r\n    " +
-"        document.querySelectorAll(\'#detail-table th.sortable\').forEach(function(" +
-"th) {\r\n                th.classList.remove(\'asc\', \'desc\');\r\n                if (" +
-"th.getAttribute(\'data-sort\') === currentSort.field) {\r\n                    th.cl" +
-"assList.add(currentSort.direction);\r\n                }\r\n            });\r\n       " +
-" }\r\n\r\n        function jobDetailUrl(jobId) {\r\n            return \'");
+"text-muted\">No jobs found.</td></tr>\';\r\n                paginationDiv.innerHTML " +
+"= \'\';\r\n                return;\r\n            }\r\n\r\n            var html = \'\';\r\n   " +
+"         jobs.forEach(function(j) {\r\n                var shortId = j.jobId ? j.j" +
+"obId.substring(0, 8) : \'\';\r\n                var stateClass = j.lastState ? j.las" +
+"tState.toLowerCase() : \'\';\r\n                var badgeClass = stateClass === \'suc" +
+"ceeded\' ? \'label label-success\' :\r\n                                 stateClass =" +
+"== \'failed\' ? \'label label-danger\' : \'label label-default\';\r\n                var" +
+" ts = j.lastTimestamp ? relativeTime(new Date(j.lastTimestamp)) : \'\';\r\n         " +
+"       var errorHtml = \'\';\r\n                if (j.errorMessage) {\r\n             " +
+"       if (j.errorMessage.length > 80) {\r\n                        errorHtml = \'<" +
+"span class=\"error-short\">\' + escapeHtml(j.errorMessage.substring(0, 80)) + \'…</s" +
+"pan>\' +\r\n                                    \'<span class=\"error-full\" style=\"di" +
+"splay:none;\">\' + escapeHtml(j.errorMessage) + \'</span> \' +\r\n                    " +
+"                \'<a href=\"javascript:void(0)\" class=\"error-toggle small\">more</a" +
+">\';\r\n                    } else {\r\n                        errorHtml = escapeHtm" +
+"l(j.errorMessage);\r\n                    }\r\n                }\r\n\r\n                " +
+"html += \'<tr class=\"detail-row \' + stateClass + \' fade-in\">\';\r\n                h" +
+"tml += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank\">#\' + shortId" +
+" + \'</a></td>\';\r\n                html += \'<td><a href=\"\' + queueUrl(j.queue) + \'" +
+"\" target=\"_blank\" class=\"text-muted\">\' + escapeHtml(j.queue) + \'</a></td>\';\r\n   " +
+"             html += \'<td><span class=\"\' + badgeClass + \'\">\' + j.lastState + \'</" +
+"span></td>\';\r\n                html += \'<td>\' + ts + \'</td>\';\r\n                ht" +
+"ml += \'<td>\' + errorHtml + \'</td>\';\r\n                html += \'<td><a href=\"\' + j" +
+"obDetailUrl(j.jobId) + \'\" target=\"_blank\" class=\"btn btn-xs btn-default\">History" +
+"</a></td>\';\r\n                html += \'</tr>\';\r\n            });\r\n            tbod" +
+"y.innerHTML = html;\r\n\r\n            // Paginación\r\n            var totalPages = M" +
+"ath.ceil(total / pageSize);\r\n            var startCount = (currentPage - 1) * pa" +
+"geSize + 1;\r\n            var endCount = Math.min(currentPage * pageSize, total);" +
+"\r\n            var pagHtml = \'<div class=\"clearfix\">\';\r\n            pagHtml += \'<" +
+"span class=\"pull-left\">Showing \' + startCount + \' - \' + endCount + \' of \' + tota" +
+"l + \' jobs</span>\';\r\n            pagHtml += \'<div class=\"pull-right\">\';\r\n       " +
+"     if (currentPage > 1) {\r\n                pagHtml += \'<button class=\"btn btn-" +
+"default btn-xs\" id=\"prev-page\">Previous</button> \';\r\n            }\r\n            " +
+"if (currentPage < totalPages) {\r\n                pagHtml += \'<button class=\"btn " +
+"btn-default btn-xs\" id=\"next-page\">Next</button>\';\r\n            }\r\n            p" +
+"agHtml += \'</div></div>\';\r\n            paginationDiv.innerHTML = pagHtml;\r\n\r\n   " +
+"         var prevBtn = $(\'prev-page\');\r\n            var nextBtn = $(\'next-page\')" +
+";\r\n            if (prevBtn) {\r\n                prevBtn.addEventListener(\'click\'," +
+" function() { currentPage--; renderDetailPage(); });\r\n            }\r\n           " +
+" if (nextBtn) {\r\n                nextBtn.addEventListener(\'click\', function() { " +
+"currentPage++; renderDetailPage(); });\r\n            }\r\n\r\n            // Toggle e" +
+"rror messages\r\n            on(\'.error-toggle\', \'click\', function() {\r\n          " +
+"      var cell = this.parentNode;\r\n                var short = cell.querySelecto" +
+"r(\'.error-short\');\r\n                var full = cell.querySelector(\'.error-full\')" +
+";\r\n                if (short.style.display !== \'none\') {\r\n                    sh" +
+"ort.style.display = \'none\';\r\n                    full.style.display = \'inline\';\r" +
+"\n                    this.textContent = \'less\';\r\n                } else {\r\n     " +
+"               short.style.display = \'inline\';\r\n                    full.style.d" +
+"isplay = \'none\';\r\n                    this.textContent = \'more\';\r\n              " +
+"  }\r\n            });\r\n        }\r\n\r\n        function updateSortIndicators() {\r\n  " +
+"          document.querySelectorAll(\'#detail-table th.sortable\').forEach(functio" +
+"n(th) {\r\n                th.classList.remove(\'asc\', \'desc\');\r\n                if" +
+" (th.getAttribute(\'data-sort\') === currentSort.field) {\r\n                    th." +
+"classList.add(currentSort.direction);\r\n                }\r\n            });\r\n     " +
+"   }\r\n\r\n        function jobDetailUrl(jobId) {\r\n            return \'");
 
 
             
-            #line 540 "..\..\Pages\JobStatus.cshtml"
+            #line 573 "..\..\Pages\JobStatus.cshtml"
                Write(Url.To("/jobs/details"));
 
             
@@ -462,7 +489,7 @@ WriteLiteral("\' + \'/\' + jobId;\r\n        }\r\n\r\n        function queueUrl(
 
 
             
-            #line 544 "..\..\Pages\JobStatus.cshtml"
+            #line 577 "..\..\Pages\JobStatus.cshtml"
                Write(Url.To("/jobs/enqueued"));
 
             

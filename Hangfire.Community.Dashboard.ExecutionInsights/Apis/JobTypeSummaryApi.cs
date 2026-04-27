@@ -1,5 +1,6 @@
 ﻿using Hangfire.Community.Dashboard.ExecutionInsights.Services;
 using Hangfire.Dashboard;
+using Hangfire.States;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,6 +67,7 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
                         summaries.Add(new
                         {
                             jobType = jt,
+                            avgDuration = sorted.Where(s => s.Duration.HasValue).Select(s => s.Duration.Value).DefaultIfEmpty(0).Average(),
                             recentExecutions = sorted, // lista de ExecutionState
                             successCount = success,
                             failedCount = failed,

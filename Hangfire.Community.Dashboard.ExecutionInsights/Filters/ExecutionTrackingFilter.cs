@@ -1,6 +1,7 @@
 ﻿using Hangfire.Community.Dashboard.ExecutionInsights.Services;
 using Hangfire.States;
 using Hangfire.Storage;
+using System;
 
 public class ExecutionTrackingFilter : IApplyStateFilter
 {
@@ -11,32 +12,51 @@ public class ExecutionTrackingFilter : IApplyStateFilter
     {
         var stateName = context.NewState.Name;
 
-        // 1. Al encolar, guardar la cola y el tipo de job
+        // 1. Al encolar, guardar cola y tipo de job
         if (context.NewState is EnqueuedState enqueuedState)
         {
-            string queueInitial = enqueuedState.Queue ?? "default";
+            var queueInitial = enqueuedState.Queue ?? "default";
             context.Connection.SetJobParameter(context.BackgroundJob.Id, QueueParameterKey, queueInitial);
 
-            string jobTypeInitial = GetJobType(context.BackgroundJob.Job);
+            var jobTypeInitial = GetJobType(context.BackgroundJob.Job);
             if (!string.IsNullOrEmpty(jobTypeInitial))
                 context.Connection.SetJobParameter(context.BackgroundJob.Id, JobTypeParameterKey, jobTypeInitial);
 
-            return; // No necesitamos registrar nada más en este estado
+            return;
         }
 
-        // 2. Solo estados finales para registrar resultados
+        // 2. Al empezar a procesar, guardar el timestamp de inicio
+        if (context.NewState is ProcessingState)
+        {
+            var processingStartedAt = DateTime.UtcNow.ToString("O");
+            context.Connection.SetJobParameter(context.BackgroundJob.Id, "ExecutionInsights.ProcessingStartedAt", processingStartedAt);
+            return;
+        }
+
+        // 3. Solo procesamos estados finales
         if (stateName != SucceededState.StateName && stateName != FailedState.StateName)
             return;
 
-        string queue = GetStoredParameter(context.Connection, context.BackgroundJob.Id, QueueParameterKey) ?? "default";
-        string jobType = GetStoredParameter(context.Connection, context.BackgroundJob.Id, JobTypeParameterKey);
+        // 4. Obtener cola y tipo de job almacenados
+        var queue = GetStoredParameter(context.Connection, context.BackgroundJob.Id, QueueParameterKey) ?? "default";
+        var jobType = GetStoredParameter(context.Connection, context.BackgroundJob.Id, JobTypeParameterKey);
 
         if (string.IsNullOrEmpty(jobType))
         {
             jobType = GetJobType(context.BackgroundJob.Job) ?? "Unknown";
         }
 
-        JobResultService.RecordResult(transaction, jobType, context.BackgroundJob.Id, queue, stateName, context.NewState);
+        // 5. Recuperar el momento de inicio del procesamiento
+        var startedAtStr = context.Connection.GetJobParameter(context.BackgroundJob.Id, "ExecutionInsights.ProcessingStartedAt");
+        DateTime? startedAt = null;
+        if (!string.IsNullOrEmpty(startedAtStr))
+        {
+            if (DateTime.TryParse(startedAtStr, null, System.Globalization.DateTimeStyles.RoundtripKind, out var parsed))
+                startedAt = parsed;
+        }
+
+        // 6. Registrar resultado final (con duración si existe)
+        JobResultService.RecordResult(transaction, jobType, context.BackgroundJob.Id, queue, stateName, context.NewState, startedAt);
     }
 
     public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction) { }

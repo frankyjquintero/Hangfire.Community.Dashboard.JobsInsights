@@ -70,28 +70,79 @@ namespace Hangfire.APMJobs.Controllers
         }
     }
 
-    /// <summary>
-    /// Tareas simuladas que representan distintos tipos de trabajo.
-    /// </summary>
     public static class SimulatedTasks
     {
-        public static void SendWelcomeEmail() => Console.WriteLine($"[{DateTime.Now}] Welcome email sent.");
-        public static void ProcessOrderPayment() => Console.WriteLine($"[{DateTime.Now}] Order payment processed.");
-        public static void GenerateMonthlyReport() => Console.WriteLine($"[{DateTime.Now}] Monthly report generated.");
-        public static void CleanupExpiredTokens() => Console.WriteLine($"[{DateTime.Now}] Expired tokens cleaned up.");
-        public static void ImportCustomerData() => Console.WriteLine($"[{DateTime.Now}] Customer data imported.");
-        public static void SyncProductCatalog() => Console.WriteLine($"[{DateTime.Now}] Product catalog synced.");
-        public static void CreateBackup() => Console.WriteLine($"[{DateTime.Now}] Backup created successfully.");
-        public static void ValidateEmailAddresses() => Console.WriteLine($"[{DateTime.Now}] Email addresses validated.");
-        public static void UpdateExchangeRates() => Console.WriteLine($"[{DateTime.Now}] Exchange rates updated.");
-        public static void PurgeOldLogs() => Console.WriteLine($"[{DateTime.Now}] Old logs purged.");
+        private static readonly Random _random = new Random();
+
+        public static void SendWelcomeEmail()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Welcome email sent.");
+        }
+        public static void ProcessOrderPayment()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Order payment processed.");
+        }
+        public static void GenerateMonthlyReport()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Monthly report generated.");
+        }
+        public static void CleanupExpiredTokens()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Expired tokens cleaned up.");
+        }
+        public static void ImportCustomerData()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Customer data imported.");
+        }
+        public static void SyncProductCatalog()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Product catalog synced.");
+        }
+        public static void CreateBackup()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Backup created successfully.");
+        }
+        public static void ValidateEmailAddresses()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Email addresses validated.");
+        }
+        public static void UpdateExchangeRates()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Exchange rates updated.");
+        }
+        public static void PurgeOldLogs()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Old logs purged.");
+        }
 
         // Jobs que fallan
-        public static void FailingJob_ProcessRefund() => throw new InvalidOperationException("Refund processing failed: transaction not found.");
-        public static void FailingJob_ChargeCreditCard() => throw new Exception("Credit card charge declined.");
-        public static void FailingJob_UpdateInventory() => throw new InvalidOperationException("Inventory update failed: insufficient stock.");
+        public static void FailingJob_ProcessRefund()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            throw new InvalidOperationException("Refund processing failed: transaction not found.");
+        }
+        public static void FailingJob_ChargeCreditCard()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            throw new Exception("Credit card charge declined.");
+        }
+        public static void FailingJob_UpdateInventory()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            throw new InvalidOperationException("Inventory update failed: insufficient stock.");
+        }
 
-        // Jobs lentos (simulan trabajo que tarda unos segundos)
+        // Jobs lentos (mantienen sus tiempos fijos)
         public static void SlowJob_GenerateInvoice()
         {
             Thread.Sleep(3000);
@@ -104,7 +155,15 @@ namespace Hangfire.APMJobs.Controllers
         }
 
         // Más jobs exitosos
-        public static void NotifyUsersAboutDowntime() => Console.WriteLine($"[{DateTime.Now}] Users notified about planned downtime.");
-        public static void RebuildSearchIndex() => Console.WriteLine($"[{DateTime.Now}] Search index rebuilt.");
+        public static void NotifyUsersAboutDowntime()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Users notified about planned downtime.");
+        }
+        public static void RebuildSearchIndex()
+        {
+            Thread.Sleep(_random.Next(1000, 5000));
+            Console.WriteLine($"[{DateTime.Now}] Search index rebuilt.");
+        }
     }
 }
