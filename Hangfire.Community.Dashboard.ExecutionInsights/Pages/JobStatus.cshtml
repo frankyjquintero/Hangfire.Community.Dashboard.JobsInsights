@@ -248,7 +248,11 @@
                             <span class="glyphicon glyphicon-stats"></span>
                             Avg Duration Trend
                         </p>
+                        
                         <div class="btn-group btn-group-xs">
+                            <button class="btn btn-default btn-xs" id="export-chart" title="Save chart as PNG">
+                                <span class="glyphicon glyphicon-picture"></span> Save PNG
+                            </button>
                             <button class="btn btn-default active" data-mode="exec">Last 100 exec</button>
                             <button class="btn btn-default" data-mode="1d">1 day</button>
                             <button class="btn btn-default" data-mode="7d">7 days</button>
@@ -256,8 +260,23 @@
                             <button class="btn btn-default" data-mode="30d">30 days</button>
                             <button class="btn btn-default" data-mode="45d">45 days</button>
                         </div>
+                        <div class="row" style="margin:8px 0;">
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">Alert if avg ></span>
+                                    <input type="number" class="form-control" id="alert-threshold" value="5" step="0.5" min="0" style="width:80px;">
+                                    <span class="input-group-addon">s</span>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div id="alert-banner" class="alert alert-danger" style="display:none; padding:6px 12px; margin:0;">
+                                    <strong>⚠️ Threshold exceeded!</strong> Current average duration is above the limit.
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <canvas id="duration-chart"></canvas>
+                    <div id="chart-stats" class="text-center"></div>
                 </div>
             </div>
         </div>
@@ -394,6 +413,22 @@
                     .catch(function(err) {
                         $('cleanup-msg').innerHTML = '<span class="label label-danger">Error: ' + err.message + '</span>';
                     });
+            });
+
+            $('export-chart').addEventListener('click', function() {
+                var canvas = document.getElementById('duration-chart');
+                if (!canvas) return;
+                var link = document.createElement('a');
+                link.download = 'execution-duration-chart.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+
+            $('alert-threshold').addEventListener('input', function() {
+                // Solo redibujar si el detalle está visible y hay datos cargados
+                if ($('detail-view').style.display !== 'none' && currentJobType) {
+                    renderDurationChart(chartMode);
+                }
             });
         }
 
@@ -737,6 +772,9 @@
 
         // ── Duration Chart ────────────────────────────────────────
         function renderDurationChart(mode) {
+
+            if (!allDetailJobs || allDetailJobs.length === 0) return;
+
             var labels = [], values = [];
 
             if (mode === 'exec') {
@@ -801,6 +839,36 @@
                 }
             }
 
+                // ── Calcular promedio (con defensa extra) ──────────────────
+            var filteredVals = (values || []).filter(function(v) { return v != null && !isNaN(v); });
+            var avgValue = filteredVals.length > 0
+                ? filteredVals.reduce(function(a, b) { return a + b; }, 0) / filteredVals.length
+                : null;
+
+            // ── Alerta de umbral ───────────────────────────────────────
+            var threshold = parseFloat($('alert-threshold').value);
+            if (isNaN(threshold)) threshold = 5;
+
+            var avgOfValues = avgValue; // reutilizar
+            var exceeded = avgOfValues !== null && avgOfValues > threshold;
+            var lineColor = exceeded ? '#d9534f' : '#337ab7';
+
+            if ($('alert-banner')) {
+                $('alert-banner').style.display = exceeded ? 'block' : 'none';
+            }
+
+            //Percentiles
+
+            var filteredVals = values.filter(v => v != null).sort((a,b) => a - b);
+            var min = filteredVals[0] || 0;
+            var max = filteredVals[filteredVals.length-1] || 0;
+            var p95 = filteredVals[Math.floor(filteredVals.length * 0.95)] || max;
+
+            document.getElementById('chart-stats').innerHTML =
+                '<span class="label label-default">Min: ' + min.toFixed(1) + 's</span> ' +
+                '<span class="label label-default">Max: ' + max.toFixed(1) + 's</span> ' +
+                '<span class="label label-default">P95: ' + p95.toFixed(1) + 's</span>';
+
             var ctx = document.getElementById('duration-chart').getContext('2d');
             if (durationChart) durationChart.destroy();
 
@@ -811,6 +879,7 @@
                     datasets: [{
                         label: 'Avg Duration (s)',
                         data: values,
+                        borderColor: lineColor,
                         borderColor: '#337ab7',
                         backgroundColor: 'rgba(51,122,183,0.08)',
                         pointBackgroundColor: function(ctx) {

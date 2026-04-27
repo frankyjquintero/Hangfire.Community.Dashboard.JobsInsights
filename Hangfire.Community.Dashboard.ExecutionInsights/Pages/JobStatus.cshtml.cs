@@ -230,38 +230,55 @@ WriteLiteral("</small>\r\n\r\n                <!-- MEJORA 3: Intervalo de auto-r
 "              <div class=\"chart-header\">\r\n                        <p class=\"char" +
 "t-title\">\r\n                            <span class=\"glyphicon glyphicon-stats\"><" +
 "/span>\r\n                            Avg Duration Trend\r\n                        " +
-"</p>\r\n                        <div class=\"btn-group btn-group-xs\">\r\n            " +
-"                <button class=\"btn btn-default active\" data-mode=\"exec\">Last 100" +
-" exec</button>\r\n                            <button class=\"btn btn-default\" data" +
-"-mode=\"1d\">1 day</button>\r\n                            <button class=\"btn btn-de" +
-"fault\" data-mode=\"7d\">7 days</button>\r\n                            <button class" +
-"=\"btn btn-default\" data-mode=\"15d\">15 days</button>\r\n                           " +
-" <button class=\"btn btn-default\" data-mode=\"30d\">30 days</button>\r\n             " +
-"               <button class=\"btn btn-default\" data-mode=\"45d\">45 days</button>\r" +
-"\n                        </div>\r\n                    </div>\r\n                   " +
-" <canvas id=\"duration-chart\"></canvas>\r\n                </div>\r\n            </di" +
-"v>\r\n        </div>\r\n\r\n        <div class=\"row\">\r\n            <div class=\"col-md-" +
-"12\">\r\n                <div class=\"table-responsive\">\r\n                    <table" +
-" class=\"table table-hover\" id=\"detail-table\">\r\n                        <thead>\r\n" +
-"                            <tr>\r\n                                <th class=\"sor" +
-"table\" data-sort=\"jobId\">Job ID</th>\r\n                                <th class=" +
-"\"sortable\" data-sort=\"queue\">Queue</th>\r\n                                <th cla" +
-"ss=\"sortable\" data-sort=\"lastState\">Last State</th>\r\n                           " +
-"     <th class=\"sortable\" data-sort=\"lastTimestamp\">Last Execution</th>\r\n       " +
-"                         <th class=\"sortable\" data-sort=\"duration\">Duration</th>" +
-"\r\n                                <th>Error</th>\r\n                              " +
-"  <th>Actions</th>\r\n                            </tr>\r\n                        <" +
-"/thead>\r\n                        <tbody id=\"detail-body\">\r\n                     " +
-"       <tr>\r\n                                <td colspan=\"6\" class=\"text-center " +
-"text-muted\">Loading...</td>\r\n                            </tr>\r\n                " +
-"        </tbody>\r\n                    </table>\r\n                </div>\r\n        " +
-"        <div id=\"detail-pagination\" class=\"text-right\"></div>\r\n            </div" +
-">\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n<script>\r\n    (function() {\r\n        va" +
-"r summaryApiUrl = \'");
+"</p>\r\n                        \r\n                        <div class=\"btn-group bt" +
+"n-group-xs\">\r\n                            <button class=\"btn btn-default btn-xs\"" +
+" id=\"export-chart\" title=\"Save chart as PNG\">\r\n                                <" +
+"span class=\"glyphicon glyphicon-picture\"></span> Save PNG\r\n                     " +
+"       </button>\r\n                            <button class=\"btn btn-default act" +
+"ive\" data-mode=\"exec\">Last 100 exec</button>\r\n                            <butto" +
+"n class=\"btn btn-default\" data-mode=\"1d\">1 day</button>\r\n                       " +
+"     <button class=\"btn btn-default\" data-mode=\"7d\">7 days</button>\r\n           " +
+"                 <button class=\"btn btn-default\" data-mode=\"15d\">15 days</button" +
+">\r\n                            <button class=\"btn btn-default\" data-mode=\"30d\">3" +
+"0 days</button>\r\n                            <button class=\"btn btn-default\" dat" +
+"a-mode=\"45d\">45 days</button>\r\n                        </div>\r\n                 " +
+"       <div class=\"row\" style=\"margin:8px 0;\">\r\n                            <div" +
+" class=\"col-md-4\">\r\n                                <div class=\"input-group inpu" +
+"t-group-sm\">\r\n                                    <span class=\"input-group-addon" +
+"\">Alert if avg ></span>\r\n                                    <input type=\"number" +
+"\" class=\"form-control\" id=\"alert-threshold\" value=\"5\" step=\"0.5\" min=\"0\" style=\"" +
+"width:80px;\">\r\n                                    <span class=\"input-group-addo" +
+"n\">s</span>\r\n                                </div>\r\n                           " +
+" </div>\r\n                            <div class=\"col-md-8\">\r\n                   " +
+"             <div id=\"alert-banner\" class=\"alert alert-danger\" style=\"display:no" +
+"ne; padding:6px 12px; margin:0;\">\r\n                                    <strong>⚠" +
+"️ Threshold exceeded!</strong> Current average duration is above the limit.\r\n   " +
+"                             </div>\r\n                            </div>\r\n       " +
+"                 </div>\r\n                    </div>\r\n                    <canvas" +
+" id=\"duration-chart\"></canvas>\r\n                    <div id=\"chart-stats\" class=" +
+"\"text-center\"></div>\r\n                </div>\r\n            </div>\r\n        </div>" +
+"\r\n\r\n        <div class=\"row\">\r\n            <div class=\"col-md-12\">\r\n            " +
+"    <div class=\"table-responsive\">\r\n                    <table class=\"table tabl" +
+"e-hover\" id=\"detail-table\">\r\n                        <thead>\r\n                  " +
+"          <tr>\r\n                                <th class=\"sortable\" data-sort=\"" +
+"jobId\">Job ID</th>\r\n                                <th class=\"sortable\" data-so" +
+"rt=\"queue\">Queue</th>\r\n                                <th class=\"sortable\" data" +
+"-sort=\"lastState\">Last State</th>\r\n                                <th class=\"so" +
+"rtable\" data-sort=\"lastTimestamp\">Last Execution</th>\r\n                         " +
+"       <th class=\"sortable\" data-sort=\"duration\">Duration</th>\r\n                " +
+"                <th>Error</th>\r\n                                <th>Actions</th>" +
+"\r\n                            </tr>\r\n                        </thead>\r\n         " +
+"               <tbody id=\"detail-body\">\r\n                            <tr>\r\n     " +
+"                           <td colspan=\"6\" class=\"text-center text-muted\">Loadin" +
+"g...</td>\r\n                            </tr>\r\n                        </tbody>\r\n" +
+"                    </table>\r\n                </div>\r\n                <div id=\"d" +
+"etail-pagination\" class=\"text-right\"></div>\r\n            </div>\r\n        </div>\r" +
+"\n    </div>\r\n</div>\r\n\r\n<script>\r\n    (function() {\r\n        var summaryApiUrl = " +
+"\'");
 
 
             
-            #line 295 "..\..\Pages\JobStatus.cshtml"
+            #line 314 "..\..\Pages\JobStatus.cshtml"
                         Write(summaryApiUrl);
 
             
@@ -271,7 +288,7 @@ WriteLiteral("\';\r\n        var detailApiUrl  = \'");
 
 
             
-            #line 296 "..\..\Pages\JobStatus.cshtml"
+            #line 315 "..\..\Pages\JobStatus.cshtml"
                         Write(detailApiUrl);
 
             
@@ -281,7 +298,7 @@ WriteLiteral("\';\r\n        var adminApiBase  = \'");
 
 
             
-            #line 297 "..\..\Pages\JobStatus.cshtml"
+            #line 316 "..\..\Pages\JobStatus.cshtml"
                         Write(Url.To(ExecutionInsightsExtension.RouteBase));
 
             
@@ -345,315 +362,345 @@ WriteLiteral("\' + \'/api/admin\';\r\n\r\n        var allDetailJobs  = [];\r\n  
 "                  loadSummary();\r\n                    })\r\n                    .c" +
 "atch(function(err) {\r\n                        $(\'cleanup-msg\').innerHTML = \'<spa" +
 "n class=\"label label-danger\">Error: \' + err.message + \'</span>\';\r\n              " +
-"      });\r\n            });\r\n        }\r\n\r\n        // ── MEJORA 3: timer helper ──" +
-"──────────────────────────────\r\n        function startRefreshTimer() {\r\n        " +
-"    clearInterval(refreshTimer);\r\n            if (refreshSeconds > 0) {\r\n       " +
-"         refreshTimer = setInterval(function() {\r\n                    if ($(\'sum" +
-"mary-view\').style.display !== \'none\') loadSummary();\r\n                }, refresh" +
-"Seconds * 1000);\r\n            }\r\n        }\r\n\r\n        // ── MEJORA 4: export CSV" +
-" ──────────────────────────────────\r\n        function exportCsv() {\r\n           " +
-" var rows = [[\'Job Type\', \'Success\', \'Failed\', \'Avg Duration\', \'Last Execution\']" +
-"];\r\n            document.querySelectorAll(\'#summary-body tr\').forEach(function(t" +
-"r) {\r\n                var cells = tr.querySelectorAll(\'td\');\r\n                if" +
-" (cells.length >= 6) {\r\n                    rows.push([\r\n                       " +
-" \'\"\' + (cells[0].textContent || \'\').replace(/\"/g, \'\"\"\') + \'\"\',\r\n                " +
-"        (cells[2].textContent || \'\').trim(),\r\n                        (cells[3]." +
-"textContent || \'\').trim(),\r\n                        (cells[5].textContent || \'\')" +
-".trim(),\r\n                        (cells[4].textContent || \'\').trim()\r\n         " +
-"           ]);\r\n                }\r\n            });\r\n            var csv  = rows." +
-"map(function(r) { return r.join(\',\'); }).join(\'\\n\');\r\n            var blob = new" +
-" Blob([csv], { type: \'text/csv;charset=utf-8;\' });\r\n            var a    = docum" +
-"ent.createElement(\'a\');\r\n            a.href   = URL.createObjectURL(blob);\r\n    " +
-"        a.download = \'job-insights-\' + new Date().toISOString().slice(0, 10) + \'" +
-".csv\';\r\n            document.body.appendChild(a);\r\n            a.click();\r\n     " +
-"       document.body.removeChild(a);\r\n        }\r\n\r\n        // ── Views ─────────" +
-"────────────────────────────────────────\r\n        function showSummary() {\r\n    " +
-"        $(\'summary-view\').style.display = \'block\';\r\n            $(\'detail-view\')" +
-".style.display  = \'none\';\r\n        }\r\n\r\n        // ── Load Summary ─────────────" +
-"─────────────────────────────\r\n        function loadSummary() {\r\n            var" +
-" state         = $(\'summary-state-filter\').value;\r\n            var jobTypeFilter" +
-" = ($(\'summary-jobtype-filter\').value || \'\').toLowerCase();\r\n            var url" +
-"           = summaryApiUrl + (state ? \'?state=\' + encodeURIComponent(state) : \'\'" +
-");\r\n\r\n            $(\'summary-body\').innerHTML = \'<tr><td colspan=\"7\" class=\"text" +
-"-center text-muted\">Loading...</td></tr>\';\r\n\r\n            fetch(url)\r\n          " +
-"      .then(function(r) { return r.json(); })\r\n                .then(function(da" +
-"ta) {\r\n                    var summaries = data.summaries || [];\r\n              " +
-"      if (jobTypeFilter) {\r\n                        summaries = summaries.filter" +
-"(function(s) {\r\n                            return s.jobType.toLowerCase().index" +
-"Of(jobTypeFilter) !== -1;\r\n                        });\r\n                    }\r\n " +
-"                   renderSummary(summaries);\r\n                })\r\n              " +
-"  .catch(function(err) {\r\n                    $(\'summary-body\').innerHTML = \'<tr" +
-"><td colspan=\"7\" class=\"text-center text-danger\">Error: \' + err.message + \'</td>" +
-"</tr>\';\r\n                });\r\n        }\r\n\r\n        // ── Render Summary ────────" +
-"────────────────────────────────\r\n        function renderSummary(summaries) {\r\n " +
-"           var tbody = $(\'summary-body\');\r\n            if (!summaries.length) {\r" +
-"\n                tbody.innerHTML = \'<tr><td colspan=\"7\" class=\"text-center text-" +
-"muted\">No job types found.</td></tr>\';\r\n                updateStats(0, 0, 0);\r\n " +
-"               return;\r\n            }\r\n\r\n            var html = \'\';\r\n           " +
-" var totalSuccess = 0, totalFailed = 0;\r\n\r\n            summaries.forEach(functio" +
-"n(s) {\r\n                // ── Dots ─────────────────────────────────────────\r\n  " +
-"              var dots = \'\';\r\n                if (s.recentExecutions) {\r\n       " +
-"             s.recentExecutions.forEach(function(exec) {\r\n                      " +
-"  var cls = exec.state ? exec.state.toLowerCase() : \'\';\r\n                       " +
-" dots += \'<span class=\"state-dot \' + cls + \'\"\'\r\n                              + " +
-"\' data-state=\"\'    + exec.state + \'\"\'\r\n                              + \' data-ti" +
-"me=\"\'     + new Date(exec.timestamp).toLocaleString() + \'\"\'\r\n                   " +
-"           + \' data-jobid=\"\'    + (exec.jobId || \'\') + \'\"\'\r\n                    " +
-"          + \' data-duration=\"\' + (exec.duration != null ? exec.duration.toFixed(" +
-"1) + \'s\' : \'\') + \'\"\'\r\n                              + \'></span>\';\r\n             " +
-"       });\r\n                }\r\n\r\n                // ── MEJORA 2: fila roja si el" +
-" último es Failed ───\r\n                var lastState = \'\';\r\n                if (" +
-"s.recentExecutions && s.recentExecutions.length > 0) {\r\n                    last" +
-"State = s.recentExecutions[s.recentExecutions.length - 1].state || \'\';\r\n        " +
-"        }\r\n                var rowClass = lastState === \'Failed\' ? \' last-failed" +
-"\' : \'\';\r\n\r\n                // ── MEJORA 6: fallos consecutivos ────────────────\r" +
-"\n                var consecutive = 0;\r\n                if (s.recentExecutions) {" +
-"\r\n                    for (var i = s.recentExecutions.length - 1; i >= 0; i--) {" +
-"\r\n                        if (s.recentExecutions[i].state === \'Failed\') consecut" +
-"ive++;\r\n                        else break;\r\n                    }\r\n            " +
-"    }\r\n                var failBadge = \'\';\r\n                if (consecutive >= 2" +
-") {\r\n                    failBadge = \' <span class=\"label label-danger consecuti" +
-"ve-badge\" title=\"\' + consecutive + \' consecutive failures\">🔥 \' + consecutive + " +
-"\'</span>\';\r\n                }\r\n\r\n                // ── MEJORA 1: Avg Duration co" +
-"n color ─────────────\r\n                var avgDuration = \'N/A\';\r\n               " +
-" if (s.avgDuration != null) {\r\n                    var secs     = s.avgDuration;" +
-"\r\n                    var durClass = secs < 1 ? \'dur-green\' : secs < 5 ? \'dur-ye" +
-"llow\' : \'dur-red\';\r\n                    avgDuration  = \'<span class=\"\' + durClas" +
-"s + \'\">\' + secs.toFixed(1) + \'s</span>\';\r\n                }\r\n\r\n                v" +
-"ar lastExec = s.lastExecution ? relativeTime(new Date(s.lastExecution)) : \'N/A\';" +
-"\r\n\r\n                html += \'<tr class=\"\' + rowClass + \'\">\';\r\n                ht" +
-"ml += \'<td>\' + escapeHtml(s.jobType) + \'</td>\';\r\n                html += \'<td>\' " +
-"+ dots + \'</td>\';\r\n                html += \'<td><span class=\"badge\">\' + s.succes" +
-"sCount + \'</span></td>\';\r\n                html += \'<td><span class=\"badge\">\' + s" +
-".failedCount + \'</span>\' + failBadge + \'</td>\';\r\n                html += \'<td>\' " +
-"+ lastExec + \'</td>\';\r\n                html += \'<td>\' + avgDuration + \'</td>\';\r\n" +
-"                html += \'<td><button class=\"btn btn-xs btn-default view-history\"" +
-" data-jobtype=\"\' + escapeHtml(s.jobType) + \'\">View Full History</button></td>\';\r" +
-"\n                html += \'</tr>\';\r\n\r\n                totalSuccess += s.successCo" +
-"unt;\r\n                totalFailed  += s.failedCount;\r\n            });\r\n\r\n       " +
-"     tbody.innerHTML = html;\r\n            updateStats(summaries.length, totalSuc" +
-"cess, totalFailed);\r\n\r\n            // ── Tooltips en los dots ──────────────────" +
-"────────────\r\n            document.querySelectorAll(\'#summary-body .state-dot\')." +
-"forEach(function(dot) {\r\n                dot.addEventListener(\'mouseenter\', func" +
-"tion(e) {\r\n                    var el       = e.target;\r\n                    var" +
-" state    = el.getAttribute(\'data-state\');\r\n                    var time     = e" +
-"l.getAttribute(\'data-time\');\r\n                    var jobId    = el.getAttribute" +
-"(\'data-jobid\');\r\n                    var duration = el.getAttribute(\'data-durati" +
-"on\');\r\n                    var ttHtml   = \'<strong>\' + state + \'</strong><br>\' +" +
-" time;\r\n                    if (duration) ttHtml += \'<br>Duration: \' + duration;" +
-"\r\n                    if (jobId)    ttHtml += \'<br>Job: <a href=\"\' + jobDetailUr" +
-"l(jobId) + \'\" target=\"_blank\">#\' + jobId.substring(0, 8) + \'</a>\';\r\n            " +
-"        tooltipDiv.innerHTML      = ttHtml;\r\n                    tooltipDiv.styl" +
-"e.display  = \'block\';\r\n                    var rect = el.getBoundingClientRect()" +
-";\r\n                    tooltipDiv.style.left = (rect.left + window.scrollX + rec" +
-"t.width / 2 - tooltipDiv.offsetWidth / 2) + \'px\';\r\n                    tooltipDi" +
-"v.style.top  = (rect.top  + window.scrollY - tooltipDiv.offsetHeight - 8) + \'px\'" +
-";\r\n                });\r\n                dot.addEventListener(\'mouseleave\', funct" +
-"ion() {\r\n                    tooltipDiv.style.display = \'none\';\r\n               " +
-" });\r\n            });\r\n\r\n            // ── Click en dot -> detalle filtrado por " +
-"id ────────\r\n            document.querySelectorAll(\'#summary-body .state-dot\').f" +
-"orEach(function(dot) {\r\n                dot.addEventListener(\'click\', function(e" +
-") {\r\n                    var jobId = this.getAttribute(\'data-jobid\');\r\n         " +
-"           if (jobId) {\r\n                        window.open(jobDetailUrl(jobId)" +
-", \'_blank\');\r\n                    }\r\n                });\r\n            });\r\n\r\n   " +
-"         // ── View Full History ─────────────────────────────────\r\n            " +
-"on(\'.view-history\', \'click\', function() {\r\n                showDetail(this.getAt" +
-"tribute(\'data-jobtype\'));\r\n            });\r\n        }\r\n\r\n        // ── Stats ───" +
-"──────────────────────────────────────────────\r\n        function updateStats(typ" +
-"es, success, failed) {\r\n            var total = success + failed;\r\n            $" +
-"(\'stat-types\').textContent   = types;\r\n            $(\'stat-total\').textContent  " +
-" = total;\r\n            $(\'stat-rate\').textContent    = total ? (success / total " +
-"* 100).toFixed(1) + \'%\' : \'-\';\r\n            $(\'stat-updated\').textContent = new " +
-"Date().toLocaleTimeString();\r\n        }\r\n\r\n        // ── Detail ────────────────" +
-"────────────────────────────────\r\n        function showDetail(jobType) {\r\n      " +
-"      currentJobType = jobType;\r\n            currentPage    = 1;\r\n            cu" +
-"rrentSort    = { field: \'lastTimestamp\', direction: \'desc\' };\r\n            $(\'de" +
-"tail-search\').value      = \'\';\r\n            $(\'detail-state-filter\').value = \'\';" +
-"\r\n            $(\'summary-view\').style.display = \'none\';\r\n            $(\'detail-v" +
-"iew\').style.display  = \'block\';\r\n            $(\'detail-jobtype-label\').textConte" +
-"nt = jobType;\r\n            loadDetail(jobType);\r\n        }\r\n\r\n        function l" +
-"oadDetail(jobType) {\r\n            var state = $(\'detail-state-filter\').value;\r\n " +
-"           var url   = detailApiUrl + \'?jobType=\' + encodeURIComponent(jobType);" +
-"\r\n            if (state) url += \'&state=\' + encodeURIComponent(state);\r\n\r\n      " +
-"      $(\'detail-body\').innerHTML     = \'<tr><td colspan=\"6\" class=\"text-center t" +
-"ext-muted\">Loading...</td></tr>\';\r\n            $(\'detail-pagination\').innerHTML " +
-"= \'\';\r\n\r\n            fetch(url)\r\n                .then(function(r) { return r.js" +
-"on(); })\r\n                .then(function(data) {\r\n                    allDetailJ" +
-"obs = data.jobs || [];\r\n                    sortAndFilter();\r\n                  " +
-"  renderDetailPage();\r\n                    renderDurationChart(chartMode);\r\n    " +
-"            })\r\n                .catch(function(err) {\r\n                    $(\'d" +
-"etail-body\').innerHTML = \'<tr><td colspan=\"6\" class=\"text-center text-danger\">Er" +
-"ror: \' + err.message + \'</td></tr>\';\r\n                });\r\n        }\r\n\r\n        " +
-"function sortAndFilter() {\r\n            var search = ($(\'detail-search\').value |" +
-"| \'\').toLowerCase();\r\n            filteredJobs = allDetailJobs.filter(function(j" +
-") {\r\n                if (!search) return true;\r\n                return (j.jobId " +
-"       && j.jobId.toLowerCase().indexOf(search)        !== -1) ||\r\n             " +
-"          (j.errorMessage && j.errorMessage.toLowerCase().indexOf(search) !== -1" +
-") ||\r\n                       (j.queue        && j.queue.toLowerCase().indexOf(se" +
-"arch)        !== -1);\r\n            });\r\n\r\n            var field = currentSort.fi" +
-"eld;\r\n            var dir   = currentSort.direction;\r\n            filteredJobs.s" +
-"ort(function(a, b) {\r\n                var valA = a[field] != null ? a[field] : \'" +
-"\';\r\n                var valB = b[field] != null ? b[field] : \'\';\r\n              " +
-"  if (field === \'lastTimestamp\') {\r\n                    valA = new Date(a.lastTi" +
-"mestamp).getTime();\r\n                    valB = new Date(b.lastTimestamp).getTim" +
-"e();\r\n                } else if (field === \'duration\') {\r\n                    va" +
-"lA = parseFloat(a.duration) || 0;\r\n                    valB = parseFloat(b.durat" +
-"ion) || 0;\r\n                } else {\r\n                    valA = valA.toString()" +
-".toLowerCase();\r\n                    valB = valB.toString().toLowerCase();\r\n    " +
-"            }\r\n                if (valA < valB) return dir === \'asc\' ? -1 : 1;\r\n" +
-"                if (valA > valB) return dir === \'asc\' ?  1 : -1;\r\n              " +
-"  return 0;\r\n            });\r\n        }\r\n\r\n        function renderDetailPage() {" +
-"\r\n            var start    = (currentPage - 1) * pageSize;\r\n            var page" +
-"Jobs = filteredJobs.slice(start, start + pageSize);\r\n            renderDetail(pa" +
-"geJobs, filteredJobs.length);\r\n        }\r\n\r\n        function renderDetail(jobs, " +
-"total) {\r\n            var tbody         = $(\'detail-body\');\r\n            var pag" +
-"inationDiv = $(\'detail-pagination\');\r\n\r\n            if (!jobs.length) {\r\n       " +
-"         tbody.innerHTML         = \'<tr><td colspan=\"7\" class=\"text-center text-" +
-"muted\">No jobs found.</td></tr>\';\r\n                paginationDiv.innerHTML = \'\';" +
-"\r\n                return;\r\n            }\r\n\r\n            var html = \'\';\r\n        " +
-"    jobs.forEach(function(j) {\r\n                var shortId    = j.jobId ? j.job" +
-"Id.substring(0, 8) : \'\';\r\n                var stateClass = j.lastState ? j.lastS" +
-"tate.toLowerCase() : \'\';\r\n                var badgeClass = stateClass === \'succe" +
-"eded\' ? \'label label-success\' :\r\n                                 stateClass ===" +
-" \'failed\'    ? \'label label-danger\'  : \'label label-default\';\r\n                v" +
-"ar ts = j.lastTimestamp ? relativeTime(new Date(j.lastTimestamp)) : \'\';\r\n\r\n     " +
-"           var errorHtml = \'\';\r\n                if (j.errorMessage) {\r\n         " +
-"           if (j.errorMessage.length > 80) {\r\n                        errorHtml " +
-"= \'<span class=\"error-short\">\'  + escapeHtml(j.errorMessage.substring(0, 80)) + " +
-"\'…</span>\'\r\n                                  + \'<span class=\"error-full\" style=" +
-"\"display:none;\">\' + escapeHtml(j.errorMessage) + \'</span> \'\r\n                   " +
-"               + \'<a href=\"javascript:void(0)\" class=\"error-toggle small\">more</" +
-"a>\';\r\n                    } else {\r\n                        errorHtml = escapeHt" +
-"ml(j.errorMessage);\r\n                    }\r\n                }\r\n\r\n               " +
-" html += \'<tr class=\"detail-row \' + stateClass + \' fade-in\">\';\r\n                " +
-"html += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank\">#\' + shortI" +
-"d + \'</a></td>\';\r\n                html += \'<td><a href=\"\' + queueUrl(j.queue)   " +
-"  + \'\" target=\"_blank\" class=\"text-muted\">\' + escapeHtml(j.queue) + \'</a></td>\';" +
-"\r\n                html += \'<td><span class=\"\' + badgeClass + \'\">\' + j.lastState " +
-"+ \'</span></td>\';\r\n                html += \'<td>\' + ts + \'</td>\';\r\n             " +
-"   // Duration con color\r\n                var durHtml = \'N/A\';\r\n                " +
-"if (j.duration != null) {\r\n                    var d = j.duration;\r\n            " +
-"        var dc = d < 1 ? \'dur-green\' : d < 5 ? \'dur-yellow\' : \'dur-red\';\r\n      " +
-"              durHtml = \'<span class=\"\' + dc + \'\">\' + d.toFixed(1) + \'s</span>\';" +
-"\r\n                }\r\n                html += \'<td>\' + durHtml + \'</td>\';\r\n      " +
-"          html += \'<td>\' + errorHtml + \'</td>\';\r\n                html += \'<td><a" +
-" href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank\" class=\"btn btn-xs btn-defa" +
-"ult\">Detail</a></td>\';\r\n                html += \'</tr>\';\r\n            });\r\n     " +
-"       tbody.innerHTML = html;\r\n\r\n            // ── Paginación ─────────────────" +
-"───────────────────────\r\n            var totalPages = Math.ceil(total / pageSize" +
-");\r\n            var startCount = (currentPage - 1) * pageSize + 1;\r\n            " +
-"var endCount   = Math.min(currentPage * pageSize, total);\r\n            var pagHt" +
-"ml    = \'<div class=\"clearfix\">\';\r\n            pagHtml += \'<span class=\"pull-lef" +
-"t\">Showing \' + startCount + \' – \' + endCount + \' of \' + total + \' jobs</span>\';\r" +
-"\n            pagHtml += \'<div class=\"pull-right\">\';\r\n            if (currentPage" +
-" > 1)          pagHtml += \'<button class=\"btn btn-default btn-xs\" id=\"prev-page\"" +
-">Previous</button> \';\r\n            if (currentPage < totalPages) pagHtml += \'<bu" +
-"tton class=\"btn btn-default btn-xs\" id=\"next-page\">Next</button>\';\r\n            " +
-"pagHtml += \'</div></div>\';\r\n            paginationDiv.innerHTML = pagHtml;\r\n\r\n  " +
-"          var prevBtn = $(\'prev-page\');\r\n            var nextBtn = $(\'next-page\'" +
-");\r\n            if (prevBtn) prevBtn.addEventListener(\'click\', function() { curr" +
-"entPage--; renderDetailPage(); });\r\n            if (nextBtn) nextBtn.addEventLis" +
-"tener(\'click\', function() { currentPage++; renderDetailPage(); });\r\n\r\n          " +
-"  // ── Toggle error ──────────────────────────────────────\r\n            on(\'.er" +
-"ror-toggle\', \'click\', function() {\r\n                var cell  = this.parentNode;" +
-"\r\n                var short = cell.querySelector(\'.error-short\');\r\n             " +
-"   var full  = cell.querySelector(\'.error-full\');\r\n                if (short.sty" +
-"le.display !== \'none\') {\r\n                    short.style.display = \'none\';\r\n   " +
-"                 full.style.display  = \'inline\';\r\n                    this.textC" +
-"ontent    = \'less\';\r\n                } else {\r\n                    short.style.d" +
-"isplay = \'inline\';\r\n                    full.style.display  = \'none\';\r\n         " +
-"           this.textContent    = \'more\';\r\n                }\r\n            });\r\n  " +
-"      }\r\n\r\n        // ── Duration Chart ────────────────────────────────────────" +
-"\r\n        function renderDurationChart(mode) {\r\n            var labels = [], val" +
-"ues = [];\r\n\r\n            if (mode === \'exec\') {\r\n                // Últimas 100 " +
-"ejecuciones individuales, sin agrupar\r\n                var sorted = allDetailJob" +
-"s\r\n                    .filter(function(j) { return j.duration != null; })\r\n    " +
-"                .sort(function(a, b) { return new Date(a.lastTimestamp) - new Da" +
-"te(b.lastTimestamp); })\r\n                    .slice(-100);\r\n\r\n                so" +
-"rted.forEach(function(j) {\r\n                    var d = new Date(j.lastTimestamp" +
-");\r\n                    labels.push(d.toLocaleTimeString([], { hour: \'2-digit\', " +
-"minute: \'2-digit\' }));\r\n                    values.push(parseFloat(j.duration.to" +
-"Fixed(2)));\r\n                });\r\n\r\n            } else if (mode === \'1d\') {\r\n   " +
-"             // Agrupar por hora del día actual (00:00 - 23:59)\r\n               " +
-" var today = new Date().toISOString().slice(0, 10);\r\n                var byHour " +
-"= {};\r\n\r\n                allDetailJobs.forEach(function(j) {\r\n                  " +
-"  if (j.duration == null) return;\r\n                    var ts = new Date(j.lastT" +
-"imestamp);\r\n                    if (ts.toISOString().slice(0, 10) !== today) ret" +
-"urn;\r\n                    var hour = ts.getHours();\r\n                    if (!by" +
-"Hour[hour]) byHour[hour] = { total: 0, count: 0 };\r\n                    byHour[h" +
-"our].total += j.duration;\r\n                    byHour[hour].count += 1;\r\n       " +
-"         });\r\n\r\n                for (var h = 0; h <= 23; h++) {\r\n               " +
-"     labels.push(String(h).padStart(2, \'0\') + \':00\');\r\n                    var a" +
-"vg = byHour[h] ? (byHour[h].total / byHour[h].count) : null;\r\n                  " +
-"  values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);\r\n              " +
-"  }\r\n\r\n            } else {\r\n                // Agrupar por día para 7d, 15d, 30" +
-"d, 45d\r\n                var dayOptions = { \'7d\': 7, \'15d\': 15, \'30d\': 30, \'45d\':" +
-" 45 };\r\n                var days = dayOptions[mode] || 7;\r\n                var c" +
-"utoff = new Date();\r\n                cutoff.setDate(cutoff.getDate() - days);\r\n\r" +
-"\n                var byDay = {};\r\n                allDetailJobs.forEach(function" +
-"(j) {\r\n                    if (j.duration == null) return;\r\n                    " +
-"var ts = new Date(j.lastTimestamp);\r\n                    if (ts < cutoff) return" +
-";\r\n                    var key = ts.toISOString().slice(0, 10);\r\n               " +
-"     if (!byDay[key]) byDay[key] = { total: 0, count: 0 };\r\n                    " +
-"byDay[key].total += j.duration;\r\n                    byDay[key].count += 1;\r\n   " +
-"             });\r\n\r\n                for (var i = days - 1; i >= 0; i--) {\r\n     " +
-"               var d = new Date();\r\n                    d.setDate(d.getDate() - " +
-"i);\r\n                    var key = d.toISOString().slice(0, 10);\r\n              " +
-"      labels.push(key.slice(5)); // MM-DD\r\n                    var avg = byDay[k" +
-"ey] ? (byDay[key].total / byDay[key].count) : null;\r\n                    values." +
-"push(avg !== null ? parseFloat(avg.toFixed(2)) : null);\r\n                }\r\n    " +
-"        }\r\n\r\n            var ctx = document.getElementById(\'duration-chart\').get" +
-"Context(\'2d\');\r\n            if (durationChart) durationChart.destroy();\r\n\r\n     " +
-"       durationChart = new Chart(ctx, {\r\n                type: \'line\',\r\n        " +
-"        data: {\r\n                    labels: labels,\r\n                    datase" +
-"ts: [{\r\n                        label: \'Avg Duration (s)\',\r\n                    " +
-"    data: values,\r\n                        borderColor: \'#337ab7\',\r\n            " +
-"            backgroundColor: \'rgba(51,122,183,0.08)\',\r\n                        p" +
-"ointBackgroundColor: function(ctx) {\r\n                            var v = ctx.ra" +
-"w;\r\n                            if (v == null) return \'#ccc\';\r\n                 " +
-"           return v < 1 ? \'#5cb85c\' : v < 5 ? \'#f0ad4e\' : \'#d9534f\';\r\n          " +
-"              },\r\n                        pointRadius: mode === \'exec\' ? 4 : 5,\r" +
-"\n                        pointHoverRadius: 7,\r\n                        borderWid" +
-"th: 2,\r\n                        tension: mode === \'exec\' ? 0.2 : 0.3,\r\n         " +
-"               spanGaps: true\r\n                    }]\r\n                },\r\n     " +
-"           options: {\r\n                    responsive: true,\r\n                  " +
-"  maintainAspectRatio: true,\r\n                    aspectRatio: 4,\r\n             " +
-"       plugins: {\r\n                        legend: { display: false },\r\n        " +
-"                tooltip: {\r\n                            callbacks: {\r\n          " +
-"                      label: function(ctx) {\r\n                                  " +
-"  return ctx.raw != null ? ctx.raw + \'s\' : \'No data\';\r\n                         " +
-"       },\r\n                                title: function(items) {\r\n           " +
-"                         if (mode !== \'exec\') return items[0].label;\r\n          " +
-"                          var job = allDetailJobs\r\n                             " +
-"           .filter(function(j) { return j.duration != null; })\r\n                " +
-"                        .sort(function(a, b) { return new Date(a.lastTimestamp) " +
-"- new Date(b.lastTimestamp); })\r\n                                        .slice(" +
-"-100)[items[0].dataIndex];\r\n                                    return job ? new" +
-" Date(job.lastTimestamp).toLocaleString() : items[0].label;\r\n                   " +
-"             }\r\n                            }\r\n                        }\r\n      " +
-"              },\r\n                    scales: {\r\n                        y: {\r\n " +
-"                           beginAtZero: false,\r\n                            sugg" +
-"estedMin: 0,\r\n                            ticks: {\r\n                            " +
-"    callback: function(v) { return v + \'s\'; },\r\n                                " +
-"maxTicksLimit: 6\r\n                            },\r\n                            gr" +
-"id: { color: \'rgba(0,0,0,0.05)\' }\r\n                        },\r\n                 " +
-"       x: {\r\n                            grid: { display: false },\r\n            " +
-"                ticks: {\r\n                                maxTicksLimit: mode ==" +
-"= \'1d\' ? 24 : 10,\r\n                                autoSkip: mode !== \'1d\',\r\n   " +
-"                             maxRotation: 0\r\n                            }\r\n    " +
-"                    }\r\n                    }\r\n                }\r\n            });" +
-"\r\n        }\r\n\r\n        // ── Sort indicators ───────────────────────────────────" +
-"────\r\n        function updateSortIndicators() {\r\n            document.querySelec" +
-"torAll(\'#detail-table th.sortable\').forEach(function(th) {\r\n                th.c" +
-"lassList.remove(\'asc\', \'desc\');\r\n                if (th.getAttribute(\'data-sort\'" +
-") === currentSort.field) {\r\n                    th.classList.add(currentSort.dir" +
-"ection);\r\n                }\r\n            });\r\n        }\r\n\r\n        // ── URL hel" +
-"pers ───────────────────────────────────────────\r\n        function jobDetailUrl(" +
-"jobId) { return \'");
+"      });\r\n            });\r\n\r\n            $(\'export-chart\').addEventListener(\'cl" +
+"ick\', function() {\r\n                var canvas = document.getElementById(\'durati" +
+"on-chart\');\r\n                if (!canvas) return;\r\n                var link = do" +
+"cument.createElement(\'a\');\r\n                link.download = \'execution-duration-" +
+"chart.png\';\r\n                link.href = canvas.toDataURL(\'image/png\');\r\n       " +
+"         link.click();\r\n            });\r\n\r\n            $(\'alert-threshold\').addE" +
+"ventListener(\'input\', function() {\r\n                // Solo redibujar si el deta" +
+"lle está visible y hay datos cargados\r\n                if ($(\'detail-view\').styl" +
+"e.display !== \'none\' && currentJobType) {\r\n                    renderDurationCha" +
+"rt(chartMode);\r\n                }\r\n            });\r\n        }\r\n\r\n        // ── M" +
+"EJORA 3: timer helper ────────────────────────────────\r\n        function startRe" +
+"freshTimer() {\r\n            clearInterval(refreshTimer);\r\n            if (refres" +
+"hSeconds > 0) {\r\n                refreshTimer = setInterval(function() {\r\n      " +
+"              if ($(\'summary-view\').style.display !== \'none\') loadSummary();\r\n  " +
+"              }, refreshSeconds * 1000);\r\n            }\r\n        }\r\n\r\n        //" +
+" ── MEJORA 4: export CSV ──────────────────────────────────\r\n        function ex" +
+"portCsv() {\r\n            var rows = [[\'Job Type\', \'Success\', \'Failed\', \'Avg Dura" +
+"tion\', \'Last Execution\']];\r\n            document.querySelectorAll(\'#summary-body" +
+" tr\').forEach(function(tr) {\r\n                var cells = tr.querySelectorAll(\'t" +
+"d\');\r\n                if (cells.length >= 6) {\r\n                    rows.push([\r" +
+"\n                        \'\"\' + (cells[0].textContent || \'\').replace(/\"/g, \'\"\"\') " +
+"+ \'\"\',\r\n                        (cells[2].textContent || \'\').trim(),\r\n          " +
+"              (cells[3].textContent || \'\').trim(),\r\n                        (cel" +
+"ls[5].textContent || \'\').trim(),\r\n                        (cells[4].textContent " +
+"|| \'\').trim()\r\n                    ]);\r\n                }\r\n            });\r\n    " +
+"        var csv  = rows.map(function(r) { return r.join(\',\'); }).join(\'\\n\');\r\n  " +
+"          var blob = new Blob([csv], { type: \'text/csv;charset=utf-8;\' });\r\n    " +
+"        var a    = document.createElement(\'a\');\r\n            a.href   = URL.crea" +
+"teObjectURL(blob);\r\n            a.download = \'job-insights-\' + new Date().toISOS" +
+"tring().slice(0, 10) + \'.csv\';\r\n            document.body.appendChild(a);\r\n     " +
+"       a.click();\r\n            document.body.removeChild(a);\r\n        }\r\n\r\n     " +
+"   // ── Views ─────────────────────────────────────────────────\r\n        functi" +
+"on showSummary() {\r\n            $(\'summary-view\').style.display = \'block\';\r\n    " +
+"        $(\'detail-view\').style.display  = \'none\';\r\n        }\r\n\r\n        // ── Lo" +
+"ad Summary ──────────────────────────────────────────\r\n        function loadSumm" +
+"ary() {\r\n            var state         = $(\'summary-state-filter\').value;\r\n     " +
+"       var jobTypeFilter = ($(\'summary-jobtype-filter\').value || \'\').toLowerCase" +
+"();\r\n            var url           = summaryApiUrl + (state ? \'?state=\' + encode" +
+"URIComponent(state) : \'\');\r\n\r\n            $(\'summary-body\').innerHTML = \'<tr><td" +
+" colspan=\"7\" class=\"text-center text-muted\">Loading...</td></tr>\';\r\n\r\n          " +
+"  fetch(url)\r\n                .then(function(r) { return r.json(); })\r\n         " +
+"       .then(function(data) {\r\n                    var summaries = data.summarie" +
+"s || [];\r\n                    if (jobTypeFilter) {\r\n                        summ" +
+"aries = summaries.filter(function(s) {\r\n                            return s.job" +
+"Type.toLowerCase().indexOf(jobTypeFilter) !== -1;\r\n                        });\r\n" +
+"                    }\r\n                    renderSummary(summaries);\r\n          " +
+"      })\r\n                .catch(function(err) {\r\n                    $(\'summary" +
+"-body\').innerHTML = \'<tr><td colspan=\"7\" class=\"text-center text-danger\">Error: " +
+"\' + err.message + \'</td></tr>\';\r\n                });\r\n        }\r\n\r\n        // ──" +
+" Render Summary ────────────────────────────────────────\r\n        function rende" +
+"rSummary(summaries) {\r\n            var tbody = $(\'summary-body\');\r\n            i" +
+"f (!summaries.length) {\r\n                tbody.innerHTML = \'<tr><td colspan=\"7\" " +
+"class=\"text-center text-muted\">No job types found.</td></tr>\';\r\n                " +
+"updateStats(0, 0, 0);\r\n                return;\r\n            }\r\n\r\n            var" +
+" html = \'\';\r\n            var totalSuccess = 0, totalFailed = 0;\r\n\r\n            s" +
+"ummaries.forEach(function(s) {\r\n                // ── Dots ─────────────────────" +
+"────────────────────\r\n                var dots = \'\';\r\n                if (s.rece" +
+"ntExecutions) {\r\n                    s.recentExecutions.forEach(function(exec) {" +
+"\r\n                        var cls = exec.state ? exec.state.toLowerCase() : \'\';\r" +
+"\n                        dots += \'<span class=\"state-dot \' + cls + \'\"\'\r\n        " +
+"                      + \' data-state=\"\'    + exec.state + \'\"\'\r\n                 " +
+"             + \' data-time=\"\'     + new Date(exec.timestamp).toLocaleString() + " +
+"\'\"\'\r\n                              + \' data-jobid=\"\'    + (exec.jobId || \'\') + \'" +
+"\"\'\r\n                              + \' data-duration=\"\' + (exec.duration != null " +
+"? exec.duration.toFixed(1) + \'s\' : \'\') + \'\"\'\r\n                              + \'>" +
+"</span>\';\r\n                    });\r\n                }\r\n\r\n                // ── M" +
+"EJORA 2: fila roja si el último es Failed ───\r\n                var lastState = \'" +
+"\';\r\n                if (s.recentExecutions && s.recentExecutions.length > 0) {\r\n" +
+"                    lastState = s.recentExecutions[s.recentExecutions.length - 1" +
+"].state || \'\';\r\n                }\r\n                var rowClass = lastState === " +
+"\'Failed\' ? \' last-failed\' : \'\';\r\n\r\n                // ── MEJORA 6: fallos consec" +
+"utivos ────────────────\r\n                var consecutive = 0;\r\n                i" +
+"f (s.recentExecutions) {\r\n                    for (var i = s.recentExecutions.le" +
+"ngth - 1; i >= 0; i--) {\r\n                        if (s.recentExecutions[i].stat" +
+"e === \'Failed\') consecutive++;\r\n                        else break;\r\n           " +
+"         }\r\n                }\r\n                var failBadge = \'\';\r\n            " +
+"    if (consecutive >= 2) {\r\n                    failBadge = \' <span class=\"labe" +
+"l label-danger consecutive-badge\" title=\"\' + consecutive + \' consecutive failure" +
+"s\">🔥 \' + consecutive + \'</span>\';\r\n                }\r\n\r\n                // ── M" +
+"EJORA 1: Avg Duration con color ─────────────\r\n                var avgDuration =" +
+" \'N/A\';\r\n                if (s.avgDuration != null) {\r\n                    var s" +
+"ecs     = s.avgDuration;\r\n                    var durClass = secs < 1 ? \'dur-gre" +
+"en\' : secs < 5 ? \'dur-yellow\' : \'dur-red\';\r\n                    avgDuration  = \'" +
+"<span class=\"\' + durClass + \'\">\' + secs.toFixed(1) + \'s</span>\';\r\n              " +
+"  }\r\n\r\n                var lastExec = s.lastExecution ? relativeTime(new Date(s." +
+"lastExecution)) : \'N/A\';\r\n\r\n                html += \'<tr class=\"\' + rowClass + \'" +
+"\">\';\r\n                html += \'<td>\' + escapeHtml(s.jobType) + \'</td>\';\r\n       " +
+"         html += \'<td>\' + dots + \'</td>\';\r\n                html += \'<td><span cl" +
+"ass=\"badge\">\' + s.successCount + \'</span></td>\';\r\n                html += \'<td><" +
+"span class=\"badge\">\' + s.failedCount + \'</span>\' + failBadge + \'</td>\';\r\n       " +
+"         html += \'<td>\' + lastExec + \'</td>\';\r\n                html += \'<td>\' + " +
+"avgDuration + \'</td>\';\r\n                html += \'<td><button class=\"btn btn-xs b" +
+"tn-default view-history\" data-jobtype=\"\' + escapeHtml(s.jobType) + \'\">View Full " +
+"History</button></td>\';\r\n                html += \'</tr>\';\r\n\r\n                tot" +
+"alSuccess += s.successCount;\r\n                totalFailed  += s.failedCount;\r\n  " +
+"          });\r\n\r\n            tbody.innerHTML = html;\r\n            updateStats(su" +
+"mmaries.length, totalSuccess, totalFailed);\r\n\r\n            // ── Tooltips en los" +
+" dots ──────────────────────────────\r\n            document.querySelectorAll(\'#su" +
+"mmary-body .state-dot\').forEach(function(dot) {\r\n                dot.addEventLis" +
+"tener(\'mouseenter\', function(e) {\r\n                    var el       = e.target;\r" +
+"\n                    var state    = el.getAttribute(\'data-state\');\r\n            " +
+"        var time     = el.getAttribute(\'data-time\');\r\n                    var jo" +
+"bId    = el.getAttribute(\'data-jobid\');\r\n                    var duration = el.g" +
+"etAttribute(\'data-duration\');\r\n                    var ttHtml   = \'<strong>\' + s" +
+"tate + \'</strong><br>\' + time;\r\n                    if (duration) ttHtml += \'<br" +
+">Duration: \' + duration;\r\n                    if (jobId)    ttHtml += \'<br>Job: " +
+"<a href=\"\' + jobDetailUrl(jobId) + \'\" target=\"_blank\">#\' + jobId.substring(0, 8)" +
+" + \'</a>\';\r\n                    tooltipDiv.innerHTML      = ttHtml;\r\n           " +
+"         tooltipDiv.style.display  = \'block\';\r\n                    var rect = el" +
+".getBoundingClientRect();\r\n                    tooltipDiv.style.left = (rect.lef" +
+"t + window.scrollX + rect.width / 2 - tooltipDiv.offsetWidth / 2) + \'px\';\r\n     " +
+"               tooltipDiv.style.top  = (rect.top  + window.scrollY - tooltipDiv." +
+"offsetHeight - 8) + \'px\';\r\n                });\r\n                dot.addEventList" +
+"ener(\'mouseleave\', function() {\r\n                    tooltipDiv.style.display = " +
+"\'none\';\r\n                });\r\n            });\r\n\r\n            // ── Click en dot " +
+"-> detalle filtrado por id ────────\r\n            document.querySelectorAll(\'#sum" +
+"mary-body .state-dot\').forEach(function(dot) {\r\n                dot.addEventList" +
+"ener(\'click\', function(e) {\r\n                    var jobId = this.getAttribute(\'" +
+"data-jobid\');\r\n                    if (jobId) {\r\n                        window." +
+"open(jobDetailUrl(jobId), \'_blank\');\r\n                    }\r\n                });" +
+"\r\n            });\r\n\r\n            // ── View Full History ───────────────────────" +
+"──────────\r\n            on(\'.view-history\', \'click\', function() {\r\n             " +
+"   showDetail(this.getAttribute(\'data-jobtype\'));\r\n            });\r\n        }\r\n\r" +
+"\n        // ── Stats ─────────────────────────────────────────────────\r\n        " +
+"function updateStats(types, success, failed) {\r\n            var total = success " +
+"+ failed;\r\n            $(\'stat-types\').textContent   = types;\r\n            $(\'st" +
+"at-total\').textContent   = total;\r\n            $(\'stat-rate\').textContent    = t" +
+"otal ? (success / total * 100).toFixed(1) + \'%\' : \'-\';\r\n            $(\'stat-upda" +
+"ted\').textContent = new Date().toLocaleTimeString();\r\n        }\r\n\r\n        // ──" +
+" Detail ────────────────────────────────────────────────\r\n        function showD" +
+"etail(jobType) {\r\n            currentJobType = jobType;\r\n            currentPage" +
+"    = 1;\r\n            currentSort    = { field: \'lastTimestamp\', direction: \'des" +
+"c\' };\r\n            $(\'detail-search\').value      = \'\';\r\n            $(\'detail-st" +
+"ate-filter\').value = \'\';\r\n            $(\'summary-view\').style.display = \'none\';\r" +
+"\n            $(\'detail-view\').style.display  = \'block\';\r\n            $(\'detail-j" +
+"obtype-label\').textContent = jobType;\r\n            loadDetail(jobType);\r\n       " +
+" }\r\n\r\n        function loadDetail(jobType) {\r\n            var state = $(\'detail-" +
+"state-filter\').value;\r\n            var url   = detailApiUrl + \'?jobType=\' + enco" +
+"deURIComponent(jobType);\r\n            if (state) url += \'&state=\' + encodeURICom" +
+"ponent(state);\r\n\r\n            $(\'detail-body\').innerHTML     = \'<tr><td colspan=" +
+"\"6\" class=\"text-center text-muted\">Loading...</td></tr>\';\r\n            $(\'detail" +
+"-pagination\').innerHTML = \'\';\r\n\r\n            fetch(url)\r\n                .then(f" +
+"unction(r) { return r.json(); })\r\n                .then(function(data) {\r\n      " +
+"              allDetailJobs = data.jobs || [];\r\n                    sortAndFilte" +
+"r();\r\n                    renderDetailPage();\r\n                    renderDuratio" +
+"nChart(chartMode);\r\n                })\r\n                .catch(function(err) {\r\n" +
+"                    $(\'detail-body\').innerHTML = \'<tr><td colspan=\"6\" class=\"tex" +
+"t-center text-danger\">Error: \' + err.message + \'</td></tr>\';\r\n                })" +
+";\r\n        }\r\n\r\n        function sortAndFilter() {\r\n            var search = ($(" +
+"\'detail-search\').value || \'\').toLowerCase();\r\n            filteredJobs = allDeta" +
+"ilJobs.filter(function(j) {\r\n                if (!search) return true;\r\n        " +
+"        return (j.jobId        && j.jobId.toLowerCase().indexOf(search)        !" +
+"== -1) ||\r\n                       (j.errorMessage && j.errorMessage.toLowerCase(" +
+").indexOf(search) !== -1) ||\r\n                       (j.queue        && j.queue." +
+"toLowerCase().indexOf(search)        !== -1);\r\n            });\r\n\r\n            va" +
+"r field = currentSort.field;\r\n            var dir   = currentSort.direction;\r\n  " +
+"          filteredJobs.sort(function(a, b) {\r\n                var valA = a[field" +
+"] != null ? a[field] : \'\';\r\n                var valB = b[field] != null ? b[fiel" +
+"d] : \'\';\r\n                if (field === \'lastTimestamp\') {\r\n                    " +
+"valA = new Date(a.lastTimestamp).getTime();\r\n                    valB = new Date" +
+"(b.lastTimestamp).getTime();\r\n                } else if (field === \'duration\') {" +
+"\r\n                    valA = parseFloat(a.duration) || 0;\r\n                    v" +
+"alB = parseFloat(b.duration) || 0;\r\n                } else {\r\n                  " +
+"  valA = valA.toString().toLowerCase();\r\n                    valB = valB.toStrin" +
+"g().toLowerCase();\r\n                }\r\n                if (valA < valB) return d" +
+"ir === \'asc\' ? -1 : 1;\r\n                if (valA > valB) return dir === \'asc\' ? " +
+" 1 : -1;\r\n                return 0;\r\n            });\r\n        }\r\n\r\n        funct" +
+"ion renderDetailPage() {\r\n            var start    = (currentPage - 1) * pageSiz" +
+"e;\r\n            var pageJobs = filteredJobs.slice(start, start + pageSize);\r\n   " +
+"         renderDetail(pageJobs, filteredJobs.length);\r\n        }\r\n\r\n        func" +
+"tion renderDetail(jobs, total) {\r\n            var tbody         = $(\'detail-body" +
+"\');\r\n            var paginationDiv = $(\'detail-pagination\');\r\n\r\n            if (" +
+"!jobs.length) {\r\n                tbody.innerHTML         = \'<tr><td colspan=\"7\" " +
+"class=\"text-center text-muted\">No jobs found.</td></tr>\';\r\n                pagin" +
+"ationDiv.innerHTML = \'\';\r\n                return;\r\n            }\r\n\r\n            " +
+"var html = \'\';\r\n            jobs.forEach(function(j) {\r\n                var shor" +
+"tId    = j.jobId ? j.jobId.substring(0, 8) : \'\';\r\n                var stateClass" +
+" = j.lastState ? j.lastState.toLowerCase() : \'\';\r\n                var badgeClass" +
+" = stateClass === \'succeeded\' ? \'label label-success\' :\r\n                       " +
+"          stateClass === \'failed\'    ? \'label label-danger\'  : \'label label-defa" +
+"ult\';\r\n                var ts = j.lastTimestamp ? relativeTime(new Date(j.lastTi" +
+"mestamp)) : \'\';\r\n\r\n                var errorHtml = \'\';\r\n                if (j.er" +
+"rorMessage) {\r\n                    if (j.errorMessage.length > 80) {\r\n          " +
+"              errorHtml = \'<span class=\"error-short\">\'  + escapeHtml(j.errorMess" +
+"age.substring(0, 80)) + \'…</span>\'\r\n                                  + \'<span c" +
+"lass=\"error-full\" style=\"display:none;\">\' + escapeHtml(j.errorMessage) + \'</span" +
+"> \'\r\n                                  + \'<a href=\"javascript:void(0)\" class=\"er" +
+"ror-toggle small\">more</a>\';\r\n                    } else {\r\n                    " +
+"    errorHtml = escapeHtml(j.errorMessage);\r\n                    }\r\n            " +
+"    }\r\n\r\n                html += \'<tr class=\"detail-row \' + stateClass + \' fade-" +
+"in\">\';\r\n                html += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" tar" +
+"get=\"_blank\">#\' + shortId + \'</a></td>\';\r\n                html += \'<td><a href=\"" +
+"\' + queueUrl(j.queue)     + \'\" target=\"_blank\" class=\"text-muted\">\' + escapeHtml" +
+"(j.queue) + \'</a></td>\';\r\n                html += \'<td><span class=\"\' + badgeCla" +
+"ss + \'\">\' + j.lastState + \'</span></td>\';\r\n                html += \'<td>\' + ts +" +
+" \'</td>\';\r\n                // Duration con color\r\n                var durHtml = " +
+"\'N/A\';\r\n                if (j.duration != null) {\r\n                    var d = j" +
+".duration;\r\n                    var dc = d < 1 ? \'dur-green\' : d < 5 ? \'dur-yell" +
+"ow\' : \'dur-red\';\r\n                    durHtml = \'<span class=\"\' + dc + \'\">\' + d." +
+"toFixed(1) + \'s</span>\';\r\n                }\r\n                html += \'<td>\' + du" +
+"rHtml + \'</td>\';\r\n                html += \'<td>\' + errorHtml + \'</td>\';\r\n       " +
+"         html += \'<td><a href=\"\' + jobDetailUrl(j.jobId) + \'\" target=\"_blank\" cl" +
+"ass=\"btn btn-xs btn-default\">Detail</a></td>\';\r\n                html += \'</tr>\';" +
+"\r\n            });\r\n            tbody.innerHTML = html;\r\n\r\n            // ── Pagi" +
+"nación ────────────────────────────────────────\r\n            var totalPages = Ma" +
+"th.ceil(total / pageSize);\r\n            var startCount = (currentPage - 1) * pag" +
+"eSize + 1;\r\n            var endCount   = Math.min(currentPage * pageSize, total)" +
+";\r\n            var pagHtml    = \'<div class=\"clearfix\">\';\r\n            pagHtml +" +
+"= \'<span class=\"pull-left\">Showing \' + startCount + \' – \' + endCount + \' of \' + " +
+"total + \' jobs</span>\';\r\n            pagHtml += \'<div class=\"pull-right\">\';\r\n   " +
+"         if (currentPage > 1)          pagHtml += \'<button class=\"btn btn-defaul" +
+"t btn-xs\" id=\"prev-page\">Previous</button> \';\r\n            if (currentPage < tot" +
+"alPages) pagHtml += \'<button class=\"btn btn-default btn-xs\" id=\"next-page\">Next<" +
+"/button>\';\r\n            pagHtml += \'</div></div>\';\r\n            paginationDiv.in" +
+"nerHTML = pagHtml;\r\n\r\n            var prevBtn = $(\'prev-page\');\r\n            var" +
+" nextBtn = $(\'next-page\');\r\n            if (prevBtn) prevBtn.addEventListener(\'c" +
+"lick\', function() { currentPage--; renderDetailPage(); });\r\n            if (next" +
+"Btn) nextBtn.addEventListener(\'click\', function() { currentPage++; renderDetailP" +
+"age(); });\r\n\r\n            // ── Toggle error ───────────────────────────────────" +
+"───\r\n            on(\'.error-toggle\', \'click\', function() {\r\n                var " +
+"cell  = this.parentNode;\r\n                var short = cell.querySelector(\'.error" +
+"-short\');\r\n                var full  = cell.querySelector(\'.error-full\');\r\n     " +
+"           if (short.style.display !== \'none\') {\r\n                    short.styl" +
+"e.display = \'none\';\r\n                    full.style.display  = \'inline\';\r\n      " +
+"              this.textContent    = \'less\';\r\n                } else {\r\n         " +
+"           short.style.display = \'inline\';\r\n                    full.style.displ" +
+"ay  = \'none\';\r\n                    this.textContent    = \'more\';\r\n              " +
+"  }\r\n            });\r\n        }\r\n\r\n        // ── Duration Chart ────────────────" +
+"────────────────────────\r\n        function renderDurationChart(mode) {\r\n\r\n      " +
+"      if (!allDetailJobs || allDetailJobs.length === 0) return;\r\n\r\n            v" +
+"ar labels = [], values = [];\r\n\r\n            if (mode === \'exec\') {\r\n            " +
+"    // Últimas 100 ejecuciones individuales, sin agrupar\r\n                var so" +
+"rted = allDetailJobs\r\n                    .filter(function(j) { return j.duratio" +
+"n != null; })\r\n                    .sort(function(a, b) { return new Date(a.last" +
+"Timestamp) - new Date(b.lastTimestamp); })\r\n                    .slice(-100);\r\n\r" +
+"\n                sorted.forEach(function(j) {\r\n                    var d = new D" +
+"ate(j.lastTimestamp);\r\n                    labels.push(d.toLocaleTimeString([], " +
+"{ hour: \'2-digit\', minute: \'2-digit\' }));\r\n                    values.push(parse" +
+"Float(j.duration.toFixed(2)));\r\n                });\r\n\r\n            } else if (mo" +
+"de === \'1d\') {\r\n                // Agrupar por hora del día actual (00:00 - 23:5" +
+"9)\r\n                var today = new Date().toISOString().slice(0, 10);\r\n        " +
+"        var byHour = {};\r\n\r\n                allDetailJobs.forEach(function(j) {\r" +
+"\n                    if (j.duration == null) return;\r\n                    var ts" +
+" = new Date(j.lastTimestamp);\r\n                    if (ts.toISOString().slice(0," +
+" 10) !== today) return;\r\n                    var hour = ts.getHours();\r\n        " +
+"            if (!byHour[hour]) byHour[hour] = { total: 0, count: 0 };\r\n         " +
+"           byHour[hour].total += j.duration;\r\n                    byHour[hour].c" +
+"ount += 1;\r\n                });\r\n\r\n                for (var h = 0; h <= 23; h++)" +
+" {\r\n                    labels.push(String(h).padStart(2, \'0\') + \':00\');\r\n      " +
+"              var avg = byHour[h] ? (byHour[h].total / byHour[h].count) : null;\r" +
+"\n                    values.push(avg !== null ? parseFloat(avg.toFixed(2)) : nul" +
+"l);\r\n                }\r\n\r\n            } else {\r\n                // Agrupar por d" +
+"ía para 7d, 15d, 30d, 45d\r\n                var dayOptions = { \'7d\': 7, \'15d\': 15" +
+", \'30d\': 30, \'45d\': 45 };\r\n                var days = dayOptions[mode] || 7;\r\n  " +
+"              var cutoff = new Date();\r\n                cutoff.setDate(cutoff.ge" +
+"tDate() - days);\r\n\r\n                var byDay = {};\r\n                allDetailJo" +
+"bs.forEach(function(j) {\r\n                    if (j.duration == null) return;\r\n " +
+"                   var ts = new Date(j.lastTimestamp);\r\n                    if (" +
+"ts < cutoff) return;\r\n                    var key = ts.toISOString().slice(0, 10" +
+");\r\n                    if (!byDay[key]) byDay[key] = { total: 0, count: 0 };\r\n " +
+"                   byDay[key].total += j.duration;\r\n                    byDay[ke" +
+"y].count += 1;\r\n                });\r\n\r\n                for (var i = days - 1; i " +
+">= 0; i--) {\r\n                    var d = new Date();\r\n                    d.set" +
+"Date(d.getDate() - i);\r\n                    var key = d.toISOString().slice(0, 1" +
+"0);\r\n                    labels.push(key.slice(5)); // MM-DD\r\n                  " +
+"  var avg = byDay[key] ? (byDay[key].total / byDay[key].count) : null;\r\n        " +
+"            values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);\r\n    " +
+"            }\r\n            }\r\n\r\n                // ── Calcular promedio (con def" +
+"ensa extra) ──────────────────\r\n            var filteredVals = (values || []).fi" +
+"lter(function(v) { return v != null && !isNaN(v); });\r\n            var avgValue " +
+"= filteredVals.length > 0\r\n                ? filteredVals.reduce(function(a, b) " +
+"{ return a + b; }, 0) / filteredVals.length\r\n                : null;\r\n\r\n        " +
+"    // ── Alerta de umbral ───────────────────────────────────────\r\n            " +
+"var threshold = parseFloat($(\'alert-threshold\').value);\r\n            if (isNaN(t" +
+"hreshold)) threshold = 5;\r\n\r\n            var avgOfValues = avgValue; // reutiliz" +
+"ar\r\n            var exceeded = avgOfValues !== null && avgOfValues > threshold;\r" +
+"\n            var lineColor = exceeded ? \'#d9534f\' : \'#337ab7\';\r\n\r\n            if" +
+" ($(\'alert-banner\')) {\r\n                $(\'alert-banner\').style.display = exceed" +
+"ed ? \'block\' : \'none\';\r\n            }\r\n\r\n            //Percentiles\r\n\r\n          " +
+"  var filteredVals = values.filter(v => v != null).sort((a,b) => a - b);\r\n      " +
+"      var min = filteredVals[0] || 0;\r\n            var max = filteredVals[filter" +
+"edVals.length-1] || 0;\r\n            var p95 = filteredVals[Math.floor(filteredVa" +
+"ls.length * 0.95)] || max;\r\n\r\n            document.getElementById(\'chart-stats\')" +
+".innerHTML =\r\n                \'<span class=\"label label-default\">Min: \' + min.to" +
+"Fixed(1) + \'s</span> \' +\r\n                \'<span class=\"label label-default\">Max" +
+": \' + max.toFixed(1) + \'s</span> \' +\r\n                \'<span class=\"label label-" +
+"default\">P95: \' + p95.toFixed(1) + \'s</span>\';\r\n\r\n            var ctx = document" +
+".getElementById(\'duration-chart\').getContext(\'2d\');\r\n            if (durationCha" +
+"rt) durationChart.destroy();\r\n\r\n            durationChart = new Chart(ctx, {\r\n  " +
+"              type: \'line\',\r\n                data: {\r\n                    labels" +
+": labels,\r\n                    datasets: [{\r\n                        label: \'Avg" +
+" Duration (s)\',\r\n                        data: values,\r\n                        " +
+"borderColor: lineColor,\r\n                        borderColor: \'#337ab7\',\r\n      " +
+"                  backgroundColor: \'rgba(51,122,183,0.08)\',\r\n                   " +
+"     pointBackgroundColor: function(ctx) {\r\n                            var v = " +
+"ctx.raw;\r\n                            if (v == null) return \'#ccc\';\r\n           " +
+"                 return v < 1 ? \'#5cb85c\' : v < 5 ? \'#f0ad4e\' : \'#d9534f\';\r\n    " +
+"                    },\r\n                        pointRadius: mode === \'exec\' ? 4" +
+" : 5,\r\n                        pointHoverRadius: 7,\r\n                        bor" +
+"derWidth: 2,\r\n                        tension: mode === \'exec\' ? 0.2 : 0.3,\r\n   " +
+"                     spanGaps: true\r\n                    }]\r\n                },\r" +
+"\n                options: {\r\n                    responsive: true,\r\n            " +
+"        maintainAspectRatio: true,\r\n                    aspectRatio: 4,\r\n       " +
+"             plugins: {\r\n                        legend: { display: false },\r\n  " +
+"                      tooltip: {\r\n                            callbacks: {\r\n    " +
+"                            label: function(ctx) {\r\n                            " +
+"        return ctx.raw != null ? ctx.raw + \'s\' : \'No data\';\r\n                   " +
+"             },\r\n                                title: function(items) {\r\n     " +
+"                               if (mode !== \'exec\') return items[0].label;\r\n    " +
+"                                var job = allDetailJobs\r\n                       " +
+"                 .filter(function(j) { return j.duration != null; })\r\n          " +
+"                              .sort(function(a, b) { return new Date(a.lastTimes" +
+"tamp) - new Date(b.lastTimestamp); })\r\n                                        ." +
+"slice(-100)[items[0].dataIndex];\r\n                                    return job" +
+" ? new Date(job.lastTimestamp).toLocaleString() : items[0].label;\r\n             " +
+"                   }\r\n                            }\r\n                        }\r\n" +
+"                    },\r\n                    scales: {\r\n                        y" +
+": {\r\n                            beginAtZero: false,\r\n                          " +
+"  suggestedMin: 0,\r\n                            ticks: {\r\n                      " +
+"          callback: function(v) { return v + \'s\'; },\r\n                          " +
+"      maxTicksLimit: 6\r\n                            },\r\n                        " +
+"    grid: { color: \'rgba(0,0,0,0.05)\' }\r\n                        },\r\n           " +
+"             x: {\r\n                            grid: { display: false },\r\n      " +
+"                      ticks: {\r\n                                maxTicksLimit: m" +
+"ode === \'1d\' ? 24 : 10,\r\n                                autoSkip: mode !== \'1d\'" +
+",\r\n                                maxRotation: 0\r\n                            }" +
+"\r\n                        }\r\n                    }\r\n                }\r\n         " +
+"   });\r\n        }\r\n\r\n        // ── Sort indicators ─────────────────────────────" +
+"──────────\r\n        function updateSortIndicators() {\r\n            document.quer" +
+"ySelectorAll(\'#detail-table th.sortable\').forEach(function(th) {\r\n              " +
+"  th.classList.remove(\'asc\', \'desc\');\r\n                if (th.getAttribute(\'data" +
+"-sort\') === currentSort.field) {\r\n                    th.classList.add(currentSo" +
+"rt.direction);\r\n                }\r\n            });\r\n        }\r\n\r\n        // ── U" +
+"RL helpers ───────────────────────────────────────────\r\n        function jobDeta" +
+"ilUrl(jobId) { return \'");
 
 
             
-            #line 884 "..\..\Pages\JobStatus.cshtml"
+            #line 953 "..\..\Pages\JobStatus.cshtml"
                                           Write(Url.To("/jobs/details"));
 
             
@@ -663,7 +710,7 @@ WriteLiteral("\' + \'/\' + jobId; }\r\n        function queueUrl(queue)     { re
 
 
             
-            #line 885 "..\..\Pages\JobStatus.cshtml"
+            #line 954 "..\..\Pages\JobStatus.cshtml"
                                           Write(Url.To("/jobs/enqueued"));
 
             
