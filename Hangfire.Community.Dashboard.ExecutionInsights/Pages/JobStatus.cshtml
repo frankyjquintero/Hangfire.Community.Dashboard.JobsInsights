@@ -13,15 +13,43 @@
 }
 
 <style>
-    /* Solo lo imprescindible que Bootstrap no cubre: puntos de colores para el resumen */
+    /* ===== Puntos de colores para el resumen ===== */
     .state-dot {
         display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 3px;
-        background-color: #ccc; /* idle o desconocido */
+        background-color: #ccc;
+        cursor: pointer;
     }
-    .state-dot.succeeded { background-color: #5cb85c; } /* verde Bootstrap success */
-    .state-dot.failed    { background-color: #d9534f; } /* rojo Bootstrap danger */
+    .state-dot.succeeded { background-color: #5cb85c; }
+    .state-dot.failed    { background-color: #d9534f; }
     .state-dot.processing { background-color: #f0ad4e; }
-    /* Modo oscuro: hereda los colores ya definidos en Hangfire; si no, los ajustamos */
+
+    /* ===== Filas coloreadas según estado ===== */
+/*     .detail-row.succeeded { background-color: #f0fff0; }
+    .detail-row.failed    { background-color: #fff0f0; }
+    .detail-row.processing { background-color: #f0f8ff; } */
+
+    /* ===== Cabeceras ordenables ===== */
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { background-color: #e0e0e0; }
+    th.sortable::after {
+        content: " ⇅";
+        opacity: 0.3;
+    }
+    th.sortable.asc::after {
+        content: " ↑";
+        opacity: 1;
+    }
+    th.sortable.desc::after {
+        content: " ↓";
+        opacity: 1;
+    }
+
+    /* ===== Animación de fade-in ===== */
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .fade-in { animation: fadeIn 0.3s; }
 </style>
 
 <div class="container-fluid">
@@ -43,6 +71,22 @@
 
     <!-- VISTA RESUMEN -->
     <div id="summary-view">
+        <!-- Estadísticas rápidas -->
+        <div class="row" style="margin-bottom:15px;">
+            <div class="col-md-3">
+                <span class="label label-default">Types: <strong id="stat-types">-</strong></span>
+            </div>
+            <div class="col-md-3">
+                <span class="label label-info">Total Executions: <strong id="stat-total">-</strong></span>
+            </div>
+            <div class="col-md-3">
+                <span class="label label-success">Success Rate: <strong id="stat-rate">-</strong></span>
+            </div>
+            <div class="col-md-3">
+                <span class="label label-default">Updated: <strong id="stat-updated">-</strong></span>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-md-3">
                 <select class="form-control input-sm" id="summary-state-filter">
@@ -90,6 +134,7 @@
                 <h4>Full History: <span id="detail-jobtype-label"></span></h4>
             </div>
         </div>
+        <!-- Filtros del detalle -->
         <div class="row">
             <div class="col-md-3">
                 <select class="form-control input-sm" id="detail-state-filter">
@@ -98,20 +143,25 @@
                     <option value="Failed">Failed</option>
                 </select>
             </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control input-sm" id="detail-search" placeholder="Search by ID, error, queue...">
+            </div>
             <div class="col-md-2">
                 <button class="btn btn-primary btn-sm" id="detail-apply">Apply</button>
+                <button class="btn btn-default btn-sm" id="detail-clear">Clear</button>
+                <button class="btn btn-default btn-sm" id="detail-reload"><span class="glyphicon glyphicon-refresh"></span></button>
             </div>
         </div>
         <div class="row" style="margin-top:15px;">
             <div class="col-md-12">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover" id="detail-table">
+                    <table class="table table-hover" id="detail-table">
                         <thead>
                             <tr>
-                                <th>Job ID</th>
-                                <th>Queue</th>
-                                <th>Last State</th>
-                                <th>Last Execution</th>
+                                <th class="sortable" data-sort="jobId">Job ID</th>
+                                <th class="sortable" data-sort="queue">Queue</th>
+                                <th class="sortable" data-sort="lastState">Last State</th>
+                                <th class="sortable" data-sort="lastTimestamp">Last Execution</th>
                                 <th>Error</th>
                                 <th>Actions</th>
                             </tr>
@@ -134,13 +184,15 @@
         var summaryApiUrl = '@summaryApiUrl';
         var detailApiUrl = '@detailApiUrl';
         var allDetailJobs = [];
+        var filteredJobs = [];
         var currentJobType = null;
         var currentPage = 1;
         var pageSize = 20;
         var autoRefresh = true;
         var refreshTimer = null;
+        var currentSort = { field: 'lastTimestamp', direction: 'desc' };
 
-        // Acceso a elementos del DOM con métodos nativos
+        // Helpers nativos
         function $(id) { return document.getElementById(id); }
         function on(selector, event, handler) {
             var els = document.querySelectorAll(selector);
@@ -160,27 +212,47 @@
             $('detail-apply').addEventListener('click', function() {
                 if (currentJobType) loadDetail(currentJobType);
             });
+            $('detail-clear').addEventListener('click', function() {
+                $('detail-search').value = '';
+                $('detail-state-filter').value = '';
+                loadDetail(currentJobType);
+            });
+            $('detail-reload').addEventListener('click', function() {
+                if (currentJobType) loadDetail(currentJobType);
+            });
             $('back-to-summary').addEventListener('click', showSummary);
 
-            // Iniciar temporizador de auto‑refresh (solo para el resumen)
+            // Auto-refresh
             refreshTimer = setInterval(function() {
-                if (autoRefresh && document.getElementById('summary-view').style.display !== 'none') {
+                if (autoRefresh && $('summary-view').style.display !== 'none') {
                     loadSummary();
                 }
-            }, 30000); // 15 segundos
+            }, 15000);
 
-            document.getElementById('toggle-auto-refresh').addEventListener('click', function() {
+            $('toggle-auto-refresh').addEventListener('click', function() {
                 autoRefresh = !autoRefresh;
                 var icon = this.querySelector('.glyphicon');
                 if (autoRefresh) {
-                    icon.classList.remove('glyphicon-play');
-                    icon.classList.add('glyphicon-pause');
+                    icon.className = 'glyphicon glyphicon-pause';
                     this.innerHTML = '<span class="glyphicon glyphicon-pause"></span> Pause';
                 } else {
-                    icon.classList.remove('glyphicon-pause');
-                    icon.classList.add('glyphicon-play');
+                    icon.className = 'glyphicon glyphicon-play';
                     this.innerHTML = '<span class="glyphicon glyphicon-play"></span> Resume';
                 }
+            });
+
+            // Ordenación de columnas en la tabla de detalle
+            on('#detail-table th.sortable', 'click', function() {
+                var field = this.getAttribute('data-sort');
+                if (currentSort.field === field) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.field = field;
+                    currentSort.direction = 'asc';
+                }
+                sortAndFilter();
+                renderDetailPage();
+                updateSortIndicators();
             });
         }
 
@@ -200,7 +272,7 @@
                     renderSummary(data.summaries || []);
                 })
                 .catch(function(err) {
-                    $('summary-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading summary: ' + err.message + '</td></tr>';
+                    $('summary-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
                 });
         }
 
@@ -208,22 +280,22 @@
             var tbody = $('summary-body');
             if (!summaries.length) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No job types found.</td></tr>';
+                updateStats(0, 0, 0);
                 return;
             }
 
             var html = '';
+            var totalSuccess = 0, totalFailed = 0;
             summaries.forEach(function(s) {
                 var dots = '';
                 if (s.recentExecutions) {
                     s.recentExecutions.forEach(function(exec) {
                         var cls = exec.state ? exec.state.toLowerCase() : '';
                         var title = exec.state + ' at ' + new Date(exec.timestamp).toLocaleTimeString();
-                        dots += '<span class="state-dot ' + cls + '" title="' + title + '"></span>';
+                        dots += '<span class="state-dot ' + cls + '" title="' + title + '" data-state="' + exec.state + '"></span>';
                     });
                 }
-
-                var lastExec = s.lastExecution ? new Date(s.lastExecution).toLocaleString() : 'N/A';
-
+                var lastExec = s.lastExecution ? relativeTime(new Date(s.lastExecution)) : 'N/A';
                 html += '<tr>';
                 html += '<td>' + escapeHtml(s.jobType) + '</td>';
                 html += '<td>' + dots + '</td>';
@@ -232,19 +304,47 @@
                 html += '<td>' + lastExec + '</td>';
                 html += '<td><button class="btn btn-xs btn-default view-history" data-jobtype="' + escapeHtml(s.jobType) + '">View Full History</button></td>';
                 html += '</tr>';
+                totalSuccess += s.successCount;
+                totalFailed += s.failedCount;
             });
             tbody.innerHTML = html;
 
-            // Asociar eventos a los nuevos botones
+            updateStats(summaries.length, totalSuccess, totalFailed);
+
+            // Click en puntos de colores para ir al detalle filtrado
+            on('.state-dot', 'click', function() {
+                var state = this.getAttribute('data-state');
+                var jobType = this.closest('tr').querySelector('.view-history').getAttribute('data-jobtype');
+                showDetail(jobType);
+                setTimeout(function() {
+                    $('detail-state-filter').value = state;
+                    loadDetail(jobType);
+                }, 200);
+            });
+
+            // Evento para los botones "View Full History"
             on('.view-history', 'click', function() {
                 var jobType = this.getAttribute('data-jobtype');
                 showDetail(jobType);
             });
         }
 
+        function updateStats(types, success, failed) {
+            var total = success + failed;
+            $('stat-types').textContent = types;
+            $('stat-total').textContent = total;
+            var rate = total ? (success / total * 100).toFixed(1) + '%' : '-';
+            $('stat-rate').textContent = rate;
+            $('stat-updated').textContent = new Date().toLocaleTimeString();
+        }
+
         function showDetail(jobType) {
             currentJobType = jobType;
             currentPage = 1;
+            // Reiniciar ordenación y filtro
+            currentSort = { field: 'lastTimestamp', direction: 'desc' };
+            $('detail-search').value = '';
+            $('detail-state-filter').value = '';
             $('summary-view').style.display = 'none';
             $('detail-view').style.display = 'block';
             $('detail-jobtype-label').textContent = jobType;
@@ -263,23 +363,48 @@
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
                     allDetailJobs = data.jobs || [];
-                    // Orden descendente por fecha de última ejecución (más reciente primero)
-                    allDetailJobs.sort(function(a, b) {
-                        return new Date(b.lastTimestamp) - new Date(a.lastTimestamp);
-                    });
-                    currentPage = 1;
+                    sortAndFilter();
                     renderDetailPage();
                 })
                 .catch(function(err) {
-                    $('detail-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading detail: ' + err.message + '</td></tr>';
+                    $('detail-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
                 });
         }
 
+        function sortAndFilter() {
+            var search = ($('detail-search').value || '').toLowerCase();
+            // Filtrar primero
+            filteredJobs = allDetailJobs.filter(function(j) {
+                if (!search) return true;
+                return (j.jobId && j.jobId.toLowerCase().indexOf(search) !== -1) ||
+                       (j.errorMessage && j.errorMessage.toLowerCase().indexOf(search) !== -1) ||
+                       (j.queue && j.queue.toLowerCase().indexOf(search) !== -1);
+            });
+
+            // Ordenar
+            var field = currentSort.field;
+            var dir = currentSort.direction;
+            filteredJobs.sort(function(a, b) {
+                var valA = a[field] || '';
+                var valB = b[field] || '';
+                if (field === 'lastTimestamp') {
+                    valA = new Date(a.lastTimestamp).getTime();
+                    valB = new Date(b.lastTimestamp).getTime();
+                } else {
+                    valA = valA.toString().toLowerCase();
+                    valB = valB.toString().toLowerCase();
+                }
+                if (valA < valB) return dir === 'asc' ? -1 : 1;
+                if (valA > valB) return dir === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
         function renderDetailPage() {
-            var total = allDetailJobs.length;
+            var total = filteredJobs.length;
             var start = (currentPage - 1) * pageSize;
             var end = start + pageSize;
-            var pageJobs = allDetailJobs.slice(start, end);
+            var pageJobs = filteredJobs.slice(start, end);
             renderDetail(pageJobs, total);
         }
 
@@ -287,7 +412,7 @@
             var tbody = $('detail-body');
             var paginationDiv = $('detail-pagination');
             if (!jobs.length) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No jobs found for this type.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No jobs found.</td></tr>';
                 paginationDiv.innerHTML = '';
                 return;
             }
@@ -296,23 +421,32 @@
             jobs.forEach(function(j) {
                 var shortId = j.jobId ? j.jobId.substring(0, 8) : '';
                 var stateClass = j.lastState ? j.lastState.toLowerCase() : '';
-                var badgeClass = stateClass === 'succeeded' ? 'label label-success' : 
+                var badgeClass = stateClass === 'succeeded' ? 'label label-success' :
                                  stateClass === 'failed' ? 'label label-danger' : 'label label-default';
-                var ts = j.lastTimestamp ? new Date(j.lastTimestamp).toLocaleString() : '';
-                var error = j.errorMessage ? '<span class="text-danger" style="font-size:11px;">' + escapeHtml(j.errorMessage.substring(0, 80)) + '</span>' : '';
+                var ts = j.lastTimestamp ? relativeTime(new Date(j.lastTimestamp)) : '';
+                var errorHtml = '';
+                if (j.errorMessage) {
+                    if (j.errorMessage.length > 80) {
+                        errorHtml = '<span class="error-short">' + escapeHtml(j.errorMessage.substring(0, 80)) + '…</span>' +
+                                    '<span class="error-full" style="display:none;">' + escapeHtml(j.errorMessage) + '</span> ' +
+                                    '<a href="javascript:void(0)" class="error-toggle small">more</a>';
+                    } else {
+                        errorHtml = escapeHtml(j.errorMessage);
+                    }
+                }
 
-                html += '<tr>';
+                html += '<tr class="detail-row ' + stateClass + ' fade-in">';
                 html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank">#' + shortId + '</a></td>';
-                html += '<td>' + escapeHtml(j.queue) + '</td>';
+                html += '<td><a href="' + queueUrl(j.queue) + '" target="_blank" class="text-muted">' + escapeHtml(j.queue) + '</a></td>';
                 html += '<td><span class="' + badgeClass + '">' + j.lastState + '</span></td>';
                 html += '<td>' + ts + '</td>';
-                html += '<td>' + error + '</td>';
+                html += '<td>' + errorHtml + '</td>';
                 html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank" class="btn btn-xs btn-default">History</a></td>';
                 html += '</tr>';
             });
             tbody.innerHTML = html;
 
-            // Controles de paginación
+            // Paginación
             var totalPages = Math.ceil(total / pageSize);
             var startCount = (currentPage - 1) * pageSize + 1;
             var endCount = Math.min(currentPage * pageSize, total);
@@ -328,25 +462,59 @@
             pagHtml += '</div></div>';
             paginationDiv.innerHTML = pagHtml;
 
-            // Asignar eventos a los botones de paginación
             var prevBtn = $('prev-page');
             var nextBtn = $('next-page');
             if (prevBtn) {
-                prevBtn.addEventListener('click', function() {
-                    currentPage--;
-                    renderDetailPage();
-                });
+                prevBtn.addEventListener('click', function() { currentPage--; renderDetailPage(); });
             }
             if (nextBtn) {
-                nextBtn.addEventListener('click', function() {
-                    currentPage++;
-                    renderDetailPage();
-                });
+                nextBtn.addEventListener('click', function() { currentPage++; renderDetailPage(); });
             }
+
+            // Toggle error messages
+            on('.error-toggle', 'click', function() {
+                var cell = this.parentNode;
+                var short = cell.querySelector('.error-short');
+                var full = cell.querySelector('.error-full');
+                if (short.style.display !== 'none') {
+                    short.style.display = 'none';
+                    full.style.display = 'inline';
+                    this.textContent = 'less';
+                } else {
+                    short.style.display = 'inline';
+                    full.style.display = 'none';
+                    this.textContent = 'more';
+                }
+            });
+        }
+
+        function updateSortIndicators() {
+            document.querySelectorAll('#detail-table th.sortable').forEach(function(th) {
+                th.classList.remove('asc', 'desc');
+                if (th.getAttribute('data-sort') === currentSort.field) {
+                    th.classList.add(currentSort.direction);
+                }
+            });
         }
 
         function jobDetailUrl(jobId) {
             return '@Url.To("/jobs/details")' + '/' + jobId;
+        }
+
+        function queueUrl(queue) {
+            return '@Url.To("/jobs/enqueued")' + '/' + encodeURIComponent(queue);
+        }
+
+        function relativeTime(date) {
+            var now = new Date();
+            var diff = now - date;
+            var seconds = Math.floor(diff / 1000);
+            if (seconds < 60) return 'just now';
+            var minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return minutes + 'm ago';
+            var hours = Math.floor(minutes / 60);
+            if (hours < 24) return hours + 'h ago';
+            return date.toLocaleDateString();
         }
 
         function escapeHtml(text) {
@@ -356,7 +524,6 @@
             return div.innerHTML;
         }
 
-        // Iniciar cuando el DOM esté listo
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', init);
         } else {
