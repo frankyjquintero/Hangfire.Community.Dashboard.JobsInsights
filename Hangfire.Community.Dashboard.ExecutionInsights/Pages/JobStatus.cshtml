@@ -62,7 +62,30 @@
 
     /* ===== Tooltip ===== */
     #dot-tooltip a { color: #adf; }
+
+    /* ===== Duration chart panel ===== */
+    #duration-chart-panel {
+        background: #fafafa;
+        border: 1px solid #e3e3e3;
+        border-radius: 4px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+    }
+    #duration-chart-panel .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    #duration-chart-panel .chart-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+        margin: 0;
+    }
+    #duration-chart-panel canvas { display: block; }
 </style>
+
 
 <div id="dot-tooltip" style="display:none; position:fixed; background:#333; color:#fff; padding:8px 12px; border-radius:4px; font-size:12px; z-index:9999; pointer-events:none;"></div>
 
@@ -131,7 +154,7 @@
             <div class="col-md-3 col-md-offset-3">
                 <div class="input-group">
                     <span class="input-group-addon">Retention days</span>
-                    <input type="number" class="form-control input-sm" id="retention-days" value="30" min="1" max="99" maxlength="2" style="width:45px;" />
+                    <input type="number" class="form-control input-sm" id="retention-days" value="30" min="1" max="99" maxlength="2" style="width:90px;" />
                     <span class="input-group-btn">
                         <button class="btn btn-danger btn-sm" id="cleanup-btn">Delete older</button>
                     </span>
@@ -216,7 +239,30 @@
             </div>
         </div>
 
+        <!-- Gráfica de tendencia de duración -->
         <div class="row" style="margin-top:15px;">
+            <div class="col-md-12">
+                <div id="duration-chart-panel">
+                    <div class="chart-header">
+                        <p class="chart-title">
+                            <span class="glyphicon glyphicon-stats"></span>
+                            Avg Duration Trend
+                        </p>
+                        <div class="btn-group btn-group-xs">
+                            <button class="btn btn-default active" data-mode="exec">Last 100 exec</button>
+                            <button class="btn btn-default" data-mode="1d">1 day</button>
+                            <button class="btn btn-default" data-mode="7d">7 days</button>
+                            <button class="btn btn-default" data-mode="15d">15 days</button>
+                            <button class="btn btn-default" data-mode="30d">30 days</button>
+                            <button class="btn btn-default" data-mode="45d">45 days</button>
+                        </div>
+                    </div>
+                    <canvas id="duration-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-md-12">
                 <div class="table-responsive">
                     <table class="table table-hover" id="detail-table">
@@ -226,6 +272,7 @@
                                 <th class="sortable" data-sort="queue">Queue</th>
                                 <th class="sortable" data-sort="lastState">Last State</th>
                                 <th class="sortable" data-sort="lastTimestamp">Last Execution</th>
+                                <th class="sortable" data-sort="duration">Duration</th>
                                 <th>Error</th>
                                 <th>Actions</th>
                             </tr>
@@ -258,6 +305,8 @@
         var refreshTimer   = null;
         var currentSort    = { field: 'lastTimestamp', direction: 'desc' };
         var tooltipDiv     = document.getElementById('dot-tooltip');
+        var chartMode = 'exec'; // 'exec' | '7d' | '30d'
+        var durationChart  = null;
 
         // ── Helpers ─────────────────────────────────────────────
         function $(id) { return document.getElementById(id); }
@@ -319,6 +368,16 @@
                 sortAndFilter();
                 renderDetailPage();
                 updateSortIndicators();
+            });
+
+            // ── Chart period toggle ───────────────────────────────
+            document.querySelectorAll('[data-mode]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    chartMode = this.getAttribute('data-mode');
+                    document.querySelectorAll('[data-mode]').forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    renderDurationChart(chartMode);
+                });
             });
 
             // ── Cleanup ───────────────────────────────────────────
@@ -551,6 +610,7 @@
                     allDetailJobs = data.jobs || [];
                     sortAndFilter();
                     renderDetailPage();
+                    renderDurationChart(chartMode);
                 })
                 .catch(function(err) {
                     $('detail-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
@@ -569,11 +629,14 @@
             var field = currentSort.field;
             var dir   = currentSort.direction;
             filteredJobs.sort(function(a, b) {
-                var valA = a[field] || '';
-                var valB = b[field] || '';
+                var valA = a[field] != null ? a[field] : '';
+                var valB = b[field] != null ? b[field] : '';
                 if (field === 'lastTimestamp') {
                     valA = new Date(a.lastTimestamp).getTime();
                     valB = new Date(b.lastTimestamp).getTime();
+                } else if (field === 'duration') {
+                    valA = parseFloat(a.duration) || 0;
+                    valB = parseFloat(b.duration) || 0;
                 } else {
                     valA = valA.toString().toLowerCase();
                     valB = valB.toString().toLowerCase();
@@ -595,7 +658,7 @@
             var paginationDiv = $('detail-pagination');
 
             if (!jobs.length) {
-                tbody.innerHTML         = '<tr><td colspan="6" class="text-center text-muted">No jobs found.</td></tr>';
+                tbody.innerHTML         = '<tr><td colspan="7" class="text-center text-muted">No jobs found.</td></tr>';
                 paginationDiv.innerHTML = '';
                 return;
             }
@@ -624,8 +687,16 @@
                 html += '<td><a href="' + queueUrl(j.queue)     + '" target="_blank" class="text-muted">' + escapeHtml(j.queue) + '</a></td>';
                 html += '<td><span class="' + badgeClass + '">' + j.lastState + '</span></td>';
                 html += '<td>' + ts + '</td>';
+                // Duration con color
+                var durHtml = 'N/A';
+                if (j.duration != null) {
+                    var d = j.duration;
+                    var dc = d < 1 ? 'dur-green' : d < 5 ? 'dur-yellow' : 'dur-red';
+                    durHtml = '<span class="' + dc + '">' + d.toFixed(1) + 's</span>';
+                }
+                html += '<td>' + durHtml + '</td>';
                 html += '<td>' + errorHtml + '</td>';
-                html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank" class="btn btn-xs btn-default">History</a></td>';
+                html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank" class="btn btn-xs btn-default">Detail</a></td>';
                 html += '</tr>';
             });
             tbody.innerHTML = html;
@@ -660,6 +731,141 @@
                     short.style.display = 'inline';
                     full.style.display  = 'none';
                     this.textContent    = 'more';
+                }
+            });
+        }
+
+        // ── Duration Chart ────────────────────────────────────────
+        function renderDurationChart(mode) {
+            var labels = [], values = [];
+
+            if (mode === 'exec') {
+                // Últimas 100 ejecuciones individuales, sin agrupar
+                var sorted = allDetailJobs
+                    .filter(function(j) { return j.duration != null; })
+                    .sort(function(a, b) { return new Date(a.lastTimestamp) - new Date(b.lastTimestamp); })
+                    .slice(-100);
+
+                sorted.forEach(function(j) {
+                    var d = new Date(j.lastTimestamp);
+                    labels.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                    values.push(parseFloat(j.duration.toFixed(2)));
+                });
+
+            } else if (mode === '1d') {
+                // Agrupar por hora del día actual (00:00 - 23:59)
+                var today = new Date().toISOString().slice(0, 10);
+                var byHour = {};
+
+                allDetailJobs.forEach(function(j) {
+                    if (j.duration == null) return;
+                    var ts = new Date(j.lastTimestamp);
+                    if (ts.toISOString().slice(0, 10) !== today) return;
+                    var hour = ts.getHours();
+                    if (!byHour[hour]) byHour[hour] = { total: 0, count: 0 };
+                    byHour[hour].total += j.duration;
+                    byHour[hour].count += 1;
+                });
+
+                for (var h = 0; h <= 23; h++) {
+                    labels.push(String(h).padStart(2, '0') + ':00');
+                    var avg = byHour[h] ? (byHour[h].total / byHour[h].count) : null;
+                    values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);
+                }
+
+            } else {
+                // Agrupar por día para 7d, 15d, 30d, 45d
+                var dayOptions = { '7d': 7, '15d': 15, '30d': 30, '45d': 45 };
+                var days = dayOptions[mode] || 7;
+                var cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - days);
+
+                var byDay = {};
+                allDetailJobs.forEach(function(j) {
+                    if (j.duration == null) return;
+                    var ts = new Date(j.lastTimestamp);
+                    if (ts < cutoff) return;
+                    var key = ts.toISOString().slice(0, 10);
+                    if (!byDay[key]) byDay[key] = { total: 0, count: 0 };
+                    byDay[key].total += j.duration;
+                    byDay[key].count += 1;
+                });
+
+                for (var i = days - 1; i >= 0; i--) {
+                    var d = new Date();
+                    d.setDate(d.getDate() - i);
+                    var key = d.toISOString().slice(0, 10);
+                    labels.push(key.slice(5)); // MM-DD
+                    var avg = byDay[key] ? (byDay[key].total / byDay[key].count) : null;
+                    values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);
+                }
+            }
+
+            var ctx = document.getElementById('duration-chart').getContext('2d');
+            if (durationChart) durationChart.destroy();
+
+            durationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Avg Duration (s)',
+                        data: values,
+                        borderColor: '#337ab7',
+                        backgroundColor: 'rgba(51,122,183,0.08)',
+                        pointBackgroundColor: function(ctx) {
+                            var v = ctx.raw;
+                            if (v == null) return '#ccc';
+                            return v < 1 ? '#5cb85c' : v < 5 ? '#f0ad4e' : '#d9534f';
+                        },
+                        pointRadius: mode === 'exec' ? 4 : 5,
+                        pointHoverRadius: 7,
+                        borderWidth: 2,
+                        tension: mode === 'exec' ? 0.2 : 0.3,
+                        spanGaps: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 4,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.raw != null ? ctx.raw + 's' : 'No data';
+                                },
+                                title: function(items) {
+                                    if (mode !== 'exec') return items[0].label;
+                                    var job = allDetailJobs
+                                        .filter(function(j) { return j.duration != null; })
+                                        .sort(function(a, b) { return new Date(a.lastTimestamp) - new Date(b.lastTimestamp); })
+                                        .slice(-100)[items[0].dataIndex];
+                                    return job ? new Date(job.lastTimestamp).toLocaleString() : items[0].label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            suggestedMin: 0,
+                            ticks: {
+                                callback: function(v) { return v + 's'; },
+                                maxTicksLimit: 6
+                            },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                maxTicksLimit: mode === '1d' ? 24 : 10,
+                                autoSkip: mode !== '1d',
+                                maxRotation: 0
+                            }
+                        }
+                    }
                 }
             });
         }
