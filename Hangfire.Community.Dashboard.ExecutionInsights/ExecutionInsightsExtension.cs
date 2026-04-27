@@ -16,6 +16,7 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights
             // APIs
             DashboardRoutes.Routes.Add($"{RouteBase}/api/jobtype-summary", new JobTypeSummaryApi());
             DashboardRoutes.Routes.Add($"{RouteBase}/api/jobtype-detail", new JobTypeDetailApi());
+            DashboardRoutes.Routes.Add($"{RouteBase}/api/admin/(?<path>.+)", new PluginAdminApi());
 
             // Página principal
             DashboardRoutes.Routes.AddRazorPage(RouteBase, x => new JobStatus());

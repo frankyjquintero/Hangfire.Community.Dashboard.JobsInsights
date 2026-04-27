@@ -31,13 +31,14 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Services
 
             var json = JsonSerializer.Serialize(result, JsonOptions);
 
-            // 1. Guardar resultado del job en hx:results:{jobType}
-            transaction.SetRangeInHash($"hx:results:{jobType}", new[] { new KeyValuePair<string, string>(jobId, json) });
+            // Guardar exclusivamente en el hash diario
+            var dayKey = now.ToString("yyyyMMdd");
+            transaction.SetRangeInHash($"hx:results:{jobType}:{dayKey}", new[] { new KeyValuePair<string, string>(jobId, json) });
 
-            // 2. Actualizar resumen de últimos 15 estados
+            // Actualizar resumen de los últimos 15 estados (esto sigue igual, usa su propio hash)
             UpdateSummary(transaction, jobType, jobId, stateName, now);
 
-            // 3. Registrar jobType en el conjunto global
+            // Registrar el tipo de job
             transaction.AddToSet("hx:jobtypes:all", jobType);
         }
 

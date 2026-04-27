@@ -32,7 +32,19 @@ namespace Hangfire.Community.Dashboard.ExecutionInsights.Apis
 
                 using (var connection = context.Storage.GetConnection())
                 {
-                    var entries = connection.GetAllEntriesFromHash($"hx:results:{jobType}");
+                    var entries = new Dictionary<string, string>();
+                    for (int i = 0; i < 30; i++)
+                    {
+                        var day = DateTime.UtcNow.Date.AddDays(-i).ToString("yyyyMMdd");
+                        var dayKey = $"hx:results:{jobType}:{day}";
+                        var dayEntries = connection.GetAllEntriesFromHash(dayKey);
+                        if (dayEntries != null)
+                        {
+                            foreach (var kv in dayEntries)
+                                entries[kv.Key] = kv.Value; // sobreescribe con el más reciente (último día)
+                        }
+                    }
+
                     if (entries == null || entries.Count == 0)
                     {
                         await WriteJson(context, new { jobs = new List<object>(), total = 0 });

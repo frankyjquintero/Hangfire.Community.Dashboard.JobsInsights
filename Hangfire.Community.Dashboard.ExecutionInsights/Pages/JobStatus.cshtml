@@ -23,11 +23,6 @@
     .state-dot.failed    { background-color: #d9534f; }
     .state-dot.processing { background-color: #f0ad4e; }
 
-    /* ===== Filas coloreadas según estado ===== */
-/*     .detail-row.succeeded { background-color: #f0fff0; }
-    .detail-row.failed    { background-color: #fff0f0; }
-    .detail-row.processing { background-color: #f0f8ff; } */
-
     /* ===== Cabeceras ordenables ===== */
     th.sortable { cursor: pointer; user-select: none; }
     th.sortable:hover { background-color: #e0e0e0; }
@@ -58,20 +53,49 @@
             <h3>
                 @JobStatus.Title
                 <small class="text-muted">@versionString</small>
-                <button class="btn btn-default btn-sm" id="refresh-btn">
+                <button class="btn btn-default btn-sm pull-right" id="refresh-btn">
                     <span class="glyphicon glyphicon-refresh"></span> Refresh
                 </button>
-                <button class="btn btn-default btn-sm" id="toggle-auto-refresh">
+                <button class="btn btn-default btn-sm pull-right" id="toggle-auto-refresh">
                     <span class="glyphicon glyphicon-pause"></span> Pause
-                </button>
+                </button>                 
             </h3>
             <hr />
         </div>
     </div>
-
     <!-- VISTA RESUMEN -->
     <div id="summary-view">
-        <!-- Estadísticas rápidas -->
+         <div class="row" id="cleanup-section">
+            <div class="col-md-3">
+                <input type="text" class="form-control input-sm" id="summary-jobtype-filter" placeholder="Filter by job type...">
+            </div>
+            <!-- Filtro de estado -->
+            <div class="col-md-3">
+                <div class="input-group">
+                    <select class="form-control input-sm" id="summary-state-filter">
+                        <option value="">All States</option>
+                        <option value="Succeeded">Success</option>
+                        <option value="Failed">Failed</option>
+                    </select>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary btn-sm" id="summary-apply">Apply</button>
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="input-group">
+                    <span class="input-group-addon">Retention days</span>
+                    <input type="number" class="form-control input-sm" id="retention-days" value="30" min="1" style="width:90px" maxlength="2"/>
+                    <span class="input-group-btn">
+                        <button class="btn btn-danger btn-sm" id="cleanup-btn">Delete older</button>
+                    </span>
+                </div>
+                <span id="cleanup-msg" class="text-muted small"></span>
+            </div>
+        </div>
+        <br/>
+         <!-- Estadísticas rápidas -->
         <div class="row" style="margin-bottom:15px;">
             <div class="col-md-3">
                 <span class="label label-default">Types: <strong id="stat-types">-</strong></span>
@@ -87,18 +111,6 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-3">
-                <select class="form-control input-sm" id="summary-state-filter">
-                    <option value="">All States</option>
-                    <option value="Succeeded">Success</option>
-                    <option value="Failed">Failed</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button class="btn btn-primary btn-sm" id="summary-apply">Apply</button>
-            </div>
-        </div>
         <div class="row" style="margin-top:15px;">
             <div class="col-md-12">
                 <div class="table-responsive">
@@ -183,6 +195,7 @@
     (function() {
         var summaryApiUrl = '@summaryApiUrl';
         var detailApiUrl = '@detailApiUrl';
+        var adminApiBase = '@Url.To(ExecutionInsightsExtension.RouteBase) + "/api/admin"';
         var allDetailJobs = [];
         var filteredJobs = [];
         var currentJobType = null;
@@ -254,6 +267,24 @@
                 renderDetailPage();
                 updateSortIndicators();
             });
+
+            // Botón de limpieza
+            $('cleanup-btn').addEventListener('click', function() {
+                var days = parseInt($('retention-days').value);
+                if (!confirm('Delete all job results older than ' + days + ' days?')) return;
+    
+                $('cleanup-msg').textContent = 'Cleaning...';
+                fetch(adminApiBase + '/cleanup?days=' + encodeURIComponent(days), { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        $('cleanup-msg').innerHTML = '<span class="label label-success">Removed ' + data.removed + ' jobs.</span>';
+                        // Opcional: refrescar estadísticas y resumen tras limpieza
+                        loadSummary();
+                    })
+                    .catch(function(err) {
+                        $('cleanup-msg').innerHTML = '<span class="label label-danger">Error: ' + err.message + '</span>';
+                    });
+            });
         }
 
         function showSummary() {
@@ -263,13 +294,21 @@
 
         function loadSummary() {
             var state = $('summary-state-filter').value;
+            var jobTypeFilter = ($('summary-jobtype-filter').value || '').toLowerCase();
             var url = summaryApiUrl + (state ? '?state=' + encodeURIComponent(state) : '');
 
             $('summary-body').innerHTML = '<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>';
             fetch(url)
                 .then(function(r) { return r.json(); })
                 .then(function(data) {
-                    renderSummary(data.summaries || []);
+                    var summaries = data.summaries || [];
+                    // Filtrar por tipo de job si hay texto
+                    if (jobTypeFilter) {
+                        summaries = summaries.filter(function(s) {
+                            return s.jobType.toLowerCase().indexOf(jobTypeFilter) !== -1;
+                        });
+                    }
+                    renderSummary(summaries);
                 })
                 .catch(function(err) {
                     $('summary-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
