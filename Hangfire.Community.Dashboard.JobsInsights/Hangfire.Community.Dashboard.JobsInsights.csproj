@@ -1,0 +1,106 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<IsPackable>true</IsPackable>
+		<PackageOutputPath>artifacts</PackageOutputPath>
+		<PackageId>Hangfire.Community.Dashboard.JobsInsights</PackageId>
+		<IncludeContentInPack>true</IncludeContentInPack>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights</RepositoryUrl>
+		<Description>
+			Adds an operational observability layer to the Hangfire Dashboard.
+			Monitor your background jobs with a live summary grouped by job type,
+			showing recent execution statuses (success/failure), average durations,
+			and a detailed history view with client-side pagination and search.
+			Includes an interactive chart panel for duration trends and throughput
+			(executions &amp; success rate) over multiple time ranges, configurable
+			alerts, and built-in data retention management.
+			Designed to work within the native Hangfire ecosystem without external
+			dependencies.
+		</Description>
+
+		<Version>1.0.0</Version>
+		<PackageTags>hangfire dashboard jobs insights monitoring observability metrics heatmap recurring-jobs background-jobs</PackageTags>
+
+		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+		<RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+
+		<Authors>FrankyJquintero</Authors>
+		<Product>Hangfire.Community.Dashboard.JobsInsights</Product>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+
+		<LangVersion>7.3</LangVersion>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+
+		<!-- Razor -->
+		<RazorProjectFile>Razor.build</RazorProjectFile>
+	</PropertyGroup>
+
+	<!-- Resolución de MSBuild (Full Framework) -->
+	<PropertyGroup>
+		<VSMSBuildPath Condition="Exists('$(ProgramFiles)\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\2022\Enterprise\MSBuild\Current\Bin\MSBuild.exe</VSMSBuildPath>
+		<VSMSBuildPath Condition="'$(VSMSBuildPath)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe</VSMSBuildPath>
+		<VSMSBuildPath Condition="'$(VSMSBuildPath)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe</VSMSBuildPath>
+		<VSMSBuildPath Condition="'$(VSMSBuildPath)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe</VSMSBuildPath>
+
+		<!-- VS 2026 -->
+		<VSMSBuildPath Condition="'$(VSMSBuildPath)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe</VSMSBuildPath>
+
+		<!-- Insider -->
+		<VSMSBuildPath Condition="'$(VSMSBuildPath)' == '' and Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Insiders\MSBuild\Current\Bin\MSBuild.exe')">$(ProgramFiles)\Microsoft Visual Studio\18\Insiders\MSBuild\Current\Bin\MSBuild.exe</VSMSBuildPath>
+
+		<!-- Fallback .NET Framework -->
+		<VSMSBuildPath Condition="'$(VSMSBuildPath)' == '' and Exists('$(MSBuildProgramFiles32)\..\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe')">$(MSBuildProgramFiles32)\..\Windows\Microsoft.NET\Framework64\v4.0.30319\MSBuild.exe</VSMSBuildPath>
+	</PropertyGroup>
+
+	<!-- Generación Razor -->
+	<Target Name="GenerateRazorClasses"
+			BeforeTargets="BeforeCompile;CoreCompile"
+			Condition="Exists('$(PkgRazorGenerator_MsBuild)\build\RazorGenerator.MsBuild.targets') AND '$(VSMSBuildPath)' != ''">
+
+		<Message Text="Regenerating Razor classes using: $(VSMSBuildPath)" Importance="high" />
+
+		<Exec Command="&quot;$(VSMSBuildPath)&quot; &quot;$(MSBuildProjectDirectory)\$(RazorProjectFile)&quot; /t:PrecompileRazorFiles /v:minimal /nologo /p:PkgRazorGenerator_MsBuild=&quot;$(PkgRazorGenerator_MsBuild)&quot;"
+			  WorkingDirectory="$(MSBuildProjectDirectory)"
+			  IgnoreExitCode="false" />
+
+	</Target>
+
+	<!-- Warning controlado -->
+	<Target Name="WarnNoMSBuild"
+			BeforeTargets="BeforeCompile;CoreCompile"
+			Condition="'$(VSMSBuildPath)' == ''">
+
+		<Warning Text="Razor (*.cshtml) NOT regenerated: Full MSBuild not found. Install Visual Studio Build Tools." />
+
+	</Target>
+
+	<!-- Dependencias -->
+	<ItemGroup>
+		<PackageReference Include="HangFire.Core" Version="1.7.28" />
+		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+	</ItemGroup>
+
+	<!-- RazorGenerator -->
+	<ItemGroup>
+		<PackageReference Include="RazorGenerator.MsBuild"
+						  Version="2.5.0"
+						  GeneratePathProperty="true">
+			<PrivateAssets>all</PrivateAssets>
+			<ExcludeAssets>runtime; native; contentfiles; analyzers; buildtransitive</ExcludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="artifacts\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="../README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>

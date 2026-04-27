@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Hangfire.APMJobs/Hangfire.APMJobs.csproj" />
+  <Project Path="Hangfire.Community.Dashboard.JobsInsights/Hangfire.Community.Dashboard.JobsInsights.csproj" />
+</Solution>

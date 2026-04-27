@@ -1,0 +1,1119 @@
+﻿@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.JobsInsights.Pages *@
+@using Hangfire.Dashboard
+@using Hangfire.Community.Dashboard.JobsInsights
+@using Hangfire.Community.Dashboard.JobsInsights.Pages
+@using Hangfire.Dashboard.Pages
+@inherits Hangfire.Dashboard.RazorPage
+@{
+    Layout = new LayoutPage(JobStatus.Title);
+    var summaryApiUrl = $"{Url.To(JobsInsightsExtension.RouteBase)}/api/jobtype-summary";
+    var detailApiUrl = $"{Url.To(JobsInsightsExtension.RouteBase)}/api/jobtype-detail";
+    var version = typeof(JobsInsightsExtension).Assembly.GetName().Version;
+    var versionString = $"v{version.Major}.{version.Minor}.{version.Build}";
+}
+
+<style>
+    /* ===== Puntos de colores para el resumen ===== */
+    .state-dot {
+        display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 3px;
+        background-color: #ccc;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+    }
+    .state-dot:hover { transform: scale(1.4); }
+    .state-dot.succeeded  { background-color: #5cb85c; }
+    .state-dot.failed     { background-color: #d9534f; }
+    .state-dot.processing { background-color: #f0ad4e; }
+
+    /* ===== Cabeceras ordenables ===== */
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { background-color: #e0e0e0; }
+    th.sortable::after        { content: " ⇅"; opacity: 0.3; }
+    th.sortable.asc::after    { content: " ↑"; opacity: 1; }
+    th.sortable.desc::after   { content: " ↓"; opacity: 1; }
+
+    /* ===== Animación de fade-in ===== */
+    @@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .fade-in { animation: fadeIn 0.3s; }
+
+    /* ===== MEJORA 5: Sticky header ===== */
+    #summary-table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f5f5f5;
+        z-index: 10;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+
+    /* ===== Fila danger si último estado es Failed ===== */
+    tr.last-failed td { background-color: rgba(217, 83, 79, 0.08) !important; }
+
+    /* ===== Badge de fallos consecutivos ===== */
+    .consecutive-badge {
+        margin-left: 4px;
+        font-size: 11px;
+        vertical-align: middle;
+    }
+
+    /* ===== Avg Duration coloreado ===== */
+    .dur-green { color: #3c763d; font-weight: bold; }
+    .dur-yellow { color: #8a6d3b; font-weight: bold; }
+    .dur-red { color: #a94442; font-weight: bold; }
+
+    /* ===== Tooltip ===== */
+    #dot-tooltip a { color: #adf; }
+
+    /* ===== Duration chart panel ===== */
+    #duration-chart-panel {
+        background: #fafafa;
+        border: 1px solid #e3e3e3;
+        border-radius: 4px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+    }
+    #duration-chart-panel .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    #duration-chart-panel .chart-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+        margin: 0;
+    }
+    #duration-chart-panel canvas { display: block; }
+</style>
+
+
+<div id="dot-tooltip" style="display:none; position:fixed; background:#333; color:#fff; padding:8px 12px; border-radius:4px; font-size:12px; z-index:9999; pointer-events:none;"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>
+                @JobStatus.Title
+                <small class="text-muted">@versionString</small>
+
+                <!-- MEJORA 3: Intervalo de auto-refresh configurable -->
+                <div class="btn-group pull-right" style="margin-left:5px;">
+                    <button class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-time"></span>
+                        <span id="refresh-interval-label">15s</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="5">Every 5s</a></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="15">Every 15s</a></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="30">Every 30s</a></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="60">Every 60s</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" class="refresh-interval-opt" data-seconds="0">
+                            <span class="glyphicon glyphicon-pause"></span> Paused
+                        </a></li>
+                    </ul>
+                </div>
+
+                <!-- MEJORA 4: Exportar CSV -->
+                <button class="btn btn-default btn-sm pull-right" id="export-csv" style="margin-left:5px;" title="Export current view to CSV">
+                    <span class="glyphicon glyphicon-download-alt"></span> Export CSV
+                </button>
+
+                <button class="btn btn-default btn-sm pull-right" id="refresh-btn">
+                    <span class="glyphicon glyphicon-refresh"></span> Refresh
+                </button>
+            </h3>
+            <hr />
+        </div>
+    </div>
+
+    <!-- VISTA RESUMEN -->
+    <div id="summary-view">
+        <div class="row" id="cleanup-section">
+            <!-- Filtro por nombre de job -->
+            <div class="col-md-3">
+                <input type="text" class="form-control input-sm" id="summary-jobtype-filter" placeholder="Filter by job type...">
+            </div>
+
+            <!-- Filtro de estado + Apply -->
+            <div class="col-md-3">
+                <div class="input-group">
+                    <select class="form-control input-sm" id="summary-state-filter">
+                        <option value="">All States</option>
+                        <option value="Succeeded">Success</option>
+                        <option value="Failed">Failed</option>
+                    </select>
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary btn-sm" id="summary-apply">Apply</button>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Retention days + Delete -->
+            <div class="col-md-3 col-md-offset-3">
+                <div class="input-group">
+                    <span class="input-group-addon">Retention days</span>
+                    <input type="number" class="form-control input-sm" id="retention-days" value="30" min="1" max="99" maxlength="2" style="width:90px;" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-danger btn-sm" id="cleanup-btn">Delete older</button>
+                    </span>
+                </div>
+                <span id="cleanup-msg" class="text-muted small"></span>
+            </div>
+        </div>
+
+        <br/>
+
+        <!-- Estadísticas rápidas -->
+        <div class="row" style="margin-bottom:15px;">
+            <div class="col-md-3">
+                <span class="label label-default">Types: <strong id="stat-types">-</strong></span>
+            </div>
+            <div class="col-md-3">
+                <span class="label label-info">Total Executions: <strong id="stat-total">-</strong></span>
+            </div>
+            <div class="col-md-3">
+                <span class="label label-success">Success Rate: <strong id="stat-rate">-</strong></span>
+            </div>
+            <div class="col-md-3">
+                <span class="label label-default">Updated: <strong id="stat-updated">-</strong></span>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:15px;">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" id="summary-table">
+                        <thead>
+                            <tr>
+                                <th>Job Type</th>
+                                <th>Last 15 Executions</th>
+                                <th>Success</th>
+                                <th>Failed</th>
+                                <th>Last Execution</th>
+                                <th>Avg Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summary-body">
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA DETALLE (Full History) -->
+    <div id="detail-view" style="display:none;">
+        <div class="row">
+            <div class="col-md-12">
+                <button class="btn btn-link btn-sm" id="back-to-summary">
+                    <span class="glyphicon glyphicon-chevron-left"></span> Back to Summary
+                </button>
+                <h4>Full History: <span id="detail-jobtype-label"></span></h4>
+            </div>
+        </div>
+
+        <!-- Filtros del detalle -->
+        <div class="row">
+            <div class="col-md-3">
+                <select class="form-control input-sm" id="detail-state-filter">
+                    <option value="">All States</option>
+                    <option value="Succeeded">Success</option>
+                    <option value="Failed">Failed</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="text" class="form-control input-sm" id="detail-search" placeholder="Search by ID, error, queue...">
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary btn-sm" id="detail-apply">Apply</button>
+                <button class="btn btn-default btn-sm" id="detail-clear">Clear</button>
+                <button class="btn btn-default btn-sm" id="detail-reload">
+                    <span class="glyphicon glyphicon-refresh"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Gráfica de tendencia de duración -->
+        <div class="row" style="margin-top:15px;">
+            <div class="col-md-12">
+                <div id="duration-chart-panel">
+                    <div class="chart-header">
+                        <p class="chart-title">
+                            <span class="glyphicon glyphicon-stats"></span>
+                            Avg Duration Trend
+                        </p>
+                        
+                        <div class="btn-group btn-group-xs">
+                            <button class="btn btn-default btn-xs" id="export-chart" title="Save chart as PNG">
+                                <span class="glyphicon glyphicon-picture"></span> Save PNG
+                            </button>
+                            <button class="btn btn-default active" data-mode="exec">Last 100 exec</button>
+                            <button class="btn btn-default" data-mode="1d">1 day</button>
+                            <button class="btn btn-default" data-mode="7d">7 days</button>
+                            <button class="btn btn-default" data-mode="15d">15 days</button>
+                            <button class="btn btn-default" data-mode="30d">30 days</button>
+                            <button class="btn btn-default" data-mode="45d">45 days</button>
+                            <button class="btn btn-default" data-mode="throughput">Throughput</button> 
+                        </div>
+                        <div class="row" style="margin:8px 0;">
+                            <div class="col-md-4">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-addon">Alert if avg ></span>
+                                    <input type="number" class="form-control" id="alert-threshold" value="5" step="0.5" min="0" style="width:80px;">
+                                    <span class="input-group-addon">s</span>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div id="alert-banner" class="alert alert-danger" style="display:none; padding:6px 12px; margin:0;">
+                                    <strong>⚠️ Threshold exceeded!</strong> Current average duration is above the limit.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <canvas id="duration-chart"></canvas>
+                    <div id="chart-stats" class="text-center"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="detail-table">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="jobId">Job ID</th>
+                                <th class="sortable" data-sort="queue">Queue</th>
+                                <th class="sortable" data-sort="lastState">Last State</th>
+                                <th class="sortable" data-sort="lastTimestamp">Last Execution</th>
+                                <th class="sortable" data-sort="duration">Duration</th>
+                                <th>Error</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detail-body">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="detail-pagination" class="text-right"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        var summaryApiUrl = '@summaryApiUrl';
+        var detailApiUrl  = '@detailApiUrl';
+        var adminApiBase  = '@Url.To(JobsInsightsExtension.RouteBase)' + '/api/admin';
+
+        var allDetailJobs  = [];
+        var filteredJobs   = [];
+        var currentJobType = null;
+        var currentPage    = 1;
+        var pageSize       = 20;
+        var refreshSeconds = 15;
+        var refreshTimer   = null;
+        var currentSort    = { field: 'lastTimestamp', direction: 'desc' };
+        var tooltipDiv     = document.getElementById('dot-tooltip');
+        var chartMode = 'exec'; // 'exec' | '7d' | '30d'
+        var durationChart  = null;
+
+        // ── Helpers ─────────────────────────────────────────────
+        function $(id) { return document.getElementById(id); }
+        function on(selector, event, handler) {
+            document.querySelectorAll(selector).forEach(function(el) {
+                el.addEventListener(event, handler);
+            });
+        }
+
+        // ── Init ─────────────────────────────────────────────────
+        function init() {
+            loadSummary();
+
+            $('refresh-btn').addEventListener('click', function() {
+                if ($('summary-view').style.display !== 'none') loadSummary();
+                else if (currentJobType) loadDetail(currentJobType);
+            });
+
+            $('summary-apply').addEventListener('click', loadSummary);
+
+            $('detail-apply').addEventListener('click', function() {
+                if (currentJobType) loadDetail(currentJobType);
+            });
+
+            $('detail-clear').addEventListener('click', function() {
+                $('detail-search').value = '';
+                $('detail-state-filter').value = '';
+                loadDetail(currentJobType);
+            });
+
+            $('detail-reload').addEventListener('click', function() {
+                if (currentJobType) loadDetail(currentJobType);
+            });
+
+            $('back-to-summary').addEventListener('click', showSummary);
+
+            // ── MEJORA 3: intervalo configurable ──────────────────
+            startRefreshTimer();
+            on('.refresh-interval-opt', 'click', function(e) {
+                e.preventDefault();
+                refreshSeconds = parseInt(this.getAttribute('data-seconds'));
+                var label = refreshSeconds > 0 ? refreshSeconds + 's' : 'Paused';
+                $('refresh-interval-label').textContent = label;
+                startRefreshTimer();
+            });
+
+            // ── MEJORA 4: export CSV ──────────────────────────────
+            $('export-csv').addEventListener('click', exportCsv);
+
+            // ── Ordenación de columnas en detalle ────────────────
+            on('#detail-table th.sortable', 'click', function() {
+                var field = this.getAttribute('data-sort');
+                if (currentSort.field === field) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.field = field;
+                    currentSort.direction = 'asc';
+                }
+                sortAndFilter();
+                renderDetailPage();
+                updateSortIndicators();
+            });
+
+            // ── Chart period toggle ───────────────────────────────
+            document.querySelectorAll('[data-mode]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    chartMode = this.getAttribute('data-mode');
+                    document.querySelectorAll('[data-mode]').forEach(function(b) { b.classList.remove('active'); });
+                    this.classList.add('active');
+                    renderDurationChart(chartMode);
+                });
+            });
+
+            // ── Cleanup ───────────────────────────────────────────
+            $('cleanup-btn').addEventListener('click', function() {
+                var days = parseInt($('retention-days').value);
+                if (!confirm('Delete all job results older than ' + days + ' days?')) return;
+                $('cleanup-msg').textContent = 'Cleaning...';
+                fetch(adminApiBase + '/cleanup?days=' + encodeURIComponent(days), { method: 'POST' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        $('cleanup-msg').innerHTML = '<span class="label label-success">Removed ' + data.removed + ' jobs.</span>';
+                        loadSummary();
+                    })
+                    .catch(function(err) {
+                        $('cleanup-msg').innerHTML = '<span class="label label-danger">Error: ' + err.message + '</span>';
+                    });
+            });
+
+            $('export-chart').addEventListener('click', function() {
+                var canvas = document.getElementById('duration-chart');
+                if (!canvas) return;
+                var link = document.createElement('a');
+                link.download = 'execution-duration-chart.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+
+            $('alert-threshold').addEventListener('input', function() {
+                // Solo redibujar si el detalle está visible y hay datos cargados
+                if ($('detail-view').style.display !== 'none' && currentJobType) {
+                    renderDurationChart(chartMode);
+                }
+            });
+        }
+
+        // ── MEJORA 3: timer helper ────────────────────────────────
+        function startRefreshTimer() {
+            clearInterval(refreshTimer);
+            if (refreshSeconds > 0) {
+                refreshTimer = setInterval(function() {
+                    if ($('summary-view').style.display !== 'none') loadSummary();
+                }, refreshSeconds * 1000);
+            }
+        }
+
+        // ── MEJORA 4: export CSV ──────────────────────────────────
+        function exportCsv() {
+            var rows = [['Job Type', 'Success', 'Failed', 'Avg Duration', 'Last Execution']];
+            document.querySelectorAll('#summary-body tr').forEach(function(tr) {
+                var cells = tr.querySelectorAll('td');
+                if (cells.length >= 6) {
+                    rows.push([
+                        '"' + (cells[0].textContent || '').replace(/"/g, '""') + '"',
+                        (cells[2].textContent || '').trim(),
+                        (cells[3].textContent || '').trim(),
+                        (cells[5].textContent || '').trim(),
+                        (cells[4].textContent || '').trim()
+                    ]);
+                }
+            });
+            var csv  = rows.map(function(r) { return r.join(','); }).join('\n');
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var a    = document.createElement('a');
+            a.href   = URL.createObjectURL(blob);
+            a.download = 'job-insights-' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // ── Views ─────────────────────────────────────────────────
+        function showSummary() {
+            $('summary-view').style.display = 'block';
+            $('detail-view').style.display  = 'none';
+        }
+
+        // ── Load Summary ──────────────────────────────────────────
+        function loadSummary() {
+            var state         = $('summary-state-filter').value;
+            var jobTypeFilter = ($('summary-jobtype-filter').value || '').toLowerCase();
+            var url           = summaryApiUrl + (state ? '?state=' + encodeURIComponent(state) : '');
+
+            $('summary-body').innerHTML = '<tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>';
+
+            fetch(url)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var summaries = data.summaries || [];
+                    if (jobTypeFilter) {
+                        summaries = summaries.filter(function(s) {
+                            return s.jobType.toLowerCase().indexOf(jobTypeFilter) !== -1;
+                        });
+                    }
+                    renderSummary(summaries);
+                })
+                .catch(function(err) {
+                    $('summary-body').innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
+                });
+        }
+
+        // ── Render Summary ────────────────────────────────────────
+        function renderSummary(summaries) {
+            var tbody = $('summary-body');
+            if (!summaries.length) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No job types found.</td></tr>';
+                updateStats(0, 0, 0);
+                return;
+            }
+
+            var html = '';
+            var totalSuccess = 0, totalFailed = 0;
+
+            summaries.forEach(function(s) {
+                // ── Dots ─────────────────────────────────────────
+                var dots = '';
+                if (s.recentExecutions) {
+                    s.recentExecutions.forEach(function(exec) {
+                        var cls = exec.state ? exec.state.toLowerCase() : '';
+                        dots += '<span class="state-dot ' + cls + '"'
+                              + ' data-state="'    + exec.state + '"'
+                              + ' data-time="'     + new Date(exec.timestamp).toLocaleString() + '"'
+                              + ' data-jobid="'    + (exec.jobId || '') + '"'
+                              + ' data-duration="' + (exec.duration != null ? exec.duration.toFixed(1) + 's' : '') + '"'
+                              + '></span>';
+                    });
+                }
+
+                // ── MEJORA 2: fila roja si el último es Failed ───
+                var lastState = '';
+                if (s.recentExecutions && s.recentExecutions.length > 0) {
+                    lastState = s.recentExecutions[s.recentExecutions.length - 1].state || '';
+                }
+                var rowClass = lastState === 'Failed' ? ' last-failed' : '';
+
+                // ── MEJORA 6: fallos consecutivos ────────────────
+                var consecutive = 0;
+                if (s.recentExecutions) {
+                    for (var i = s.recentExecutions.length - 1; i >= 0; i--) {
+                        if (s.recentExecutions[i].state === 'Failed') consecutive++;
+                        else break;
+                    }
+                }
+                var failBadge = '';
+                if (consecutive >= 2) {
+                    failBadge = ' <span class="label label-danger consecutive-badge" title="' + consecutive + ' consecutive failures">🔥 ' + consecutive + '</span>';
+                }
+
+                // ── MEJORA 1: Avg Duration con color ─────────────
+                var avgDuration = 'N/A';
+                if (s.avgDuration != null) {
+                    var secs     = s.avgDuration;
+                    var durClass = secs < 1 ? 'dur-green' : secs < 5 ? 'dur-yellow' : 'dur-red';
+                    avgDuration  = '<span class="' + durClass + '">' + secs.toFixed(1) + 's</span>';
+                }
+
+                var lastExec = s.lastExecution ? relativeTime(new Date(s.lastExecution)) : 'N/A';
+
+                html += '<tr class="' + rowClass + '">';
+                html += '<td>' + escapeHtml(s.jobType) + '</td>';
+                html += '<td>' + dots + '</td>';
+                html += '<td><span class="badge">' + s.successCount + '</span></td>';
+                html += '<td><span class="badge">' + s.failedCount + '</span>' + failBadge + '</td>';
+                html += '<td>' + lastExec + '</td>';
+                html += '<td>' + avgDuration + '</td>';
+                html += '<td><button class="btn btn-xs btn-default view-history" data-jobtype="' + escapeHtml(s.jobType) + '">View Full History</button></td>';
+                html += '</tr>';
+
+                totalSuccess += s.successCount;
+                totalFailed  += s.failedCount;
+            });
+
+            tbody.innerHTML = html;
+            updateStats(summaries.length, totalSuccess, totalFailed);
+
+            // ── Tooltips en los dots ──────────────────────────────
+            document.querySelectorAll('#summary-body .state-dot').forEach(function(dot) {
+                dot.addEventListener('mouseenter', function(e) {
+                    var el       = e.target;
+                    var state    = el.getAttribute('data-state');
+                    var time     = el.getAttribute('data-time');
+                    var jobId    = el.getAttribute('data-jobid');
+                    var duration = el.getAttribute('data-duration');
+                    var ttHtml   = '<strong>' + state + '</strong><br>' + time;
+                    if (duration) ttHtml += '<br>Duration: ' + duration;
+                    if (jobId)    ttHtml += '<br>Job: <a href="' + jobDetailUrl(jobId) + '" target="_blank">#' + jobId.substring(0, 8) + '</a>';
+                    tooltipDiv.innerHTML      = ttHtml;
+                    tooltipDiv.style.display  = 'block';
+                    var rect = el.getBoundingClientRect();
+                    tooltipDiv.style.left = (rect.left + window.scrollX + rect.width / 2 - tooltipDiv.offsetWidth / 2) + 'px';
+                    tooltipDiv.style.top  = (rect.top  + window.scrollY - tooltipDiv.offsetHeight - 8) + 'px';
+                });
+                dot.addEventListener('mouseleave', function() {
+                    tooltipDiv.style.display = 'none';
+                });
+            });
+
+            // ── Click en dot -> detalle filtrado por id ────────
+            document.querySelectorAll('#summary-body .state-dot').forEach(function(dot) {
+                dot.addEventListener('click', function(e) {
+                    var jobId = this.getAttribute('data-jobid');
+                    if (jobId) {
+                        window.open(jobDetailUrl(jobId), '_blank');
+                    }
+                });
+            });
+
+            // ── View Full History ─────────────────────────────────
+            on('.view-history', 'click', function() {
+                showDetail(this.getAttribute('data-jobtype'));
+            });
+        }
+
+        // ── Stats ─────────────────────────────────────────────────
+        function updateStats(types, success, failed) {
+            var total = success + failed;
+            $('stat-types').textContent   = types;
+            $('stat-total').textContent   = total;
+            $('stat-rate').textContent    = total ? (success / total * 100).toFixed(1) + '%' : '-';
+            $('stat-updated').textContent = new Date().toLocaleTimeString();
+        }
+
+        // ── Detail ────────────────────────────────────────────────
+        function showDetail(jobType) {
+            currentJobType = jobType;
+            currentPage    = 1;
+            currentSort    = { field: 'lastTimestamp', direction: 'desc' };
+            $('detail-search').value      = '';
+            $('detail-state-filter').value = '';
+            $('summary-view').style.display = 'none';
+            $('detail-view').style.display  = 'block';
+            $('detail-jobtype-label').textContent = jobType;
+            loadDetail(jobType);
+        }
+
+        function loadDetail(jobType) {
+            var state = $('detail-state-filter').value;
+            var url   = detailApiUrl + '?jobType=' + encodeURIComponent(jobType);
+            if (state) url += '&state=' + encodeURIComponent(state);
+
+            $('detail-body').innerHTML     = '<tr><td colspan="6" class="text-center text-muted">Loading...</td></tr>';
+            $('detail-pagination').innerHTML = '';
+
+            fetch(url)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    allDetailJobs = data.jobs || [];
+                    sortAndFilter();
+                    renderDetailPage();
+                    renderDurationChart(chartMode);
+                })
+                .catch(function(err) {
+                    $('detail-body').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error: ' + err.message + '</td></tr>';
+                });
+        }
+
+        function sortAndFilter() {
+            var search = ($('detail-search').value || '').toLowerCase();
+            filteredJobs = allDetailJobs.filter(function(j) {
+                if (!search) return true;
+                return (j.jobId        && j.jobId.toLowerCase().indexOf(search)        !== -1) ||
+                       (j.errorMessage && j.errorMessage.toLowerCase().indexOf(search) !== -1) ||
+                       (j.queue        && j.queue.toLowerCase().indexOf(search)        !== -1);
+            });
+
+            var field = currentSort.field;
+            var dir   = currentSort.direction;
+            filteredJobs.sort(function(a, b) {
+                var valA = a[field] != null ? a[field] : '';
+                var valB = b[field] != null ? b[field] : '';
+                if (field === 'lastTimestamp') {
+                    valA = new Date(a.lastTimestamp).getTime();
+                    valB = new Date(b.lastTimestamp).getTime();
+                } else if (field === 'duration') {
+                    valA = parseFloat(a.duration) || 0;
+                    valB = parseFloat(b.duration) || 0;
+                } else {
+                    valA = valA.toString().toLowerCase();
+                    valB = valB.toString().toLowerCase();
+                }
+                if (valA < valB) return dir === 'asc' ? -1 : 1;
+                if (valA > valB) return dir === 'asc' ?  1 : -1;
+                return 0;
+            });
+        }
+
+        function renderDetailPage() {
+            var start    = (currentPage - 1) * pageSize;
+            var pageJobs = filteredJobs.slice(start, start + pageSize);
+            renderDetail(pageJobs, filteredJobs.length);
+        }
+
+        function renderDetail(jobs, total) {
+            var tbody         = $('detail-body');
+            var paginationDiv = $('detail-pagination');
+
+            if (!jobs.length) {
+                tbody.innerHTML         = '<tr><td colspan="7" class="text-center text-muted">No jobs found.</td></tr>';
+                paginationDiv.innerHTML = '';
+                return;
+            }
+
+            var html = '';
+            jobs.forEach(function(j) {
+                var shortId    = j.jobId ? j.jobId.substring(0, 8) : '';
+                var stateClass = j.lastState ? j.lastState.toLowerCase() : '';
+                var badgeClass = stateClass === 'succeeded' ? 'label label-success' :
+                                 stateClass === 'failed'    ? 'label label-danger'  : 'label label-default';
+                var ts = j.lastTimestamp ? relativeTime(new Date(j.lastTimestamp)) : '';
+
+                var errorHtml = '';
+                if (j.errorMessage) {
+                    if (j.errorMessage.length > 80) {
+                        errorHtml = '<span class="error-short">'  + escapeHtml(j.errorMessage.substring(0, 80)) + '…</span>'
+                                  + '<span class="error-full" style="display:none;">' + escapeHtml(j.errorMessage) + '</span> '
+                                  + '<a href="javascript:void(0)" class="error-toggle small">more</a>';
+                    } else {
+                        errorHtml = escapeHtml(j.errorMessage);
+                    }
+                }
+
+                html += '<tr class="detail-row ' + stateClass + ' fade-in">';
+                html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank">#' + shortId + '</a></td>';
+                html += '<td><a href="' + queueUrl(j.queue)     + '" target="_blank" class="text-muted">' + escapeHtml(j.queue) + '</a></td>';
+                html += '<td><span class="' + badgeClass + '">' + j.lastState + '</span></td>';
+                html += '<td>' + ts + '</td>';
+                // Duration con color
+                var durHtml = 'N/A';
+                if (j.duration != null) {
+                    var d = j.duration;
+                    var dc = d < 1 ? 'dur-green' : d < 5 ? 'dur-yellow' : 'dur-red';
+                    durHtml = '<span class="' + dc + '">' + d.toFixed(1) + 's</span>';
+                }
+                html += '<td>' + durHtml + '</td>';
+                html += '<td>' + errorHtml + '</td>';
+                html += '<td><a href="' + jobDetailUrl(j.jobId) + '" target="_blank" class="btn btn-xs btn-default">Detail</a></td>';
+                html += '</tr>';
+            });
+            tbody.innerHTML = html;
+
+            // ── Paginación ────────────────────────────────────────
+            var totalPages = Math.ceil(total / pageSize);
+            var startCount = (currentPage - 1) * pageSize + 1;
+            var endCount   = Math.min(currentPage * pageSize, total);
+            var pagHtml    = '<div class="clearfix">';
+            pagHtml += '<span class="pull-left">Showing ' + startCount + ' – ' + endCount + ' of ' + total + ' jobs</span>';
+            pagHtml += '<div class="pull-right">';
+            if (currentPage > 1)          pagHtml += '<button class="btn btn-default btn-xs" id="prev-page">Previous</button> ';
+            if (currentPage < totalPages) pagHtml += '<button class="btn btn-default btn-xs" id="next-page">Next</button>';
+            pagHtml += '</div></div>';
+            paginationDiv.innerHTML = pagHtml;
+
+            var prevBtn = $('prev-page');
+            var nextBtn = $('next-page');
+            if (prevBtn) prevBtn.addEventListener('click', function() { currentPage--; renderDetailPage(); });
+            if (nextBtn) nextBtn.addEventListener('click', function() { currentPage++; renderDetailPage(); });
+
+            // ── Toggle error ──────────────────────────────────────
+            on('.error-toggle', 'click', function() {
+                var cell  = this.parentNode;
+                var short = cell.querySelector('.error-short');
+                var full  = cell.querySelector('.error-full');
+                if (short.style.display !== 'none') {
+                    short.style.display = 'none';
+                    full.style.display  = 'inline';
+                    this.textContent    = 'less';
+                } else {
+                    short.style.display = 'inline';
+                    full.style.display  = 'none';
+                    this.textContent    = 'more';
+                }
+            });
+        }
+
+
+        // ── Duration Chart ────────────────────────────────────────
+        function renderDurationChart(mode) {
+
+            if (!allDetailJobs || allDetailJobs.length === 0) return;
+
+            var labels = [], values = [];
+
+            // ── Throughput: barras (total) + línea (tasa de éxito) ─────
+           if (mode === 'throughput') {
+    var now = new Date();
+    var since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    var byHour = {};
+    allDetailJobs.forEach(function (j) {
+        var ts = new Date(j.lastTimestamp);
+        if (ts >= since && ts <= now) {
+            var hourKey = ts.getHours();
+            if (!byHour[hourKey]) byHour[hourKey] = { total: 0, success: 0 };
+            byHour[hourKey].total++;
+            if (j.lastState === 'Succeeded') byHour[hourKey].success++;
+        }
+    });
+
+    var labels = [];
+    var totalExecs = [];
+    var successRates = [];
+
+    for (var h = 0; h < 24; h++) {
+        labels.push(('0' + h).slice(-2) + ':00');
+
+        var bucket = byHour[h] || { total: 0, success: 0 };
+        totalExecs.push(bucket.total);
+
+        var rate = bucket.total > 0 ? (bucket.success / bucket.total * 100) : null;
+        successRates.push(rate != null ? Math.round(rate) : null);
+    }
+
+    var datasets = [
+        {
+            label: 'Total Executions',
+            type: 'bar',
+            data: totalExecs,
+            backgroundColor: 'rgba(51,122,183,0.6)',
+            borderColor: '#337ab7',
+            borderWidth: 1,
+            yAxisID: 'y-count'
+        },
+        {
+            label: 'Success Rate (%)',
+            type: 'line',
+            data: successRates,
+            borderColor: '#5cb85c',
+            backgroundColor: 'transparent',
+            pointBackgroundColor: '#5cb85c',
+            pointRadius: 3,
+            lineTension: 0.2,
+            spanGaps: true,
+            yAxisID: 'y-rate'
+        }
+    ];
+
+    var chartOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 4,
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    var value = tooltipItem.yLabel;
+                    if (tooltipItem.datasetIndex === 1 && value != null) {
+                        return value + '%';
+                    }
+                    return value + ' jobs';
+                }
+            }
+        },
+        scales: {
+            xAxes: [{
+                gridLines: { display: false }
+            }],
+            yAxes: [
+                {
+                    id: 'y-count',
+                    position: 'left',
+                    ticks: { beginAtZero: true },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Executions'
+                    },
+                    gridLines: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                {
+                    id: 'y-rate',
+                    position: 'right',
+                    ticks: {
+                        beginAtZero: true,
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        callback: function (v) { return v + '%'; }
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Success Rate (%)'
+                    },
+                    gridLines: {
+                        drawOnChartArea: false
+                    }
+                }
+            ]
+        }
+    };
+
+    var container = document.getElementById('duration-chart-panel');
+
+    if (container) {
+        var oldCanvas = document.getElementById('duration-chart');
+        if (oldCanvas) oldCanvas.remove();
+
+        var newCanvas = document.createElement('canvas');
+        newCanvas.id = 'duration-chart';
+        container.appendChild(newCanvas);
+
+        var ctx = newCanvas.getContext('2d');
+        if (!ctx) return;
+
+        try {
+            if (durationChart) {
+                durationChart.destroy();
+                durationChart = null;
+            }
+
+            durationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: chartOptions
+            });
+
+        } catch (e) {
+            console.error('Error al crear el gráfico de throughput:', e);
+        }
+    }
+
+    return;
+}
+
+            // ── Modos de duración (exec, 1d, 7d, 15d, 30d, 45d) ────────
+            if (mode === 'exec') {
+                var sorted = allDetailJobs
+                    .filter(function(j) { return j.duration != null; })
+                    .sort(function(a, b) { return new Date(a.lastTimestamp) - new Date(b.lastTimestamp); })
+                    .slice(-100);
+
+                sorted.forEach(function(j) {
+                    var d = new Date(j.lastTimestamp);
+                    labels.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                    values.push(parseFloat(j.duration.toFixed(2)));
+                });
+            } else if (mode === '1d') {
+                var today = new Date().toISOString().slice(0, 10);
+                var byHour = {};
+                allDetailJobs.forEach(function(j) {
+                    if (j.duration == null) return;
+                    var ts = new Date(j.lastTimestamp);
+                    if (ts.toISOString().slice(0, 10) !== today) return;
+                    var hour = ts.getHours();
+                    if (!byHour[hour]) byHour[hour] = { total: 0, count: 0 };
+                    byHour[hour].total += j.duration;
+                    byHour[hour].count += 1;
+                });
+                for (var h = 0; h <= 23; h++) {
+                    labels.push(String(h).padStart(2, '0') + ':00');
+                    var avg = byHour[h] ? (byHour[h].total / byHour[h].count) : null;
+                    values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);
+                }
+            } else {
+                var dayOptions = { '7d': 7, '15d': 15, '30d': 30, '45d': 45 };
+                var days = dayOptions[mode] || 7;
+                var cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - days);
+                var byDay = {};
+                allDetailJobs.forEach(function(j) {
+                    if (j.duration == null) return;
+                    var ts = new Date(j.lastTimestamp);
+                    if (ts < cutoff) return;
+                    var key = ts.toISOString().slice(0, 10);
+                    if (!byDay[key]) byDay[key] = { total: 0, count: 0 };
+                    byDay[key].total += j.duration;
+                    byDay[key].count += 1;
+                });
+                for (var i = days - 1; i >= 0; i--) {
+                    var d = new Date();
+                    d.setDate(d.getDate() - i);
+                    var key = d.toISOString().slice(0, 10);
+                    labels.push(key.slice(5));
+                    var avg = byDay[key] ? (byDay[key].total / byDay[key].count) : null;
+                    values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);
+                }
+            }
+
+            // ── Valores filtrados (sin nulos/NaN) ───────────────────────
+            var filteredVals = (values || []).filter(function(v) { return v != null && !isNaN(v); });
+
+            // ── Línea de promedio y alerta de umbral ────────────────────
+            var avgValue = filteredVals.length > 0
+                ? filteredVals.reduce(function(a, b) { return a + b; }, 0) / filteredVals.length
+                : null;
+
+            var threshold = parseFloat($('alert-threshold').value);
+            if (isNaN(threshold)) threshold = 5;
+            var exceeded = avgValue !== null && avgValue > threshold;
+            var lineColor = exceeded ? '#d9534f' : '#337ab7';
+
+            if ($('alert-banner')) {
+                $('alert-banner').style.display = exceeded ? 'block' : 'none';
+            }
+
+            // ── Percentiles ─────────────────────────────────────────────
+            var sortedVals = filteredVals.slice().sort(function(a, b) { return a - b; });
+            var min = sortedVals[0] || 0;
+            var max = sortedVals[sortedVals.length - 1] || 0;
+            var p95 = sortedVals[Math.floor(sortedVals.length * 0.95)] || max;
+
+            document.getElementById('chart-stats').innerHTML =
+                '<span class="label label-default">Min: ' + min.toFixed(1) + 's</span> ' +
+                '<span class="label label-default">Max: ' + max.toFixed(1) + 's</span> ' +
+                '<span class="label label-default">P95: ' + p95.toFixed(1) + 's</span>';
+
+
+            // ── Gráfico de duración ─────────────────────────────────────
+            var ctx = document.getElementById('duration-chart').getContext('2d');
+            if (durationChart) durationChart.destroy();
+
+            durationChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Avg Duration (s)',
+                        data: values,
+                        borderColor: lineColor,
+                        backgroundColor: 'rgba(51,122,183,0.08)',
+                        pointBackgroundColor: function(ctx) {
+                            var v = ctx.raw;
+                            if (v == null) return '#ccc';
+                            return v < 1 ? '#5cb85c' : v < 5 ? '#f0ad4e' : '#d9534f';
+                        },
+                        pointRadius: mode === 'exec' ? 4 : 5,
+                        pointHoverRadius: 7,
+                        borderWidth: 2,
+                        tension: mode === 'exec' ? 0.2 : 0.3,
+                        spanGaps: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 4,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.raw != null ? ctx.raw + 's' : 'No data';
+                                },
+                                title: function(items) {
+                                    if (mode !== 'exec') return items[0].label;
+                                    var job = allDetailJobs
+                                        .filter(function(j) { return j.duration != null; })
+                                        .sort(function(a, b) { return new Date(a.lastTimestamp) - new Date(b.lastTimestamp); })
+                                        .slice(-100)[items[0].dataIndex];
+                                    return job ? new Date(job.lastTimestamp).toLocaleString() : items[0].label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            suggestedMin: 0,
+                            ticks: {
+                                callback: function(v) { return v + 's'; },
+                                maxTicksLimit: 6
+                            },
+                            grid: { color: 'rgba(0,0,0,0.05)' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: {
+                                maxTicksLimit: mode === '1d' ? 24 : 10,
+                                autoSkip: mode !== '1d',
+                                maxRotation: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ── Sort indicators ───────────────────────────────────────
+        function updateSortIndicators() {
+            document.querySelectorAll('#detail-table th.sortable').forEach(function(th) {
+                th.classList.remove('asc', 'desc');
+                if (th.getAttribute('data-sort') === currentSort.field) {
+                    th.classList.add(currentSort.direction);
+                }
+            });
+        }
+
+        // ── URL helpers ───────────────────────────────────────────
+        function jobDetailUrl(jobId) { return '@Url.To("/jobs/details")' + '/' + jobId; }
+        function queueUrl(queue)     { return '@Url.To("/jobs/enqueued")' + '/' + encodeURIComponent(queue); }
+
+        // ── Time helper ───────────────────────────────────────────
+        function relativeTime(date) {
+            var diff    = new Date() - date;
+            var seconds = Math.floor(diff / 1000);
+            if (seconds < 60)   return 'just now';
+            var minutes = Math.floor(seconds / 60);
+            if (minutes < 60)   return minutes + 'm ago';
+            var hours   = Math.floor(minutes / 60);
+            if (hours   < 24)   return hours + 'h ago';
+            return date.toLocaleDateString();
+        }
+
+        // ── Escape HTML ───────────────────────────────────────────
+        function escapeHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+
+        // ── Boot ──────────────────────────────────────────────────
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    })();
+</script>
