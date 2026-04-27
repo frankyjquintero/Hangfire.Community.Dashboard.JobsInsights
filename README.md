@@ -37,8 +37,12 @@ Monitor the health and performance of your background jobs at a glance, with a l
 ### 📸 Screenshots
 
 
-![Summary view](https://user-images.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/summary.png)  
-![Detail view with chart](https://user-images.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/detail.png)
+![Summary view](https://raw.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/refs/heads/feature/packages-nuget/images/summary.png)  
+![Detail view with chart](https://raw.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/refs/heads/feature/packages-nuget/images/detail1.png)
+![Detail view with chart](https://raw.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/refs/heads/feature/packages-nuget/images/detail2.png)
+![Detail view with chart](https://raw.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/refs/heads/feature/packages-nuget/images/detail3.png)
+![Detail view with chart](https://raw.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/refs/heads/feature/packages-nuget/images/detail4.png)
+![Detail view with chart](https://raw.githubusercontent.com/frankyjquintero/Hangfire.Community.Dashboard.JobsInsights/refs/heads/feature/packages-nuget/images/detail5.png)
 
 ---
 
