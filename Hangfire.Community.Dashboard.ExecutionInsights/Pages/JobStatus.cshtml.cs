@@ -241,44 +241,45 @@ WriteLiteral("</small>\r\n\r\n                <!-- MEJORA 3: Intervalo de auto-r
 "                 <button class=\"btn btn-default\" data-mode=\"15d\">15 days</button" +
 ">\r\n                            <button class=\"btn btn-default\" data-mode=\"30d\">3" +
 "0 days</button>\r\n                            <button class=\"btn btn-default\" dat" +
-"a-mode=\"45d\">45 days</button>\r\n                        </div>\r\n                 " +
-"       <div class=\"row\" style=\"margin:8px 0;\">\r\n                            <div" +
-" class=\"col-md-4\">\r\n                                <div class=\"input-group inpu" +
-"t-group-sm\">\r\n                                    <span class=\"input-group-addon" +
-"\">Alert if avg ></span>\r\n                                    <input type=\"number" +
-"\" class=\"form-control\" id=\"alert-threshold\" value=\"5\" step=\"0.5\" min=\"0\" style=\"" +
-"width:80px;\">\r\n                                    <span class=\"input-group-addo" +
-"n\">s</span>\r\n                                </div>\r\n                           " +
-" </div>\r\n                            <div class=\"col-md-8\">\r\n                   " +
-"             <div id=\"alert-banner\" class=\"alert alert-danger\" style=\"display:no" +
-"ne; padding:6px 12px; margin:0;\">\r\n                                    <strong>⚠" +
-"️ Threshold exceeded!</strong> Current average duration is above the limit.\r\n   " +
-"                             </div>\r\n                            </div>\r\n       " +
-"                 </div>\r\n                    </div>\r\n                    <canvas" +
-" id=\"duration-chart\"></canvas>\r\n                    <div id=\"chart-stats\" class=" +
-"\"text-center\"></div>\r\n                </div>\r\n            </div>\r\n        </div>" +
-"\r\n\r\n        <div class=\"row\">\r\n            <div class=\"col-md-12\">\r\n            " +
-"    <div class=\"table-responsive\">\r\n                    <table class=\"table tabl" +
-"e-hover\" id=\"detail-table\">\r\n                        <thead>\r\n                  " +
-"          <tr>\r\n                                <th class=\"sortable\" data-sort=\"" +
-"jobId\">Job ID</th>\r\n                                <th class=\"sortable\" data-so" +
-"rt=\"queue\">Queue</th>\r\n                                <th class=\"sortable\" data" +
-"-sort=\"lastState\">Last State</th>\r\n                                <th class=\"so" +
-"rtable\" data-sort=\"lastTimestamp\">Last Execution</th>\r\n                         " +
-"       <th class=\"sortable\" data-sort=\"duration\">Duration</th>\r\n                " +
-"                <th>Error</th>\r\n                                <th>Actions</th>" +
-"\r\n                            </tr>\r\n                        </thead>\r\n         " +
-"               <tbody id=\"detail-body\">\r\n                            <tr>\r\n     " +
-"                           <td colspan=\"6\" class=\"text-center text-muted\">Loadin" +
-"g...</td>\r\n                            </tr>\r\n                        </tbody>\r\n" +
-"                    </table>\r\n                </div>\r\n                <div id=\"d" +
-"etail-pagination\" class=\"text-right\"></div>\r\n            </div>\r\n        </div>\r" +
-"\n    </div>\r\n</div>\r\n\r\n<script>\r\n    (function() {\r\n        var summaryApiUrl = " +
-"\'");
+"a-mode=\"45d\">45 days</button>\r\n                            <button class=\"btn bt" +
+"n-default\" data-mode=\"throughput\">Throughput</button> \r\n                        " +
+"</div>\r\n                        <div class=\"row\" style=\"margin:8px 0;\">\r\n       " +
+"                     <div class=\"col-md-4\">\r\n                                <di" +
+"v class=\"input-group input-group-sm\">\r\n                                    <span" +
+" class=\"input-group-addon\">Alert if avg ></span>\r\n                              " +
+"      <input type=\"number\" class=\"form-control\" id=\"alert-threshold\" value=\"5\" s" +
+"tep=\"0.5\" min=\"0\" style=\"width:80px;\">\r\n                                    <spa" +
+"n class=\"input-group-addon\">s</span>\r\n                                </div>\r\n  " +
+"                          </div>\r\n                            <div class=\"col-md" +
+"-8\">\r\n                                <div id=\"alert-banner\" class=\"alert alert-" +
+"danger\" style=\"display:none; padding:6px 12px; margin:0;\">\r\n                    " +
+"                <strong>⚠️ Threshold exceeded!</strong> Current average duration" +
+" is above the limit.\r\n                                </div>\r\n                  " +
+"          </div>\r\n                        </div>\r\n                    </div>\r\n  " +
+"                  <canvas id=\"duration-chart\"></canvas>\r\n                    <di" +
+"v id=\"chart-stats\" class=\"text-center\"></div>\r\n                </div>\r\n         " +
+"   </div>\r\n        </div>\r\n\r\n        <div class=\"row\">\r\n            <div class=\"" +
+"col-md-12\">\r\n                <div class=\"table-responsive\">\r\n                   " +
+" <table class=\"table table-hover\" id=\"detail-table\">\r\n                        <t" +
+"head>\r\n                            <tr>\r\n                                <th cla" +
+"ss=\"sortable\" data-sort=\"jobId\">Job ID</th>\r\n                                <th" +
+" class=\"sortable\" data-sort=\"queue\">Queue</th>\r\n                                " +
+"<th class=\"sortable\" data-sort=\"lastState\">Last State</th>\r\n                    " +
+"            <th class=\"sortable\" data-sort=\"lastTimestamp\">Last Execution</th>\r\n" +
+"                                <th class=\"sortable\" data-sort=\"duration\">Durati" +
+"on</th>\r\n                                <th>Error</th>\r\n                       " +
+"         <th>Actions</th>\r\n                            </tr>\r\n                  " +
+"      </thead>\r\n                        <tbody id=\"detail-body\">\r\n              " +
+"              <tr>\r\n                                <td colspan=\"6\" class=\"text-" +
+"center text-muted\">Loading...</td>\r\n                            </tr>\r\n         " +
+"               </tbody>\r\n                    </table>\r\n                </div>\r\n " +
+"               <div id=\"detail-pagination\" class=\"text-right\"></div>\r\n          " +
+"  </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n<script>\r\n    (function() {\r\n   " +
+"     var summaryApiUrl = \'");
 
 
             
-            #line 314 "..\..\Pages\JobStatus.cshtml"
+            #line 315 "..\..\Pages\JobStatus.cshtml"
                         Write(summaryApiUrl);
 
             
@@ -288,7 +289,7 @@ WriteLiteral("\';\r\n        var detailApiUrl  = \'");
 
 
             
-            #line 315 "..\..\Pages\JobStatus.cshtml"
+            #line 316 "..\..\Pages\JobStatus.cshtml"
                         Write(detailApiUrl);
 
             
@@ -298,7 +299,7 @@ WriteLiteral("\';\r\n        var adminApiBase  = \'");
 
 
             
-            #line 316 "..\..\Pages\JobStatus.cshtml"
+            #line 317 "..\..\Pages\JobStatus.cshtml"
                         Write(Url.To(ExecutionInsightsExtension.RouteBase));
 
             
@@ -589,118 +590,171 @@ WriteLiteral("\' + \'/api/admin\';\r\n\r\n        var allDetailJobs  = [];\r\n  
 "              this.textContent    = \'less\';\r\n                } else {\r\n         " +
 "           short.style.display = \'inline\';\r\n                    full.style.displ" +
 "ay  = \'none\';\r\n                    this.textContent    = \'more\';\r\n              " +
-"  }\r\n            });\r\n        }\r\n\r\n        // ── Duration Chart ────────────────" +
-"────────────────────────\r\n        function renderDurationChart(mode) {\r\n\r\n      " +
-"      if (!allDetailJobs || allDetailJobs.length === 0) return;\r\n\r\n            v" +
-"ar labels = [], values = [];\r\n\r\n            if (mode === \'exec\') {\r\n            " +
-"    // Últimas 100 ejecuciones individuales, sin agrupar\r\n                var so" +
-"rted = allDetailJobs\r\n                    .filter(function(j) { return j.duratio" +
-"n != null; })\r\n                    .sort(function(a, b) { return new Date(a.last" +
-"Timestamp) - new Date(b.lastTimestamp); })\r\n                    .slice(-100);\r\n\r" +
-"\n                sorted.forEach(function(j) {\r\n                    var d = new D" +
-"ate(j.lastTimestamp);\r\n                    labels.push(d.toLocaleTimeString([], " +
-"{ hour: \'2-digit\', minute: \'2-digit\' }));\r\n                    values.push(parse" +
-"Float(j.duration.toFixed(2)));\r\n                });\r\n\r\n            } else if (mo" +
-"de === \'1d\') {\r\n                // Agrupar por hora del día actual (00:00 - 23:5" +
-"9)\r\n                var today = new Date().toISOString().slice(0, 10);\r\n        " +
-"        var byHour = {};\r\n\r\n                allDetailJobs.forEach(function(j) {\r" +
-"\n                    if (j.duration == null) return;\r\n                    var ts" +
-" = new Date(j.lastTimestamp);\r\n                    if (ts.toISOString().slice(0," +
-" 10) !== today) return;\r\n                    var hour = ts.getHours();\r\n        " +
-"            if (!byHour[hour]) byHour[hour] = { total: 0, count: 0 };\r\n         " +
-"           byHour[hour].total += j.duration;\r\n                    byHour[hour].c" +
-"ount += 1;\r\n                });\r\n\r\n                for (var h = 0; h <= 23; h++)" +
-" {\r\n                    labels.push(String(h).padStart(2, \'0\') + \':00\');\r\n      " +
-"              var avg = byHour[h] ? (byHour[h].total / byHour[h].count) : null;\r" +
-"\n                    values.push(avg !== null ? parseFloat(avg.toFixed(2)) : nul" +
-"l);\r\n                }\r\n\r\n            } else {\r\n                // Agrupar por d" +
-"ía para 7d, 15d, 30d, 45d\r\n                var dayOptions = { \'7d\': 7, \'15d\': 15" +
-", \'30d\': 30, \'45d\': 45 };\r\n                var days = dayOptions[mode] || 7;\r\n  " +
-"              var cutoff = new Date();\r\n                cutoff.setDate(cutoff.ge" +
-"tDate() - days);\r\n\r\n                var byDay = {};\r\n                allDetailJo" +
-"bs.forEach(function(j) {\r\n                    if (j.duration == null) return;\r\n " +
-"                   var ts = new Date(j.lastTimestamp);\r\n                    if (" +
-"ts < cutoff) return;\r\n                    var key = ts.toISOString().slice(0, 10" +
-");\r\n                    if (!byDay[key]) byDay[key] = { total: 0, count: 0 };\r\n " +
-"                   byDay[key].total += j.duration;\r\n                    byDay[ke" +
-"y].count += 1;\r\n                });\r\n\r\n                for (var i = days - 1; i " +
-">= 0; i--) {\r\n                    var d = new Date();\r\n                    d.set" +
-"Date(d.getDate() - i);\r\n                    var key = d.toISOString().slice(0, 1" +
-"0);\r\n                    labels.push(key.slice(5)); // MM-DD\r\n                  " +
-"  var avg = byDay[key] ? (byDay[key].total / byDay[key].count) : null;\r\n        " +
-"            values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);\r\n    " +
-"            }\r\n            }\r\n\r\n                // ── Calcular promedio (con def" +
-"ensa extra) ──────────────────\r\n            var filteredVals = (values || []).fi" +
-"lter(function(v) { return v != null && !isNaN(v); });\r\n            var avgValue " +
-"= filteredVals.length > 0\r\n                ? filteredVals.reduce(function(a, b) " +
-"{ return a + b; }, 0) / filteredVals.length\r\n                : null;\r\n\r\n        " +
-"    // ── Alerta de umbral ───────────────────────────────────────\r\n            " +
-"var threshold = parseFloat($(\'alert-threshold\').value);\r\n            if (isNaN(t" +
-"hreshold)) threshold = 5;\r\n\r\n            var avgOfValues = avgValue; // reutiliz" +
-"ar\r\n            var exceeded = avgOfValues !== null && avgOfValues > threshold;\r" +
-"\n            var lineColor = exceeded ? \'#d9534f\' : \'#337ab7\';\r\n\r\n            if" +
-" ($(\'alert-banner\')) {\r\n                $(\'alert-banner\').style.display = exceed" +
-"ed ? \'block\' : \'none\';\r\n            }\r\n\r\n            //Percentiles\r\n\r\n          " +
-"  var filteredVals = values.filter(v => v != null).sort((a,b) => a - b);\r\n      " +
-"      var min = filteredVals[0] || 0;\r\n            var max = filteredVals[filter" +
-"edVals.length-1] || 0;\r\n            var p95 = filteredVals[Math.floor(filteredVa" +
-"ls.length * 0.95)] || max;\r\n\r\n            document.getElementById(\'chart-stats\')" +
-".innerHTML =\r\n                \'<span class=\"label label-default\">Min: \' + min.to" +
-"Fixed(1) + \'s</span> \' +\r\n                \'<span class=\"label label-default\">Max" +
-": \' + max.toFixed(1) + \'s</span> \' +\r\n                \'<span class=\"label label-" +
-"default\">P95: \' + p95.toFixed(1) + \'s</span>\';\r\n\r\n            var ctx = document" +
-".getElementById(\'duration-chart\').getContext(\'2d\');\r\n            if (durationCha" +
-"rt) durationChart.destroy();\r\n\r\n            durationChart = new Chart(ctx, {\r\n  " +
-"              type: \'line\',\r\n                data: {\r\n                    labels" +
-": labels,\r\n                    datasets: [{\r\n                        label: \'Avg" +
-" Duration (s)\',\r\n                        data: values,\r\n                        " +
-"borderColor: lineColor,\r\n                        borderColor: \'#337ab7\',\r\n      " +
-"                  backgroundColor: \'rgba(51,122,183,0.08)\',\r\n                   " +
-"     pointBackgroundColor: function(ctx) {\r\n                            var v = " +
-"ctx.raw;\r\n                            if (v == null) return \'#ccc\';\r\n           " +
-"                 return v < 1 ? \'#5cb85c\' : v < 5 ? \'#f0ad4e\' : \'#d9534f\';\r\n    " +
-"                    },\r\n                        pointRadius: mode === \'exec\' ? 4" +
-" : 5,\r\n                        pointHoverRadius: 7,\r\n                        bor" +
-"derWidth: 2,\r\n                        tension: mode === \'exec\' ? 0.2 : 0.3,\r\n   " +
-"                     spanGaps: true\r\n                    }]\r\n                },\r" +
-"\n                options: {\r\n                    responsive: true,\r\n            " +
-"        maintainAspectRatio: true,\r\n                    aspectRatio: 4,\r\n       " +
-"             plugins: {\r\n                        legend: { display: false },\r\n  " +
-"                      tooltip: {\r\n                            callbacks: {\r\n    " +
-"                            label: function(ctx) {\r\n                            " +
-"        return ctx.raw != null ? ctx.raw + \'s\' : \'No data\';\r\n                   " +
-"             },\r\n                                title: function(items) {\r\n     " +
-"                               if (mode !== \'exec\') return items[0].label;\r\n    " +
-"                                var job = allDetailJobs\r\n                       " +
-"                 .filter(function(j) { return j.duration != null; })\r\n          " +
-"                              .sort(function(a, b) { return new Date(a.lastTimes" +
-"tamp) - new Date(b.lastTimestamp); })\r\n                                        ." +
-"slice(-100)[items[0].dataIndex];\r\n                                    return job" +
-" ? new Date(job.lastTimestamp).toLocaleString() : items[0].label;\r\n             " +
-"                   }\r\n                            }\r\n                        }\r\n" +
-"                    },\r\n                    scales: {\r\n                        y" +
-": {\r\n                            beginAtZero: false,\r\n                          " +
-"  suggestedMin: 0,\r\n                            ticks: {\r\n                      " +
-"          callback: function(v) { return v + \'s\'; },\r\n                          " +
-"      maxTicksLimit: 6\r\n                            },\r\n                        " +
-"    grid: { color: \'rgba(0,0,0,0.05)\' }\r\n                        },\r\n           " +
-"             x: {\r\n                            grid: { display: false },\r\n      " +
-"                      ticks: {\r\n                                maxTicksLimit: m" +
-"ode === \'1d\' ? 24 : 10,\r\n                                autoSkip: mode !== \'1d\'" +
-",\r\n                                maxRotation: 0\r\n                            }" +
-"\r\n                        }\r\n                    }\r\n                }\r\n         " +
-"   });\r\n        }\r\n\r\n        // ── Sort indicators ─────────────────────────────" +
-"──────────\r\n        function updateSortIndicators() {\r\n            document.quer" +
-"ySelectorAll(\'#detail-table th.sortable\').forEach(function(th) {\r\n              " +
-"  th.classList.remove(\'asc\', \'desc\');\r\n                if (th.getAttribute(\'data" +
-"-sort\') === currentSort.field) {\r\n                    th.classList.add(currentSo" +
-"rt.direction);\r\n                }\r\n            });\r\n        }\r\n\r\n        // ── U" +
-"RL helpers ───────────────────────────────────────────\r\n        function jobDeta" +
-"ilUrl(jobId) { return \'");
+"  }\r\n            });\r\n        }\r\n\r\n\r\n        // ── Duration Chart ──────────────" +
+"──────────────────────────\r\n        function renderDurationChart(mode) {\r\n\r\n    " +
+"        if (!allDetailJobs || allDetailJobs.length === 0) return;\r\n\r\n           " +
+" var labels = [], values = [];\r\n\r\n            // ── Throughput: barras (total) +" +
+" línea (tasa de éxito) ─────\r\n           if (mode === \'throughput\') {\r\n    var n" +
+"ow = new Date();\r\n    var since = new Date(now.getTime() - 24 * 60 * 60 * 1000);" +
+"\r\n\r\n    var byHour = {};\r\n    allDetailJobs.forEach(function (j) {\r\n        var " +
+"ts = new Date(j.lastTimestamp);\r\n        if (ts >= since && ts <= now) {\r\n      " +
+"      var hourKey = ts.getHours();\r\n            if (!byHour[hourKey]) byHour[hou" +
+"rKey] = { total: 0, success: 0 };\r\n            byHour[hourKey].total++;\r\n       " +
+"     if (j.lastState === \'Succeeded\') byHour[hourKey].success++;\r\n        }\r\n   " +
+" });\r\n\r\n    var labels = [];\r\n    var totalExecs = [];\r\n    var successRates = [" +
+"];\r\n\r\n    for (var h = 0; h < 24; h++) {\r\n        labels.push((\'0\' + h).slice(-2" +
+") + \':00\');\r\n\r\n        var bucket = byHour[h] || { total: 0, success: 0 };\r\n    " +
+"    totalExecs.push(bucket.total);\r\n\r\n        var rate = bucket.total > 0 ? (buc" +
+"ket.success / bucket.total * 100) : null;\r\n        successRates.push(rate != nul" +
+"l ? Math.round(rate) : null);\r\n    }\r\n\r\n    var datasets = [\r\n        {\r\n       " +
+"     label: \'Total Executions\',\r\n            type: \'bar\',\r\n            data: tot" +
+"alExecs,\r\n            backgroundColor: \'rgba(51,122,183,0.6)\',\r\n            bord" +
+"erColor: \'#337ab7\',\r\n            borderWidth: 1,\r\n            yAxisID: \'y-count\'" +
+"\r\n        },\r\n        {\r\n            label: \'Success Rate (%)\',\r\n            typ" +
+"e: \'line\',\r\n            data: successRates,\r\n            borderColor: \'#5cb85c\'," +
+"\r\n            backgroundColor: \'transparent\',\r\n            pointBackgroundColor:" +
+" \'#5cb85c\',\r\n            pointRadius: 3,\r\n            lineTension: 0.2,\r\n       " +
+"     spanGaps: true,\r\n            yAxisID: \'y-rate\'\r\n        }\r\n    ];\r\n\r\n    va" +
+"r chartOptions = {\r\n        responsive: true,\r\n        maintainAspectRatio: true" +
+",\r\n        aspectRatio: 4,\r\n        tooltips: {\r\n            callbacks: {\r\n     " +
+"           label: function (tooltipItem, data) {\r\n                    var value " +
+"= tooltipItem.yLabel;\r\n                    if (tooltipItem.datasetIndex === 1 &&" +
+" value != null) {\r\n                        return value + \'%\';\r\n                " +
+"    }\r\n                    return value + \' jobs\';\r\n                }\r\n         " +
+"   }\r\n        },\r\n        scales: {\r\n            xAxes: [{\r\n                grid" +
+"Lines: { display: false }\r\n            }],\r\n            yAxes: [\r\n              " +
+"  {\r\n                    id: \'y-count\',\r\n                    position: \'left\',\r\n" +
+"                    ticks: { beginAtZero: true },\r\n                    scaleLabe" +
+"l: {\r\n                        display: true,\r\n                        labelStrin" +
+"g: \'Executions\'\r\n                    },\r\n                    gridLines: {\r\n     " +
+"                   color: \'rgba(0,0,0,0.05)\'\r\n                    }\r\n           " +
+"     },\r\n                {\r\n                    id: \'y-rate\',\r\n                 " +
+"   position: \'right\',\r\n                    ticks: {\r\n                        beg" +
+"inAtZero: true,\r\n                        suggestedMin: 0,\r\n                     " +
+"   suggestedMax: 100,\r\n                        callback: function (v) { return v" +
+" + \'%\'; }\r\n                    },\r\n                    scaleLabel: {\r\n          " +
+"              display: true,\r\n                        labelString: \'Success Rate" +
+" (%)\'\r\n                    },\r\n                    gridLines: {\r\n               " +
+"         drawOnChartArea: false\r\n                    }\r\n                }\r\n     " +
+"       ]\r\n        }\r\n    };\r\n\r\n    var container = document.getElementById(\'dura" +
+"tion-chart-panel\');\r\n\r\n    if (container) {\r\n        var oldCanvas = document.ge" +
+"tElementById(\'duration-chart\');\r\n        if (oldCanvas) oldCanvas.remove();\r\n\r\n " +
+"       var newCanvas = document.createElement(\'canvas\');\r\n        newCanvas.id =" +
+" \'duration-chart\';\r\n        container.appendChild(newCanvas);\r\n\r\n        var ctx" +
+" = newCanvas.getContext(\'2d\');\r\n        if (!ctx) return;\r\n\r\n        try {\r\n    " +
+"        if (durationChart) {\r\n                durationChart.destroy();\r\n        " +
+"        durationChart = null;\r\n            }\r\n\r\n            durationChart = new " +
+"Chart(ctx, {\r\n                type: \'bar\',\r\n                data: {\r\n           " +
+"         labels: labels,\r\n                    datasets: datasets\r\n              " +
+"  },\r\n                options: chartOptions\r\n            });\r\n\r\n        } catch " +
+"(e) {\r\n            console.error(\'Error al crear el gráfico de throughput:\', e);" +
+"\r\n        }\r\n    }\r\n\r\n    return;\r\n}\r\n\r\n            // ── Modos de duración (exe" +
+"c, 1d, 7d, 15d, 30d, 45d) ────────\r\n            if (mode === \'exec\') {\r\n        " +
+"        var sorted = allDetailJobs\r\n                    .filter(function(j) { re" +
+"turn j.duration != null; })\r\n                    .sort(function(a, b) { return n" +
+"ew Date(a.lastTimestamp) - new Date(b.lastTimestamp); })\r\n                    .s" +
+"lice(-100);\r\n\r\n                sorted.forEach(function(j) {\r\n                   " +
+" var d = new Date(j.lastTimestamp);\r\n                    labels.push(d.toLocaleT" +
+"imeString([], { hour: \'2-digit\', minute: \'2-digit\' }));\r\n                    val" +
+"ues.push(parseFloat(j.duration.toFixed(2)));\r\n                });\r\n            }" +
+" else if (mode === \'1d\') {\r\n                var today = new Date().toISOString()" +
+".slice(0, 10);\r\n                var byHour = {};\r\n                allDetailJobs." +
+"forEach(function(j) {\r\n                    if (j.duration == null) return;\r\n    " +
+"                var ts = new Date(j.lastTimestamp);\r\n                    if (ts." +
+"toISOString().slice(0, 10) !== today) return;\r\n                    var hour = ts" +
+".getHours();\r\n                    if (!byHour[hour]) byHour[hour] = { total: 0, " +
+"count: 0 };\r\n                    byHour[hour].total += j.duration;\r\n            " +
+"        byHour[hour].count += 1;\r\n                });\r\n                for (var " +
+"h = 0; h <= 23; h++) {\r\n                    labels.push(String(h).padStart(2, \'0" +
+"\') + \':00\');\r\n                    var avg = byHour[h] ? (byHour[h].total / byHou" +
+"r[h].count) : null;\r\n                    values.push(avg !== null ? parseFloat(a" +
+"vg.toFixed(2)) : null);\r\n                }\r\n            } else {\r\n              " +
+"  var dayOptions = { \'7d\': 7, \'15d\': 15, \'30d\': 30, \'45d\': 45 };\r\n              " +
+"  var days = dayOptions[mode] || 7;\r\n                var cutoff = new Date();\r\n " +
+"               cutoff.setDate(cutoff.getDate() - days);\r\n                var byD" +
+"ay = {};\r\n                allDetailJobs.forEach(function(j) {\r\n                 " +
+"   if (j.duration == null) return;\r\n                    var ts = new Date(j.last" +
+"Timestamp);\r\n                    if (ts < cutoff) return;\r\n                    v" +
+"ar key = ts.toISOString().slice(0, 10);\r\n                    if (!byDay[key]) by" +
+"Day[key] = { total: 0, count: 0 };\r\n                    byDay[key].total += j.du" +
+"ration;\r\n                    byDay[key].count += 1;\r\n                });\r\n      " +
+"          for (var i = days - 1; i >= 0; i--) {\r\n                    var d = new" +
+" Date();\r\n                    d.setDate(d.getDate() - i);\r\n                    v" +
+"ar key = d.toISOString().slice(0, 10);\r\n                    labels.push(key.slic" +
+"e(5));\r\n                    var avg = byDay[key] ? (byDay[key].total / byDay[key" +
+"].count) : null;\r\n                    values.push(avg !== null ? parseFloat(avg." +
+"toFixed(2)) : null);\r\n                }\r\n            }\r\n\r\n            // ── Valo" +
+"res filtrados (sin nulos/NaN) ───────────────────────\r\n            var filteredV" +
+"als = (values || []).filter(function(v) { return v != null && !isNaN(v); });\r\n\r\n" +
+"            // ── Línea de promedio y alerta de umbral ────────────────────\r\n   " +
+"         var avgValue = filteredVals.length > 0\r\n                ? filteredVals." +
+"reduce(function(a, b) { return a + b; }, 0) / filteredVals.length\r\n             " +
+"   : null;\r\n\r\n            var threshold = parseFloat($(\'alert-threshold\').value)" +
+";\r\n            if (isNaN(threshold)) threshold = 5;\r\n            var exceeded = " +
+"avgValue !== null && avgValue > threshold;\r\n            var lineColor = exceeded" +
+" ? \'#d9534f\' : \'#337ab7\';\r\n\r\n            if ($(\'alert-banner\')) {\r\n             " +
+"   $(\'alert-banner\').style.display = exceeded ? \'block\' : \'none\';\r\n            }" +
+"\r\n\r\n            // ── Percentiles ─────────────────────────────────────────────\r" +
+"\n            var sortedVals = filteredVals.slice().sort(function(a, b) { return " +
+"a - b; });\r\n            var min = sortedVals[0] || 0;\r\n            var max = sor" +
+"tedVals[sortedVals.length - 1] || 0;\r\n            var p95 = sortedVals[Math.floo" +
+"r(sortedVals.length * 0.95)] || max;\r\n\r\n            document.getElementById(\'cha" +
+"rt-stats\').innerHTML =\r\n                \'<span class=\"label label-default\">Min: " +
+"\' + min.toFixed(1) + \'s</span> \' +\r\n                \'<span class=\"label label-de" +
+"fault\">Max: \' + max.toFixed(1) + \'s</span> \' +\r\n                \'<span class=\"la" +
+"bel label-default\">P95: \' + p95.toFixed(1) + \'s</span>\';\r\n\r\n\r\n            // ── " +
+"Gráfico de duración ─────────────────────────────────────\r\n            var ctx =" +
+" document.getElementById(\'duration-chart\').getContext(\'2d\');\r\n            if (du" +
+"rationChart) durationChart.destroy();\r\n\r\n            durationChart = new Chart(c" +
+"tx, {\r\n                type: \'line\',\r\n                data: {\r\n                 " +
+"   labels: labels,\r\n                    datasets: [{\r\n                        la" +
+"bel: \'Avg Duration (s)\',\r\n                        data: values,\r\n               " +
+"         borderColor: lineColor,\r\n                        backgroundColor: \'rgba" +
+"(51,122,183,0.08)\',\r\n                        pointBackgroundColor: function(ctx)" +
+" {\r\n                            var v = ctx.raw;\r\n                            if" +
+" (v == null) return \'#ccc\';\r\n                            return v < 1 ? \'#5cb85c" +
+"\' : v < 5 ? \'#f0ad4e\' : \'#d9534f\';\r\n                        },\r\n                " +
+"        pointRadius: mode === \'exec\' ? 4 : 5,\r\n                        pointHove" +
+"rRadius: 7,\r\n                        borderWidth: 2,\r\n                        te" +
+"nsion: mode === \'exec\' ? 0.2 : 0.3,\r\n                        spanGaps: true\r\n   " +
+"                 }]\r\n                },\r\n                options: {\r\n           " +
+"         responsive: true,\r\n                    maintainAspectRatio: true,\r\n    " +
+"                aspectRatio: 4,\r\n                    plugins: {\r\n               " +
+"         legend: { display: false },\r\n                        tooltip: {\r\n      " +
+"                      callbacks: {\r\n                                label: funct" +
+"ion(ctx) {\r\n                                    return ctx.raw != null ? ctx.raw" +
+" + \'s\' : \'No data\';\r\n                                },\r\n                       " +
+"         title: function(items) {\r\n                                    if (mode " +
+"!== \'exec\') return items[0].label;\r\n                                    var job " +
+"= allDetailJobs\r\n                                        .filter(function(j) { r" +
+"eturn j.duration != null; })\r\n                                        .sort(func" +
+"tion(a, b) { return new Date(a.lastTimestamp) - new Date(b.lastTimestamp); })\r\n " +
+"                                       .slice(-100)[items[0].dataIndex];\r\n      " +
+"                              return job ? new Date(job.lastTimestamp).toLocaleS" +
+"tring() : items[0].label;\r\n                                }\r\n                  " +
+"          }\r\n                        }\r\n                    },\r\n                " +
+"    scales: {\r\n                        y: {\r\n                            beginAt" +
+"Zero: false,\r\n                            suggestedMin: 0,\r\n                    " +
+"        ticks: {\r\n                                callback: function(v) { return" +
+" v + \'s\'; },\r\n                                maxTicksLimit: 6\r\n                " +
+"            },\r\n                            grid: { color: \'rgba(0,0,0,0.05)\' }\r" +
+"\n                        },\r\n                        x: {\r\n                     " +
+"       grid: { display: false },\r\n                            ticks: {\r\n        " +
+"                        maxTicksLimit: mode === \'1d\' ? 24 : 10,\r\n               " +
+"                 autoSkip: mode !== \'1d\',\r\n                                maxRo" +
+"tation: 0\r\n                            }\r\n                        }\r\n           " +
+"         }\r\n                }\r\n            });\r\n        }\r\n\r\n        // ── Sort " +
+"indicators ───────────────────────────────────────\r\n        function updateSortI" +
+"ndicators() {\r\n            document.querySelectorAll(\'#detail-table th.sortable\'" +
+").forEach(function(th) {\r\n                th.classList.remove(\'asc\', \'desc\');\r\n " +
+"               if (th.getAttribute(\'data-sort\') === currentSort.field) {\r\n      " +
+"              th.classList.add(currentSort.direction);\r\n                }\r\n     " +
+"       });\r\n        }\r\n\r\n        // ── URL helpers ─────────────────────────────" +
+"──────────────\r\n        function jobDetailUrl(jobId) { return \'");
 
 
             
-            #line 953 "..\..\Pages\JobStatus.cshtml"
+            #line 1089 "..\..\Pages\JobStatus.cshtml"
                                           Write(Url.To("/jobs/details"));
 
             
@@ -710,7 +764,7 @@ WriteLiteral("\' + \'/\' + jobId; }\r\n        function queueUrl(queue)     { re
 
 
             
-            #line 954 "..\..\Pages\JobStatus.cshtml"
+            #line 1090 "..\..\Pages\JobStatus.cshtml"
                                           Write(Url.To("/jobs/enqueued"));
 
             

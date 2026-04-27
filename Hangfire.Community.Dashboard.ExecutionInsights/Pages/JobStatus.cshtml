@@ -259,6 +259,7 @@
                             <button class="btn btn-default" data-mode="15d">15 days</button>
                             <button class="btn btn-default" data-mode="30d">30 days</button>
                             <button class="btn btn-default" data-mode="45d">45 days</button>
+                            <button class="btn btn-default" data-mode="throughput">Throughput</button> 
                         </div>
                         <div class="row" style="margin:8px 0;">
                             <div class="col-md-4">
@@ -770,6 +771,7 @@
             });
         }
 
+
         // ── Duration Chart ────────────────────────────────────────
         function renderDurationChart(mode) {
 
@@ -777,8 +779,151 @@
 
             var labels = [], values = [];
 
+            // ── Throughput: barras (total) + línea (tasa de éxito) ─────
+           if (mode === 'throughput') {
+    var now = new Date();
+    var since = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    var byHour = {};
+    allDetailJobs.forEach(function (j) {
+        var ts = new Date(j.lastTimestamp);
+        if (ts >= since && ts <= now) {
+            var hourKey = ts.getHours();
+            if (!byHour[hourKey]) byHour[hourKey] = { total: 0, success: 0 };
+            byHour[hourKey].total++;
+            if (j.lastState === 'Succeeded') byHour[hourKey].success++;
+        }
+    });
+
+    var labels = [];
+    var totalExecs = [];
+    var successRates = [];
+
+    for (var h = 0; h < 24; h++) {
+        labels.push(('0' + h).slice(-2) + ':00');
+
+        var bucket = byHour[h] || { total: 0, success: 0 };
+        totalExecs.push(bucket.total);
+
+        var rate = bucket.total > 0 ? (bucket.success / bucket.total * 100) : null;
+        successRates.push(rate != null ? Math.round(rate) : null);
+    }
+
+    var datasets = [
+        {
+            label: 'Total Executions',
+            type: 'bar',
+            data: totalExecs,
+            backgroundColor: 'rgba(51,122,183,0.6)',
+            borderColor: '#337ab7',
+            borderWidth: 1,
+            yAxisID: 'y-count'
+        },
+        {
+            label: 'Success Rate (%)',
+            type: 'line',
+            data: successRates,
+            borderColor: '#5cb85c',
+            backgroundColor: 'transparent',
+            pointBackgroundColor: '#5cb85c',
+            pointRadius: 3,
+            lineTension: 0.2,
+            spanGaps: true,
+            yAxisID: 'y-rate'
+        }
+    ];
+
+    var chartOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 4,
+        tooltips: {
+            callbacks: {
+                label: function (tooltipItem, data) {
+                    var value = tooltipItem.yLabel;
+                    if (tooltipItem.datasetIndex === 1 && value != null) {
+                        return value + '%';
+                    }
+                    return value + ' jobs';
+                }
+            }
+        },
+        scales: {
+            xAxes: [{
+                gridLines: { display: false }
+            }],
+            yAxes: [
+                {
+                    id: 'y-count',
+                    position: 'left',
+                    ticks: { beginAtZero: true },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Executions'
+                    },
+                    gridLines: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                {
+                    id: 'y-rate',
+                    position: 'right',
+                    ticks: {
+                        beginAtZero: true,
+                        suggestedMin: 0,
+                        suggestedMax: 100,
+                        callback: function (v) { return v + '%'; }
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Success Rate (%)'
+                    },
+                    gridLines: {
+                        drawOnChartArea: false
+                    }
+                }
+            ]
+        }
+    };
+
+    var container = document.getElementById('duration-chart-panel');
+
+    if (container) {
+        var oldCanvas = document.getElementById('duration-chart');
+        if (oldCanvas) oldCanvas.remove();
+
+        var newCanvas = document.createElement('canvas');
+        newCanvas.id = 'duration-chart';
+        container.appendChild(newCanvas);
+
+        var ctx = newCanvas.getContext('2d');
+        if (!ctx) return;
+
+        try {
+            if (durationChart) {
+                durationChart.destroy();
+                durationChart = null;
+            }
+
+            durationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: chartOptions
+            });
+
+        } catch (e) {
+            console.error('Error al crear el gráfico de throughput:', e);
+        }
+    }
+
+    return;
+}
+
+            // ── Modos de duración (exec, 1d, 7d, 15d, 30d, 45d) ────────
             if (mode === 'exec') {
-                // Últimas 100 ejecuciones individuales, sin agrupar
                 var sorted = allDetailJobs
                     .filter(function(j) { return j.duration != null; })
                     .sort(function(a, b) { return new Date(a.lastTimestamp) - new Date(b.lastTimestamp); })
@@ -789,12 +934,9 @@
                     labels.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
                     values.push(parseFloat(j.duration.toFixed(2)));
                 });
-
             } else if (mode === '1d') {
-                // Agrupar por hora del día actual (00:00 - 23:59)
                 var today = new Date().toISOString().slice(0, 10);
                 var byHour = {};
-
                 allDetailJobs.forEach(function(j) {
                     if (j.duration == null) return;
                     var ts = new Date(j.lastTimestamp);
@@ -804,20 +946,16 @@
                     byHour[hour].total += j.duration;
                     byHour[hour].count += 1;
                 });
-
                 for (var h = 0; h <= 23; h++) {
                     labels.push(String(h).padStart(2, '0') + ':00');
                     var avg = byHour[h] ? (byHour[h].total / byHour[h].count) : null;
                     values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);
                 }
-
             } else {
-                // Agrupar por día para 7d, 15d, 30d, 45d
                 var dayOptions = { '7d': 7, '15d': 15, '30d': 30, '45d': 45 };
                 var days = dayOptions[mode] || 7;
                 var cutoff = new Date();
                 cutoff.setDate(cutoff.getDate() - days);
-
                 var byDay = {};
                 allDetailJobs.forEach(function(j) {
                     if (j.duration == null) return;
@@ -828,47 +966,46 @@
                     byDay[key].total += j.duration;
                     byDay[key].count += 1;
                 });
-
                 for (var i = days - 1; i >= 0; i--) {
                     var d = new Date();
                     d.setDate(d.getDate() - i);
                     var key = d.toISOString().slice(0, 10);
-                    labels.push(key.slice(5)); // MM-DD
+                    labels.push(key.slice(5));
                     var avg = byDay[key] ? (byDay[key].total / byDay[key].count) : null;
                     values.push(avg !== null ? parseFloat(avg.toFixed(2)) : null);
                 }
             }
 
-                // ── Calcular promedio (con defensa extra) ──────────────────
+            // ── Valores filtrados (sin nulos/NaN) ───────────────────────
             var filteredVals = (values || []).filter(function(v) { return v != null && !isNaN(v); });
+
+            // ── Línea de promedio y alerta de umbral ────────────────────
             var avgValue = filteredVals.length > 0
                 ? filteredVals.reduce(function(a, b) { return a + b; }, 0) / filteredVals.length
                 : null;
 
-            // ── Alerta de umbral ───────────────────────────────────────
             var threshold = parseFloat($('alert-threshold').value);
             if (isNaN(threshold)) threshold = 5;
-
-            var avgOfValues = avgValue; // reutilizar
-            var exceeded = avgOfValues !== null && avgOfValues > threshold;
+            var exceeded = avgValue !== null && avgValue > threshold;
             var lineColor = exceeded ? '#d9534f' : '#337ab7';
 
             if ($('alert-banner')) {
                 $('alert-banner').style.display = exceeded ? 'block' : 'none';
             }
 
-            //Percentiles
-
-            var filteredVals = values.filter(v => v != null).sort((a,b) => a - b);
-            var min = filteredVals[0] || 0;
-            var max = filteredVals[filteredVals.length-1] || 0;
-            var p95 = filteredVals[Math.floor(filteredVals.length * 0.95)] || max;
+            // ── Percentiles ─────────────────────────────────────────────
+            var sortedVals = filteredVals.slice().sort(function(a, b) { return a - b; });
+            var min = sortedVals[0] || 0;
+            var max = sortedVals[sortedVals.length - 1] || 0;
+            var p95 = sortedVals[Math.floor(sortedVals.length * 0.95)] || max;
 
             document.getElementById('chart-stats').innerHTML =
                 '<span class="label label-default">Min: ' + min.toFixed(1) + 's</span> ' +
                 '<span class="label label-default">Max: ' + max.toFixed(1) + 's</span> ' +
                 '<span class="label label-default">P95: ' + p95.toFixed(1) + 's</span>';
 
+
+            // ── Gráfico de duración ─────────────────────────────────────
             var ctx = document.getElementById('duration-chart').getContext('2d');
             if (durationChart) durationChart.destroy();
 
@@ -880,7 +1017,6 @@
                         label: 'Avg Duration (s)',
                         data: values,
                         borderColor: lineColor,
-                        borderColor: '#337ab7',
                         backgroundColor: 'rgba(51,122,183,0.08)',
                         pointBackgroundColor: function(ctx) {
                             var v = ctx.raw;
