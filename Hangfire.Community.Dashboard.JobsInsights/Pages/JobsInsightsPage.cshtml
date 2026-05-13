@@ -1,0 +1,48 @@
+﻿@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.JobsInsights.Pages *@
+@using Hangfire.Dashboard
+@using Hangfire.Dashboard.Pages
+@using Hangfire.Dashboard
+@using Hangfire.Community.Dashboard.JobsInsights
+@using Hangfire.Community.Dashboard.JobsInsights.Pages
+@inherits Hangfire.Dashboard.RazorPage
+@{
+    Layout = new LayoutPage(JobsInsightsPage.Title);
+}
+<div class="jobs-insights-dashboard">
+    <div class="container-fluid">
+        @Html.RenderPartial(new _TopBar())
+        @Html.RenderPartial(new _SummaryView())
+    </div>
+
+    <!-- Modal oculto por defecto -->
+    @Html.RenderPartial(new _DetailModal())
+
+    <!-- Tooltip para los dots (lo dejamos dentro del dashboard) -->
+    <div id="dot-tooltip" style="display:none; position:fixed; background:#333; color:#fff; padding:8px 12px; border-radius:4px; font-size:12px; z-index:9999; pointer-events:none;"></div>
+</div>
+
+@* Configuración JS inline y arranque *@
+<script>
+    (function() {
+        window.JobsInsightsConfig = {
+            summaryApiUrl: '@Url.To(JobsInsightsExtension.RouteBase)/api/jobtype-summary',
+            detailApiUrl:  '@Url.To(JobsInsightsExtension.RouteBase)/api/jobtype-detail',
+            adminApiBase:  '@Url.To(JobsInsightsExtension.RouteBase)/api/admin',
+            version:       '@(typeof(JobsInsightsExtension).Assembly.GetName().Version.ToString(3))',
+            jobDetailBase: '@Url.To("/jobs/details")',
+            queueBase:     '@Url.To("/jobs/enqueued")'
+        };
+        // Disparar inicio cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.JobsInsights && window.JobsInsights.init) {
+                    window.JobsInsights.init();
+                }
+            });
+        } else {
+            if (window.JobsInsights && window.JobsInsights.init) {
+                window.JobsInsights.init();
+            }
+        }
+    })();
+</script>

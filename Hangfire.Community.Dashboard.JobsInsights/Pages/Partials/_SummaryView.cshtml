@@ -1,0 +1,81 @@
+@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.JobsInsights.Pages *@
+@using Hangfire.Dashboard
+@inherits Hangfire.Dashboard.RazorPage
+
+<div id="summary-view">
+    <div class="row" id="cleanup-section">
+        <!-- Filtro por nombre de job -->
+        <div class="col-md-3">
+            <input type="text" class="form-control input-sm" id="summary-jobtype-filter" placeholder="Filter by job type...">
+        </div>
+
+        <!-- Filtro de estado + Apply -->
+        <div class="col-md-3">
+            <div class="input-group">
+                <select class="form-control input-sm" id="summary-state-filter">
+                    <option value="">All States</option>
+                    <option value="Succeeded">Success</option>
+                    <option value="Failed">Failed</option>
+                </select>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary btn-sm" id="summary-apply">Apply</button>
+                </span>
+            </div>
+        </div>
+
+        <!-- Retention days + Delete -->
+        <div class="col-md-3 col-md-offset-3">
+            <div class="input-group">
+                <span class="input-group-addon">Retention days</span>
+                <input type="number" class="form-control input-sm" id="retention-days" value="30" min="1" max="99" maxlength="2" style="width:90px;" />
+                <span class="input-group-btn">
+                    <button class="btn btn-danger btn-sm" id="cleanup-btn">Delete older</button>
+                </span>
+            </div>
+            <span id="cleanup-msg" class="text-muted small"></span>
+        </div>
+    </div>
+
+    <br/>
+
+    <!-- Estadísticas rápidas -->
+    <div class="row" style="margin-bottom:15px;">
+        <div class="col-md-3">
+            <span class="label label-default">Types: <strong id="stat-types">-</strong></span>
+        </div>
+        <div class="col-md-3">
+            <span class="label label-info">Total Executions: <strong id="stat-total">-</strong></span>
+        </div>
+        <div class="col-md-3">
+            <span class="label label-success">Success Rate: <strong id="stat-rate">-</strong></span>
+        </div>
+        <div class="col-md-3">
+            <span class="label label-default">Updated: <strong id="stat-updated">-</strong></span>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:15px;">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="summary-table">
+                    <thead>
+                        <tr>
+                            <th>Job Type</th>
+                            <th>Last 15 Executions</th>
+                            <th>Success</th>
+                            <th>Failed</th>
+                            <th>Last Execution</th>
+                            <th>Avg Duration</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summary-body">
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

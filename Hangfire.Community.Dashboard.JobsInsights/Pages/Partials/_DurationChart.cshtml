@@ -1,0 +1,43 @@
+@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.JobsInsights.Pages *@
+@using Hangfire.Dashboard
+@inherits Hangfire.Dashboard.RazorPage
+
+<div id="duration-chart-panel">
+    <div class="chart-header">
+        <p class="chart-title">
+            <span class="glyphicon glyphicon-stats"></span>
+            Avg Duration Trend
+        </p>
+
+        <div class="btn-group btn-group-xs">
+            <button class="btn btn-default btn-xs" id="export-chart" title="Save chart as PNG">
+                <span class="glyphicon glyphicon-picture"></span> Save PNG
+            </button>
+            <button class="btn btn-default active" data-mode="exec">Last 100 exec</button>
+            <button class="btn btn-default" data-mode="1d">1 day</button>
+            <button class="btn btn-default" data-mode="7d">7 days</button>
+            <button class="btn btn-default" data-mode="15d">15 days</button>
+            <button class="btn btn-default" data-mode="30d">30 days</button>
+            <button class="btn btn-default" data-mode="45d">45 days</button>
+            <button class="btn btn-default" data-mode="throughput">Throughput</button>
+        </div>
+
+        <div class="row" style="margin:8px 0;">
+            <div class="col-md-4">
+                <div class="input-group input-group-sm">
+                    <span class="input-group-addon">Alert if avg ></span>
+                    <input type="number" class="form-control" id="alert-threshold" value="5" step="0.5" min="0" style="width:80px;">
+                    <span class="input-group-addon">s</span>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div id="alert-banner" class="alert alert-danger" style="display:none; padding:6px 12px; margin:0;">
+                    <strong>Threshold exceeded!</strong> Current average duration is above the limit.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="duration-chart"></canvas>
+    <div id="chart-stats" class="text-center"></div>
+</div>

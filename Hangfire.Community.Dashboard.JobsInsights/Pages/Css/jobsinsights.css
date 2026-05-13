@@ -1,0 +1,264 @@
+/* ═══════════════════════════════════════════════════
+   Hangfire.Community.Dashboard.JobsInsights - DARK MODE
+   Prefixed: .jobs-insights-dashboard
+   ══════════════════════════════════════════════════ */
+
+.jobs-insights-dashboard {
+    /* Variables de tema (Dark Mode) */
+    --ji-bg: #1e1e1e;
+    --ji-text: #e0e0e0;
+    --ji-muted: #a0a0a0;
+    --ji-border: #444;
+    --ji-success: #5cb85c;
+    --ji-danger: #d9534f;
+    --ji-warning: #f0ad4e;
+    --ji-info: #5dade2;
+    --ji-radius: 4px;
+    --ji-transition: 0.15s ease;
+    background: var(--ji-bg);
+    color: var(--ji-text);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+    /* ===== Puntos de colores para el resumen ===== */
+    .jobs-insights-dashboard .state-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 3px;
+        background-color: #555;
+        cursor: pointer;
+        transition: transform var(--ji-transition);
+    }
+
+        .jobs-insights-dashboard .state-dot:hover {
+            transform: scale(1.4);
+        }
+
+        .jobs-insights-dashboard .state-dot.succeeded {
+            background-color: var(--ji-success);
+        }
+
+        .jobs-insights-dashboard .state-dot.failed {
+            background-color: var(--ji-danger);
+        }
+
+        .jobs-insights-dashboard .state-dot.processing {
+            background-color: var(--ji-warning);
+        }
+
+    /* ===== Cabeceras ordenables ===== */
+    .jobs-insights-dashboard th.sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .jobs-insights-dashboard th.sortable:hover {
+            background-color: #333;
+        }
+
+        .jobs-insights-dashboard th.sortable::after {
+            content: " ⇅";
+            opacity: 0.3;
+        }
+
+        .jobs-insights-dashboard th.sortable.asc::after {
+            content: " ↑";
+            opacity: 1;
+        }
+
+        .jobs-insights-dashboard th.sortable.desc::after {
+            content: " ↓";
+            opacity: 1;
+        }
+
+/* ===== Animación de fade-in (prefijo único) ===== */
+@keyframes jobs-insights-fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.jobs-insights-dashboard .fade-in {
+    animation: jobs-insights-fadeIn 0.3s;
+}
+
+/* ===== Sticky header para la tabla de resumen ===== */
+.jobs-insights-dashboard #summary-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #22272e;
+    z-index: 10;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* ===== Fila danger si último estado es Failed ===== */
+.jobs-insights-dashboard tr.last-failed td {
+    background-color: rgba(217, 83, 79, 0.15) !important;
+}
+
+/* ===== Badge de fallos consecutivos ===== */
+.jobs-insights-dashboard .consecutive-badge {
+    margin-left: 4px;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+/* ===== Avg Duration coloreado ===== */
+.jobs-insights-dashboard .dur-green {
+    color: #7ccc7c;
+    font-weight: bold;
+}
+
+.jobs-insights-dashboard .dur-yellow {
+    color: #ffc966;
+    font-weight: bold;
+}
+
+.jobs-insights-dashboard .dur-red {
+    color: #ff8a80;
+    font-weight: bold;
+}
+
+/* ===== Tooltip para los dots ===== */
+.jobs-insights-dashboard #dot-tooltip a {
+    color: #7dd3fc;
+}
+
+/* ===== Panel del gráfico de duración ===== */
+.jobs-insights-dashboard #duration-chart-panel {
+    background: #22272e;
+    border: 1px solid #444;
+    border-radius: var(--ji-radius);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+}
+
+    .jobs-insights-dashboard #duration-chart-panel .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .jobs-insights-dashboard #duration-chart-panel .chart-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #c0c0c0;
+        margin: 0;
+    }
+
+    .jobs-insights-dashboard #duration-chart-panel canvas {
+        display: block;
+    }
+
+/* ===== Estados de las badges (sobrescritas si Bootstrap está presente) ===== */
+.jobs-insights-dashboard .label-success {
+    background-color: var(--ji-success);
+}
+
+.jobs-insights-dashboard .label-danger {
+    background-color: var(--ji-danger);
+}
+
+.jobs-insights-dashboard .label-default {
+    background-color: #555;
+}
+
+/* ===== Botones auxiliares ===== */
+.jobs-insights-dashboard .btn {
+    transition: all var(--ji-transition);
+}
+
+/* ===== Tablas ===== */
+.jobs-insights-dashboard .table-responsive {
+    margin-top: 10px;
+}
+
+/* ===== Scrollbars (opcional) ===== */
+.jobs-insights-dashboard ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.jobs-insights-dashboard ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.jobs-insights-dashboard ::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 3px;
+}
+
+    .jobs-insights-dashboard ::-webkit-scrollbar-thumb:hover {
+        background: #777;
+    }
+
+
+/* ── Modal de detalle (dentro de .jobs-insights-dashboard) ── */
+.jobs-insights-dashboard .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1050;
+    display: none;
+    backdrop-filter: blur(2px);
+}
+
+.jobs-insights-dashboard .modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 1200px;
+    max-height: 90vh;
+    background: #22272e;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    z-index: 1051;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.jobs-insights-dashboard .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #444;
+    background: #2a2a2a;
+}
+
+    .jobs-insights-dashboard .modal-header h4 {
+        margin: 0;
+        font-size: 18px;
+        color: #e0e0e0;
+    }
+
+.jobs-insights-dashboard .modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #a0a0a0;
+    padding: 0 5px;
+}
+
+    .jobs-insights-dashboard .modal-close:hover {
+        color: #d9534f;
+    }
+
+.jobs-insights-dashboard .modal-body {
+    padding: 15px 20px;
+    overflow-y: auto;
+    flex: 1;
+    color: #e0e0e0;
+}

@@ -54,27 +54,55 @@
 
 	<!-- Razor -->
 	<ItemGroup>
-		<Compile Update="Pages\JobStatus.cshtml.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>JobStatus.cshtml</DependentUpon>
-		</Compile>
-		<!-- Agrega más archivos aquí siguiendo el mismo patrón -->
-	</ItemGroup>
-	<ItemGroup>
-		<None Update="Pages\JobStatus.cshtml">
+		<!-- Vista principal (JobsInsightsPage) -->
+		<None Update="Pages\JobsInsightsPage.cshtml">
 			<Generator>RazorGenerator</Generator>
-			<LastGenOutput>JobStatus.cshtml.cs</LastGenOutput>
+			<LastGenOutput>JobsInsightsPage.cshtml.cs</LastGenOutput>
 		</None>
+
+		<!-- Vistas parciales -->
+		<None Update="Pages\_TopBar.cshtml">
+			<Generator>RazorGenerator</Generator>
+			<LastGenOutput>_TopBar.cshtml.cs</LastGenOutput>
+		</None>
+		<None Update="Pages\_SummaryView.cshtml">
+			<Generator>RazorGenerator</Generator>
+			<LastGenOutput>_SummaryView.cshtml.cs</LastGenOutput>
+		</None>
+		<None Update="Pages\_DurationChart.cshtml">
+			<Generator>RazorGenerator</Generator>
+			<LastGenOutput>_DurationChart.cshtml.cs</LastGenOutput>
+		</None>
+		<None Update="Pages\_DetailView.cshtml">
+			<Generator>RazorGenerator</Generator>
+			<LastGenOutput>_DetailView.cshtml.cs</LastGenOutput>
+		</None>
+
 		<!-- Agrega más archivos aquí siguiendo el mismo patrón -->
 	</ItemGroup>
 
 
 	<!-- Dependencias -->
 	<ItemGroup>
-		<PackageReference Include="HangFire.Core" Version="1.7.28" />
+		<PackageReference Include="HangFire.Core" Version="1.8.0" />
 		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 		<PackageReference Include="RazorGenerator.MsBuild" Version="2.5.0" PrivateAssets="all" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Pages\Js\" />
+	  <Folder Include="Pages\Css\" />
+
+		<!-- Archivos js modulares -->
+		<EmbeddedResource Include="Pages\Js\jobsinsights.util.js" />
+		<EmbeddedResource Include="Pages\Js\jobsinsights.chart.js" />
+		<EmbeddedResource Include="Pages\Js\jobsinsights.summary.js" />
+		<EmbeddedResource Include="Pages\Js\jobsinsights.modal.js" />
+		<EmbeddedResource Include="Pages\Js\jobsinsights.init.js" />
+
+		<!-- Archivos css modulares -->
+		<EmbeddedResource Include="Pages\Css\jobsinsights.css" />
+	</ItemGroup>
+	
+	
 
 </Project>

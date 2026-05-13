@@ -18,12 +18,36 @@ namespace Hangfire.Community.Dashboard.JobsInsights
             DashboardRoutes.Routes.Add($"{RouteBase}/api/admin/(?<path>.+)", new PluginAdminApi());
 
             // Página principal
-            DashboardRoutes.Routes.AddRazorPage(RouteBase, x => new JobStatus());
+            DashboardRoutes.Routes.AddRazorPage(RouteBase, x => new JobsInsightsPage());
 
-            NavigationMenu.Items.Add(page => new MenuItem(JobStatus.Title, page.Url.To(RouteBase))
+            NavigationMenu.Items.Add(page => new MenuItem(JobsInsightsPage.Title, page.Url.To(RouteBase))
             {
                 Active = page.RequestPath == RouteBase || page.RequestPath.StartsWith($"{RouteBase}/")
             });
+
+            // ===== Recursos estáticos =====
+            var assembly = typeof(JobsInsightsExtension).Assembly;
+
+            // CSS
+            DashboardRoutes.AddStylesheet(assembly,
+                "Hangfire.Community.Dashboard.JobsInsights.Pages.Css.jobsinsights.css");
+
+            // JavaScript (orden de dependencia)
+            DashboardRoutes.AddJavaScript(assembly,
+                "Hangfire.Community.Dashboard.JobsInsights.Pages.Js.jobsinsights.util.js");
+
+            DashboardRoutes.AddJavaScript(assembly,
+                "Hangfire.Community.Dashboard.JobsInsights.Pages.Js.jobsinsights.chart.js");
+
+            DashboardRoutes.AddJavaScript(assembly,
+                "Hangfire.Community.Dashboard.JobsInsights.Pages.Js.jobsinsights.summary.js");
+
+            DashboardRoutes.AddJavaScript(assembly,
+                "Hangfire.Community.Dashboard.JobsInsights.Pages.Js.jobsinsights.modal.js");
+
+            DashboardRoutes.AddJavaScript(assembly,
+                "Hangfire.Community.Dashboard.JobsInsights.Pages.Js.jobsinsights.init.js");
+
 
             return config;
         }

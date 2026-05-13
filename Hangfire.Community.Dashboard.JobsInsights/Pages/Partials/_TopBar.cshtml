@@ -1,0 +1,40 @@
+@* Generator: Template TypeVisibility: Internal GeneratePrettyNames: True Namespace: Hangfire.Community.Dashboard.JobsInsights.Pages *@
+@using Hangfire.Dashboard
+@inherits Hangfire.Dashboard.RazorPage
+
+<div class="topbar">
+    <h3>
+        @JobsInsightsPage.Title
+        <small class="text-muted" id="version-display"></small>
+
+        <!-- Selector de auto-refresh -->
+        <div class="btn-group pull-right" style="margin-left:5px;">
+            <button class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">
+                <span class="glyphicon glyphicon-time"></span>
+                <span id="refresh-interval-label">15s</span>
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right">
+                <li><a href="#" class="refresh-interval-opt" data-seconds="5">Every 5s</a></li>
+                <li><a href="#" class="refresh-interval-opt" data-seconds="15">Every 15s</a></li>
+                <li><a href="#" class="refresh-interval-opt" data-seconds="30">Every 30s</a></li>
+                <li><a href="#" class="refresh-interval-opt" data-seconds="60">Every 60s</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" class="refresh-interval-opt" data-seconds="0">
+                    <span class="glyphicon glyphicon-pause"></span> Paused
+                </a></li>
+            </ul>
+        </div>
+
+        <!-- Exportar CSV -->
+        <button class="btn btn-default btn-sm pull-right" id="export-csv" style="margin-left:5px;" title="Export current view to CSV">
+            <span class="glyphicon glyphicon-download-alt"></span> Export CSV
+        </button>
+
+        <!-- Refresh manual -->
+        <button class="btn btn-default btn-sm pull-right" id="refresh-btn">
+            <span class="glyphicon glyphicon-refresh"></span> Refresh
+        </button>
+    </h3>
+    <hr />
+</div>
